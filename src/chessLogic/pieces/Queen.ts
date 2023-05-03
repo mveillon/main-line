@@ -4,8 +4,19 @@ class Queen extends Piece {
     readonly whiteEmoji: string = '♕'
     readonly blackEmoji: string = '♛'
 
-    legalMoves(): Set<string> {
-        return new Set()
+    legalMovesNoChecks(): Set<string> {
+        const direcs: [number, number][] = [
+            [ 1,  0],
+            [-1,  0],
+            [ 0,  1],
+            [ 0, -1],
+            [-1, -1],
+            [-1,  1],
+            [ 1,  1],
+            [ 1, -1]
+        ]
+
+        return this._straightLineMoves(direcs)
     }
 }
 

@@ -109,9 +109,14 @@ class Board {
         }
 
         this._board[toI][toJ] = p
+        this._board[fromI][fromJ] = null
         p.coords = to
         if (p instanceof King || p instanceof Pawn) {
             p.hasMoved = true
+        }
+
+        if (p instanceof Pawn && (toJ === 0 || toJ === 7)) {
+            p.promote()
         }
     }
 
@@ -123,18 +128,19 @@ class Board {
      * @param coords the coords to move to
      * @param color whose turn it is
      * @returns whether the square is out of bounds and unoccupied or
-     * occupied by an opposing piece
+     * occupied by an opposing piece. `true` if the square is blocked,
+     * `false` otherwise
      */
     blockedOOB(coords: [number, number], color: Color): boolean {
         if (
-            coords[0] < 0 || coords[0] > this._board.length ||
-            coords[1] < 0 || coords[1] > this._board[coords[0]].length
+            coords[0] < 0 || coords[0] >= this._board.length ||
+            coords[1] < 0 || coords[1] >= this._board[0].length
         ) {
-            return false
+            return true
         }
 
         const p = this._board[coords[0]][coords[1]]
-        return p !== null && p.color !== color
+        return p !== null && p.color === color
     }
 }
 

@@ -1,3 +1,5 @@
+import { addArrays } from "../../utils/numJS";
+import { indicesToNotation, notationToIndices } from "../notationIndices";
 import Piece from "./Piece";
 
 class King extends Piece {
@@ -5,8 +7,20 @@ class King extends Piece {
     readonly blackEmoji: string = '♚'
     hasMoved: boolean = false
 
-    legalMoves(): Set<string> {
-        return new Set()
+    // TODO : override legalMoves method and put castling in that
+    legalMovesNoChecks(): Set<string> {
+        const direcs: [number, number][] = [
+            [ 1,  0],
+            [-1,  0],
+            [ 0,  1],
+            [ 0, -1],
+            [-1, -1],
+            [-1,  1],
+            [ 1,  1],
+            [ 1, -1]
+        ]
+
+        return this._finiteMoves(direcs)
     }
 }
 

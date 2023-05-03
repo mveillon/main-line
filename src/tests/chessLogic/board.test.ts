@@ -1,5 +1,6 @@
 import { Board } from "../../chessLogic/Board";
 import Color from "../../chessLogic/Color";
+import { notationToIndices } from "../../chessLogic/notationIndices";
 import Bishop from "../../chessLogic/pieces/Bishop";
 import King from "../../chessLogic/pieces/King";
 import Knight from "../../chessLogic/pieces/Knight";
@@ -30,4 +31,42 @@ test('starting position', () => {
         expect(b.pieceAt(`${file}7`)).toBeInstanceOf(Pawn)
         expect((b.pieceAt(`${file}7`) as Piece).color).toBe(Color.Black)
     }
+})
+
+test('movePiece', () => {
+    const b = new Board()
+
+    b.movePiece('e2', 'e4')
+    expect(b.pieceAt('e2')).toBeNull()
+    expect(b.pieceAt('e4')).toBeInstanceOf(Pawn)
+    expect((b.pieceAt('e4') as Piece).coords).toBe('e4')
+    expect((b.pieceAt('e4') as Piece).color).toBe(Color.White)
+
+    b.movePiece('e7', 'e5')
+    expect(b.pieceAt('e7')).toBeNull()
+    expect(b.pieceAt('e5')).toBeInstanceOf(Pawn)
+    expect((b.pieceAt('e5') as Piece).coords).toBe('e5')
+    expect((b.pieceAt('e5') as Piece).color).toBe(Color.Black)
+})
+
+test('blockedOOB', () => {
+    const b = new Board()
+    expect(b.blockedOOB(notationToIndices('a1'), Color.White)).toBeTruthy()
+    expect(b.blockedOOB(notationToIndices('h1'), Color.White)).toBeTruthy()
+    expect(b.blockedOOB(notationToIndices('a1'), Color.Black)).toBeFalsy()
+    expect(b.blockedOOB(notationToIndices('h1'), Color.Black)).toBeFalsy()
+
+    expect(b.blockedOOB(notationToIndices('a8'), Color.Black)).toBeTruthy()
+    expect(b.blockedOOB(notationToIndices('h8'), Color.Black)).toBeTruthy()
+    expect(b.blockedOOB(notationToIndices('a8'), Color.White)).toBeFalsy()
+    expect(b.blockedOOB(notationToIndices('h8'), Color.White)).toBeFalsy()
+
+    expect(b.blockedOOB([-1, 7], Color.White)).toBeTruthy()
+    expect(b.blockedOOB([-1, 7], Color.Black)).toBeTruthy()
+    expect(b.blockedOOB([8, 0], Color.White)).toBeTruthy()
+    expect(b.blockedOOB([8, 0], Color.Black)).toBeTruthy()
+    expect(b.blockedOOB([0, -1], Color.White)).toBeTruthy()
+    expect(b.blockedOOB([0, -1], Color.Black)).toBeTruthy()
+    expect(b.blockedOOB([0, 8], Color.White)).toBeTruthy()
+    expect(b.blockedOOB([0, 8], Color.Black)).toBeTruthy()
 })
