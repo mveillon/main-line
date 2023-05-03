@@ -1,6 +1,13 @@
 import Piece from "./Piece";
 
 class Bishop extends Piece {
-    readonly letter: string = 'B' 
+    readonly whiteEmoji: string = '♗' 
+    readonly blackEmoji: string = '♝'
+
+    legalMoves(): Set<string> {
+        return new Set()
+    }
 }
+
+export default Bishop
 

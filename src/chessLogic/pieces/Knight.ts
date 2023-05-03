@@ -1,5 +1,12 @@
 import Piece from "./Piece";
 
 class Knight extends Piece {
-    readonly letter: string = 'N'
+    readonly whiteEmoji: string = '♘'
+    readonly blackEmoji: string = '♞'
+
+    legalMoves(): Set<string> {
+        return new Set()
+    }
 }
+
+export default Knight
