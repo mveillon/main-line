@@ -142,6 +142,49 @@ class Board {
         const p = this._board[coords[0]][coords[1]]
         return p !== null && p.color === color
     }
+
+    /**
+     * Checks whether, after moving the piece at `from` to `to`, whether 
+     * the king would be in check. Assumes the piece moving matches the 
+     * king that would be checked. 
+     * @param from the position the piece is moving from. 
+     * @param to the position the piece is moving to
+     * @returns whether the move would put the king in check
+     */
+    putsKingInCheck(from: string, to: string): boolean {
+        const p = this.pieceAt(from)
+        if (p === null) {
+            throw new Error(`${from} is an empty square`)
+        }
+
+        const oldPiece = this.pieceAt(to)
+        this.movePiece(from, to)
+
+        const backToNormal = () => {
+            this.movePiece(to, from)
+            const [i, j] = notationToIndices(to)
+            this._board[i][j] = oldPiece
+        }
+
+        const opposingColor = p.color === Color.White ? Color.Black : Color.White
+        const kingPos = this.findPieces(King, p.color)[0].coords
+
+        for (const row of this._board) {
+            for (const square of row) {
+                if (
+                    square !== null && 
+                    square.color === opposingColor && 
+                    square.legalMovesNoChecks().has(kingPos)
+                ) {
+                    backToNormal()
+                    return true
+                }
+            }
+        }
+
+        backToNormal()
+        return false
+    }
 }
 
 export { Board };

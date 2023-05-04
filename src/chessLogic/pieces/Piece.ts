@@ -24,6 +24,23 @@ abstract class Piece {
     abstract legalMovesNoChecks(): Set<string>;
 
     /**
+     * Finds all of the piece's legal moves, including checking if they 
+     * put the king in check
+     * @returns the set of legal moves of the piece
+     */
+    legalMoves(): Set<string> {
+        const res = this.legalMovesNoChecks()
+
+        for (let move of res) {
+            if (this._board.putsKingInCheck(this.coords, move)) {
+                res.delete(move)
+            }
+        }
+
+        return res
+    }
+
+    /**
      * Pieces that move in infinite straight lines (bishops, rooks, queens)
      * can use this helper method to find their legal moves just by providing
      * in which directions the piece can move

@@ -1,5 +1,3 @@
-import { addArrays } from "../../utils/numJS";
-import { indicesToNotation, notationToIndices } from "../notationIndices";
 import Piece from "./Piece";
 
 class King extends Piece {

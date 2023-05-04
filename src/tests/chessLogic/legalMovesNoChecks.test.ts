@@ -1,18 +1,12 @@
 import { Board } from "../../chessLogic/Board";
 import Piece from "../../chessLogic/pieces/Piece";
+import { compareSetToArray } from "./testUtilts";
 
 test('legalMovesNoChecks', () => {
     const b = new Board()
 
     const numMoves = (coord: string): number | undefined => {
         return b.pieceAt(coord)?.legalMovesNoChecks().size
-    }
-
-    const compareSetToArray = <T>(s: Set<T>, arr: T[]) => {
-        expect(arr.length).toBe(s.size)
-        for (const el of arr) {
-            expect(s.has(el)).toBeTruthy()
-        }
     }
 
     const cantMove = [
