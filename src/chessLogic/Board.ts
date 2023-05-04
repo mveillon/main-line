@@ -84,7 +84,7 @@ class Board {
                 if (
                     square !== null && 
                     square instanceof pieceType && 
-                    square.color == color &&
+                    square.color === color &&
                     (typeof file === "undefined" || square.coords[0] === file) &&
                     (typeof rank === "undefined" || square.coords[1] === rank)
                 ) {
@@ -101,9 +101,15 @@ class Board {
      * @param from the starting square
      * @param to the ending square
      * @param sideEffects whether or not to update the piece's hasMoved
+     * @param promoteType what type of piece to promote to if the move
+     * promotes a pawn
      * field and promote pawns. Good to turn off if making a hypothetical move
      */
-    movePiece(from: string, to: string, sideEffects: boolean = true) {
+    movePiece(
+        from: string, 
+        to: string, 
+        sideEffects: boolean = true,
+        promoteType?: typeof Piece) {
         const [fromI, fromJ] = notationToIndices(from)
         const [toI, toJ] = notationToIndices(to)
         const p = this._board[fromI][fromJ]
@@ -119,8 +125,13 @@ class Board {
             p.hasMoved = true
         }
 
-        if (sideEffects && p instanceof Pawn && (toJ === 0 || toJ === 7)) {
-            p.promote()
+        if (sideEffects && p instanceof Pawn && (toI === 0 || toI === 7)) {
+            if (typeof promoteType === 'undefined') {
+                throw new Error(
+                    `Undefined promotion type for promoting move when moving ${from} to ${to}`
+                )
+            }
+            p.promote(promoteType)
         }
     }
 

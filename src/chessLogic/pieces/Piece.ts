@@ -47,7 +47,7 @@ abstract class Piece {
      * @param direcs direction vectors that represent which ways the piece can move
      * @returns all possible moves the piece can make not counting checks
      */
-    protected _straightLineMoves(direcs: [number, number][]): Set<string> {
+    protected _infiniteMoves(direcs: [number, number][]): Set<string> {
         const res: Set<string> = new Set()
         const current = notationToIndices(this.coords)
 
@@ -65,7 +65,7 @@ abstract class Piece {
             }
             
         }
-        res.delete(indicesToNotation(...current))
+        res.delete(this.coords)
 
         return res
     }

@@ -51,9 +51,10 @@ class Pawn extends Piece {
 
     /**
      * Promotes the pawn into whatever piece the player chooses
+     * @param pieceType what kind of piece to promote to
      * TODO : write me!
      */
-    promote() {
+    promote(pieceType: typeof Piece) {
         
     }
 }

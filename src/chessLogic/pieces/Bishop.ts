@@ -12,7 +12,7 @@ class Bishop extends Piece {
             [ 1, -1]
         ]
 
-        return this._straightLineMoves(direcs)
+        return this._infiniteMoves(direcs)
     }
 }
 

@@ -13,7 +13,7 @@ class Rook extends Piece {
             [ 0, -1]
         ]
 
-        return this._straightLineMoves(direcs)
+        return this._infiniteMoves(direcs)
     }
 }
 
