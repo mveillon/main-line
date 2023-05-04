@@ -4,6 +4,7 @@ import King from "../../chessLogic/pieces/King";
 import Pawn from "../../chessLogic/pieces/Pawn";
 import Piece from "../../chessLogic/pieces/Piece";
 import Queen from "../../chessLogic/pieces/Queen";
+import Rook from "../../chessLogic/pieces/Rook";
 import { compareSetToArray } from "./testUtilts";
 
 test('legalMovesIncludeNoCheck', () => {
@@ -136,5 +137,65 @@ test('legalMoves', () => {
 
     pawnMoves = (b.pieceAt('e2') as Piece).legalMoves()
     compareSetToArray(pawnMoves, ['f3'])
+})
+
+test('castling', () => {
+    const b = new Board()
+
+    const wKingMoves = (): Set<string> => {
+        return (b.pieceAt('e1') as Piece).legalMoves()
+    }
+
+    const bKingMoves = (): Set<string> => {
+        return (b.pieceAt('e8') as Piece).legalMoves()
+    }
+
+    compareSetToArray(wKingMoves(), [])
+    compareSetToArray(bKingMoves(), [])
+
+    b.movePiece('f1', 'c4')
+    b.movePiece('g1', 'f3')
+
+    expect((b.pieceAt('e1') as King).hasMoved).toBeFalsy()
+    expect(b.pieceAt('h1')).toBeInstanceOf(Rook)
+    expect((b.pieceAt('h1') as Rook).hasMoved).toBeFalsy()
+    expect(b.pieceAt('f1')).toBeNull()
+    expect(b.pieceAt('g1')).toBeNull()
+    expect(b.putsKingInCheck('e1', 'f1')).toBeFalsy()
+    expect(b.putsKingInCheck('e1', 'g1')).toBeFalsy()
+    expect(b.putsKingInCheck('h1', 'g1')).toBeFalsy()
+
+    compareSetToArray(wKingMoves(), ['O-O', 'f1'])
+
+    b.movePiece('f8', 'c5')
+    b.movePiece('g8', 'f6')
+    compareSetToArray(bKingMoves(), ['O-O', 'f8'])
+
+    b.movePiece('b1', 'c3')
+    b.movePiece('c1', 'f4')
+    b.movePiece('d1', 'd3')
+    compareSetToArray(wKingMoves(), ['O-O', 'O-O-O', 'd1', 'f1'])
+
+    b.movePiece('b8', 'c6')
+    b.movePiece('c8', 'f5')
+    b.movePiece('d8', 'd6')
+    compareSetToArray(bKingMoves(), ['O-O', 'O-O-O', 'd8', 'f8'])
+
+    b.movePiece('d6', 'd3')
+    b.movePiece('e2', 'e3')
+    compareSetToArray(wKingMoves(), ['O-O-O', 'd1'])
+
+    b.movePiece('d3', 'c2')
+    compareSetToArray(wKingMoves(), ['O-O', 'e2', 'f1'])
+
+    b.movePiece('f4', 'c7')
+    compareSetToArray(bKingMoves(), ['O-O', 'f8'])
+
+    b.movePiece('c4', 'f7')
+    compareSetToArray(bKingMoves(), ['f8', 'f7'])
+
+    b.movePiece('e1', 'e2')
+    b.movePiece('e2', 'e1')
+    compareSetToArray(wKingMoves(), ['f1', 'e2'])
 })
 

@@ -4,6 +4,7 @@ import startingPosition from "./startingPosition"
 import { notationToIndices } from "./notationIndices"
 import King from "./pieces/King"
 import Pawn from "./pieces/Pawn"
+import Rook from "./pieces/Rook"
 
 /**
  * An array of pieces. An empty square is `null`. A `BoardT`[0] refers
@@ -99,8 +100,10 @@ class Board {
      * Moves the piece at `from` to `to`, regardless of whether it's legal
      * @param from the starting square
      * @param to the ending square
+     * @param sideEffects whether or not to update the piece's hasMoved
+     * field and promote pawns. Good to turn off if making a hypothetical move
      */
-    movePiece(from: string, to: string) {
+    movePiece(from: string, to: string, sideEffects: boolean = true) {
         const [fromI, fromJ] = notationToIndices(from)
         const [toI, toJ] = notationToIndices(to)
         const p = this._board[fromI][fromJ]
@@ -111,11 +114,12 @@ class Board {
         this._board[toI][toJ] = p
         this._board[fromI][fromJ] = null
         p.coords = to
-        if (p instanceof King || p instanceof Pawn) {
+        if (sideEffects && 
+            (p instanceof King || p instanceof Pawn || p instanceof Rook)) {
             p.hasMoved = true
         }
 
-        if (p instanceof Pawn && (toJ === 0 || toJ === 7)) {
+        if (sideEffects && p instanceof Pawn && (toJ === 0 || toJ === 7)) {
             p.promote()
         }
     }
@@ -158,10 +162,10 @@ class Board {
         }
 
         const oldPiece = this.pieceAt(to)
-        this.movePiece(from, to)
+        this.movePiece(from, to, false)
 
         const backToNormal = () => {
-            this.movePiece(to, from)
+            this.movePiece(to, from, false)
             const [i, j] = notationToIndices(to)
             this._board[i][j] = oldPiece
         }
@@ -187,5 +191,5 @@ class Board {
     }
 }
 
-export { Board };
+export { Board }
 export type { BoardT }
