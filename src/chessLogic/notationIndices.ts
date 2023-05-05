@@ -7,12 +7,12 @@
  * @returns which column within the BoardT it corresponds to
  */
 export const letterToCol = (letter: string): number => {
-    const code = letter.charCodeAt(0)
-    // 104 is h and 97 is a in ASCII
-    if (code > 104 || code < 97) {
-        throw new Error(`Unexpected letter ${letter}. Should be between a and h`)
-    }
-    return 104 - code
+  const code = letter.charCodeAt(0)
+  // 104 is h and 97 is a in ASCII
+  if (code > 104 || code < 97) {
+    throw new Error(`Unexpected letter ${letter}. Should be between a and h`)
+  }
+  return 104 - code
 }
 
 /**
@@ -24,10 +24,10 @@ export const letterToCol = (letter: string): number => {
  * @returns the letter of the corresponding index. Will be between a and h
  */
 export const indexToLetter = (ind: number): string => {
-    if (ind < 0 || ind > 7) {
-        throw new Error(`Index out of bounds ${ind}`)
-    }
-    return String.fromCharCode(104 - ind)
+  if (ind < 0 || ind > 7) {
+    throw new Error(`Index out of bounds ${ind}`)
+  }
+  return String.fromCharCode(104 - ind)
 }
 
 /**
@@ -36,14 +36,14 @@ export const indexToLetter = (ind: number): string => {
  * @returns an `[i, j]` pair of coordinates
  */
 export const notationToIndices = (coords: string): [number, number] => {
-    if (coords.length !== 2) {
-        throw new Error(`Invalid coordinates ${coords}`)
-    }
+  if (coords.length !== 2) {
+    throw new Error(`Invalid coordinates ${coords}`)
+  }
 
-    return [
-        parseInt(coords[1]) - 1, 
-        letterToCol(coords[0])
-    ]
+  return [
+    parseInt(coords[1]) - 1, 
+    letterToCol(coords[0])
+  ]
 }
 
 /**
@@ -53,9 +53,9 @@ export const notationToIndices = (coords: string): [number, number] => {
  * @returns the indices as chess notation
  */
 export const indicesToNotation = (rank: number, file: number): string => {
-    if (rank < 0 || rank > 7) {
-        throw new Error(`Invalid indices [${rank}, ${file}]`)
-    }
+  if (rank < 0 || rank > 7) {
+    throw new Error(`Invalid indices [${rank}, ${file}]`)
+  }
 
-    return `${indexToLetter(file)}${rank + 1}`
+  return `${indexToLetter(file)}${rank + 1}`
 }

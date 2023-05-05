@@ -13,13 +13,13 @@ import Pawn from "./pieces/Pawn"
  * @returns all piece acronyms
  */
 const acronyms = (): { [index: string]: PieceT } => {
-    return {
-        'B': Bishop,
-        'K': King,
-        'N': Knight,
-        'Q': Queen,
-        'R': Rook
-    }
+  return {
+    'B': Bishop,
+    'K': King,
+    'N': Knight,
+    'Q': Queen,
+    'R': Rook
+  }
 }
 
 /**
@@ -29,8 +29,8 @@ const acronyms = (): { [index: string]: PieceT } => {
  * @returns the trimmed notation with just the moves
  */
 const trimMoveNumber = (notation: string): string => {
-    const r = /^[0-9]+\./ // matches the turn number e.g. 4.
-    return notation.replace(r, '').trim()
+  const r = /^[0-9]+\./ // matches the turn number e.g. 4.
+  return notation.replace(r, '').trim()
 }
 
 /**
@@ -41,12 +41,12 @@ const trimMoveNumber = (notation: string): string => {
  * @returns the typeof the piece it corresponds to
  */
 const pieceAcronym = (acronym: string): PieceT => {
-    const acs = acronyms()
+  const acs = acronyms()
 
-    if (typeof acs[acronym] === 'undefined') {
-        return Pawn
-    }
-    return acs[acronym]
+  if (typeof acs[acronym] === 'undefined') {
+    return Pawn
+  }
+  return acs[acronym]
 }
 
 /**
@@ -58,21 +58,21 @@ const pieceAcronym = (acronym: string): PieceT => {
  * @param board the current board
  */
 const castle = (
-    turn: Color,
-    kingFile: string, 
-    oldRookFile: string, 
-    newRookFile: string, 
-    board: Board) => {
+  turn: Color,
+  kingFile: string, 
+  oldRookFile: string, 
+  newRookFile: string, 
+  board: Board) => {
 
-    const king = board.findPieces(King, turn)[0]
-    const allRooks = board.findPieces(Rook, turn, oldRookFile)
-    if (allRooks.length === 0) {
-        throw new Error(`There is no rook on the correct square!`)
-    }
-    
-    const rank = turn === Color.White ? '1' : '8'
-    board.movePiece(king.coords, kingFile + rank)
-    board.movePiece(allRooks[0].coords, newRookFile + rank, false)
+  const king = board.findPieces(King, turn)[0]
+  const allRooks = board.findPieces(Rook, turn, oldRookFile)
+  if (allRooks.length === 0) {
+    throw new Error(`There is no rook on the correct square!`)
+  }
+  
+  const rank = turn === Color.White ? '1' : '8'
+  board.movePiece(king.coords, kingFile + rank)
+  board.movePiece(allRooks[0].coords, newRookFile + rank, false)
 }
 
 /**
@@ -81,13 +81,13 @@ const castle = (
  * @param board the board to perform the moves on
  */
 export const doubleMove = (moveNotation: string, board: Board) => {
-    moveNotation = trimMoveNumber(moveNotation)
+  moveNotation = trimMoveNumber(moveNotation)
 
-    const moves = moveNotation.split(' ')
-    parseMove(moves[0], board)
-    if (moves.length > 1) {
-        parseMove('...' + moves[1], board)
-    }
+  const moves = moveNotation.split(' ')
+  parseMove(moves[0], board)
+  if (moves.length > 1) {
+    parseMove('...' + moves[1], board)
+  }
 }
 
 /**
@@ -96,87 +96,87 @@ export const doubleMove = (moveNotation: string, board: Board) => {
  * the notation should start with "..."
  */
 export const parseMove = (notation: string, board: Board) => {
-    notation = trimMoveNumber(notation)
+  notation = trimMoveNumber(notation)
 
-    let turn: Color;
-    const ellipseRegex = /^\.\.\./
-    if (ellipseRegex.test(notation)) {
-        turn = Color.Black
-        notation = notation.replace(ellipseRegex, '')
+  let turn: Color;
+  const ellipseRegex = /^\.\.\./
+  if (ellipseRegex.test(notation)) {
+    turn = Color.Black
+    notation = notation.replace(ellipseRegex, '')
+  } else {
+    turn = Color.White
+  }
+
+  const acs = acronyms()
+  let promotionType: PieceT | undefined = undefined
+  let lastInd = notation.length - 1
+  while (isNaN(parseInt(notation[lastInd])) && notation[lastInd] !== 'O') {
+    // handles promotion, checks, checkmate, and decorations
+    if (typeof acs[notation[lastInd]] !== "undefined") {
+      promotionType = acs[notation[lastInd]]
+    }
+
+    lastInd--
+  }
+  
+  if (lastInd < notation.length - 1) {
+    notation = notation.slice(0, lastInd + 1)
+  }
+
+  if (notation === 'O-O') {
+    castle(turn, 'g', 'h', 'f', board)
+  } else if (notation === 'O-O-O') {
+    castle(turn, 'c', 'a', 'd', board)
+  } else {
+    const pieceType = pieceAcronym(notation[0])
+
+    let pieces: Piece[];
+    if (notation.length === 2) {
+      // normal pawn move
+      pieces = board.findPieces(pieceType, turn, notation[0])
+
+    } else if (notation.length === 3) {
+      // normal piece move
+      pieces = board.findPieces(pieceType, turn)
+      
     } else {
-        turn = Color.White
-    }
-
-    const acs = acronyms()
-    let promotionType: PieceT | undefined = undefined
-    let lastInd = notation.length - 1
-    while (isNaN(parseInt(notation[lastInd])) && notation[lastInd] !== 'O') {
-        // handles promotion, checks, checkmate, and decorations
-        if (typeof acs[notation[lastInd]] !== "undefined") {
-            promotionType = acs[notation[lastInd]]
-        }
-
-        lastInd--
-    }
-    
-    if (lastInd < notation.length - 1) {
-        notation = notation.slice(0, lastInd + 1)
-    }
-
-    if (notation === 'O-O') {
-        castle(turn, 'g', 'h', 'f', board)
-    } else if (notation === 'O-O-O') {
-        castle(turn, 'c', 'a', 'd', board)
-    } else {
-        const pieceType = pieceAcronym(notation[0])
-
-        let pieces: Piece[];
-        if (notation.length === 2) {
-            // normal pawn move
-            pieces = board.findPieces(pieceType, turn, notation[0])
-
-        } else if (notation.length === 3) {
-            // normal piece move
-            pieces = board.findPieces(pieceType, turn)
-            
+      if (pieceType === Pawn) {
+        // pawn capture
+        pieces = board.findPieces(
+          pieceType, 
+          turn,
+          notation[0]
+        )
+      } else if (notation[1] === 'x') {
+        // piece capture
+        pieces = board.findPieces(pieceType, turn)
+      } else {
+        // two pieces can move to same square
+        if (isNaN(parseInt(notation[1]))) {
+          // sort by file
+          pieces = board.findPieces(
+            pieceType, 
+            turn,
+            notation[1]
+          )
         } else {
-            if (pieceType === Pawn) {
-                // pawn capture
-                pieces = board.findPieces(
-                    pieceType, 
-                    turn,
-                    notation[0]
-                )
-            } else if (notation[1] === 'x') {
-                // piece capture
-                pieces = board.findPieces(pieceType, turn)
-            } else {
-                // two pieces can move to same square
-                if (isNaN(parseInt(notation[1]))) {
-                    // sort by file
-                    pieces = board.findPieces(
-                        pieceType, 
-                        turn,
-                        notation[1]
-                    )
-                } else {
-                    // sort by rank
-                    pieces = board.findPieces(
-                        pieceType,
-                        turn,
-                        undefined,
-                        notation[1]
-                    )
-                }
-            }
+          // sort by rank
+          pieces = board.findPieces(
+            pieceType,
+            turn,
+            undefined,
+            notation[1]
+          )
         }
-
-        const to = notation.slice(notation.length - 2)
-        for (const p of pieces) {
-            if (p.legalMoves().has(to)) {
-                board.movePiece(p.coords, to, true, promotionType)
-            }
-        }
+      }
     }
+
+    const to = notation.slice(notation.length - 2)
+    for (const p of pieces) {
+      if (p.legalMoves().has(to)) {
+        board.movePiece(p.coords, to, true, promotionType)
+      }
+    }
+  }
 }
 
