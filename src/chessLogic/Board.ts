@@ -71,7 +71,7 @@ export class Board {
       rows.push(current.join(''))
       rows.push(line)
     }
-    rows.push('  h   g   f   e   d   c   b   a  ')
+    rows.push('    h   g   f   e   d   c   b   a  ')
     return rows.join('\n')
   }
 

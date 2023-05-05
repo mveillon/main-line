@@ -3,8 +3,8 @@ import { Piece } from "./Piece";
 import Rook from "./Rook";
 
 class King extends Piece {
-  readonly whiteEmoji: string = '♔'
-  readonly blackEmoji: string = '♚'
+  readonly blackEmoji: string = '♔'
+  readonly whiteEmoji: string = '♚'
 
   legalMovesNoChecks(): Set<string> {
     const direcs: [number, number][] = [

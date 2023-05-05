@@ -1,6 +1,7 @@
 import { Piece } from "../chessLogic/pieces/Piece";
 import Color from "../chessLogic/Color";
 import "./styling/PieceComponent.css"
+import { useState } from "react";
 
 import blackBishop from "../assets/blackBishop.png"
 import blackKing from "../assets/blackKing.png"
@@ -42,11 +43,33 @@ const pieceToSrc = (piece: Piece): string => {
   return pieces[color + name]
 }
 
-const PieceComponent = (props: { piece: Piece }) => {
+const PieceComponent = (props: { piece: Piece, selected: boolean }) => {
   const src = pieceToSrc(props.piece)
 
+  const [style, setStyle] = useState({})
+  // TODO : This code doesn't work. Supposed to have selected piece
+  // follow mouse cursor, which does work, but doesn't "unselect" piece
+  // on click
+  
+  // if (props.selected) {
+  //   window.onmousemove = (e) => {
+  //     setStyle({
+  //       position: 'absolute',
+  //       zIndex: 5,
+  //       top: e.pageY - 10,
+  //       left: e.pageX - 10,
+  //       pointerEvents: 'none'
+  //     })
+  //   }
+  // }
+
   return (
-    <img src={src} className="piece-img" alt='piece' />
+    <img 
+      src={src} 
+      className="piece-img" 
+      alt='piece' 
+      style={props.selected ? style : undefined} 
+    />
   )
 }
 

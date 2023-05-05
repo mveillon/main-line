@@ -21,8 +21,9 @@ class Game {
   playMove(from: string, to: string) {
     const moving = this.board.pieceAt(from)
     if (
-      this.result !== '' && 
+      this.result === '' && 
       moving !== null && 
+      moving.color === this.turn &&
       moving.legalMoves().has(to)
     ) {
       this.board.movePiece(from, to)
