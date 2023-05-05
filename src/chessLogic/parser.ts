@@ -1,6 +1,6 @@
 import { Board } from "./Board"
 import Color from "./Color"
-import Piece from "./pieces/Piece"
+import { Piece, PieceT } from "./pieces/Piece"
 import Bishop from "./pieces/Bishop"
 import King from "./pieces/King"
 import Knight from "./pieces/Knight"
@@ -12,7 +12,7 @@ import Pawn from "./pieces/Pawn"
  * Returns the acronyms used for pieces in chess notation
  * @returns all piece acronyms
  */
-const acronyms = (): { [index: string]: typeof Piece } => {
+const acronyms = (): { [index: string]: PieceT } => {
     return {
         'B': Bishop,
         'K': King,
@@ -40,7 +40,7 @@ const trimMoveNumber = (notation: string): string => {
  * acronym, it will default to Pawn
  * @returns the typeof the piece it corresponds to
  */
-const pieceAcronym = (acronym: string): typeof Piece => {
+const pieceAcronym = (acronym: string): PieceT => {
     const acs = acronyms()
 
     if (typeof acs[acronym] === 'undefined') {
@@ -72,7 +72,7 @@ const castle = (
     
     const rank = turn === Color.White ? '1' : '8'
     board.movePiece(king.coords, kingFile + rank)
-    board.movePiece(allRooks[0].coords, newRookFile + rank)
+    board.movePiece(allRooks[0].coords, newRookFile + rank, false)
 }
 
 /**
@@ -108,7 +108,7 @@ export const parseMove = (notation: string, board: Board) => {
     }
 
     const acs = acronyms()
-    let promotionType: typeof Piece | undefined = undefined
+    let promotionType: PieceT | undefined = undefined
     let lastInd = notation.length - 1
     while (isNaN(parseInt(notation[lastInd])) && notation[lastInd] !== 'O') {
         // handles promotion, checks, checkmate, and decorations

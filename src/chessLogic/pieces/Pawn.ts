@@ -1,12 +1,11 @@
 import { addArrays } from "../../utils/numJS";
 import Color from "../Color";
-import { indicesToNotation, notationToIndices } from "../notationIndices";
-import Piece from "./Piece";
+import { indicesToNotation, notationToIndices, indexToLetter } from "../notationIndices";
+import { Piece } from "./Piece";
 
 class Pawn extends Piece {
     readonly whiteEmoji: string = '♙'
     readonly blackEmoji: string = '♟'
-    hasMoved = false
 
     // assumes the pawn is not on the opposite rank i.e. if it can promote, 
     // it already has
@@ -20,11 +19,16 @@ class Pawn extends Piece {
 
         if (this._board.pieceAt(oneUpNotation) === null) {
             res.add(oneUpNotation)
-            const twoUp = (addArrays(current, [movesTowards * 2, 0]) as [number, number])
-            const twoUpNotation = indicesToNotation(...twoUp)
 
-            if (!this.hasMoved && this._board.pieceAt(twoUpNotation) === null) {
-                res.add(twoUpNotation)
+            if (!this.hasMoved) {
+                const twoUp = (
+                    addArrays(current, [movesTowards * 2, 0]) as [number, number]
+                )
+                const twoUpNotation = indicesToNotation(...twoUp)
+    
+                if (this._board.pieceAt(twoUpNotation) === null) {
+                    res.add(twoUpNotation)
+                }
             }
         }
 
@@ -41,10 +45,28 @@ class Pawn extends Piece {
                 if (p !== null && p.color !== this.color) {
                     res.add(notation)
                 }
+
+                const epRank = this.color === Color.White ? '5' : '4'
+                if (this.coords[1] === epRank) {
+                    const opStartRank = (
+                        this.color === Color.White ? '7' : '2'
+                    )
+                    const lastMove = (
+                        this._board.movesMade[this._board.movesMade.length - 1]
+                    )
+
+                    const canPassant = (
+                        lastMove.to === notation[0] + epRank &&
+                        lastMove.from === notation[0] + opStartRank &&
+                        this._board.pieceAt(lastMove.to) instanceof Pawn
+                    )
+
+                    if (canPassant) {
+                        res.add(notation)
+                    }
+                }
             }
         }
-
-        // TODO : add En Passant
 
         return res
     }

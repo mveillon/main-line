@@ -1,10 +1,10 @@
-import Piece from "./pieces/Piece"
+import { Piece, PieceT } from "./pieces/Piece"
 import Color from "./Color"
 import startingPosition from "./startingPosition"
 import { notationToIndices } from "./notationIndices"
 import King from "./pieces/King"
 import Pawn from "./pieces/Pawn"
-import Rook from "./pieces/Rook"
+import type { MoveInfo } from "./moveInfo"
 
 /**
  * An array of pieces. An empty square is `null`. A `BoardT`[0] refers
@@ -12,16 +12,18 @@ import Rook from "./pieces/Rook"
  * if you print the contents of the board, you will be looking at it from
  * black's perspective
  */
-type BoardT = (Piece | null)[][]
+export type BoardT = (Piece | null)[][]
 
-class Board {
+export class Board {
     protected _board: BoardT
     public get board() : BoardT {
         return this._board
     }
+    movesMade: MoveInfo[]
 
     constructor(pgn?: string) {
         this._board = startingPosition(this)
+        this.movesMade = []
     }
 
     toString(): string {
@@ -109,7 +111,8 @@ class Board {
         from: string, 
         to: string, 
         sideEffects: boolean = true,
-        promoteType?: typeof Piece) {
+        promoteType?: PieceT) {
+
         const [fromI, fromJ] = notationToIndices(from)
         const [toI, toJ] = notationToIndices(to)
         const p = this._board[fromI][fromJ]
@@ -117,13 +120,22 @@ class Board {
             throw new Error(`${from} is an empty square`)
         }
 
+        const info: MoveInfo = {
+            from: from,
+            to: to,
+            captured: this.pieceAt(to),
+            hadMoved: p.hasMoved,
+            promoted: false,
+            enPassant: (
+                p instanceof Pawn &&
+                toJ !== fromJ &&
+                this.pieceAt(to) === null
+            )
+        }
+
         this._board[toI][toJ] = p
         this._board[fromI][fromJ] = null
         p.coords = to
-        if (sideEffects && 
-            (p instanceof King || p instanceof Pawn || p instanceof Rook)) {
-            p.hasMoved = true
-        }
 
         if (sideEffects && p instanceof Pawn && (toI === 0 || toI === 7)) {
             if (typeof promoteType === 'undefined') {
@@ -131,8 +143,28 @@ class Board {
                     `Undefined promotion type for promoting move when moving ${from} to ${to}`
                 )
             }
-            p.promote(promoteType)
+            this._promotePawn(p, promoteType)
+            info.promoted = true
         }
+
+        if (sideEffects) {
+            p.hasMoved = true
+            if (info.enPassant) {
+                info.captured = this._board[fromI][toJ]
+                this._board[fromI][toJ] = null
+            }
+            this.movesMade.push(info)
+        }
+    }
+
+    /**
+     * Promotes the pawn into the given promoteType
+     * @param pawn the pawn to promote. Should already be on the final rank
+     * @param promoteType what type to promote to e.g. Queen or Knight
+     */
+    protected _promotePawn(pawn: Pawn, promoteType: PieceT) {
+        const [i, j] = notationToIndices(pawn.coords)
+        this._board[i][j] = new promoteType(pawn.color, pawn.coords, this)
     }
 
     /**
@@ -201,6 +233,3 @@ class Board {
         return false
     }
 }
-
-export { Board }
-export type { BoardT }

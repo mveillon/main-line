@@ -2,7 +2,7 @@ import { Board } from "../../chessLogic/Board";
 import Color from "../../chessLogic/Color";
 import King from "../../chessLogic/pieces/King";
 import Pawn from "../../chessLogic/pieces/Pawn";
-import Piece from "../../chessLogic/pieces/Piece";
+import { Piece } from "../../chessLogic/pieces/Piece";
 import Queen from "../../chessLogic/pieces/Queen";
 import Rook from "../../chessLogic/pieces/Rook";
 import { compareSetToArray } from "./testUtilts";

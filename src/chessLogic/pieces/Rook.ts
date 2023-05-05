@@ -1,9 +1,8 @@
-import Piece from "./Piece";
+import { Piece } from "./Piece";
 
 class Rook extends Piece {
     readonly whiteEmoji: string = '♖'
     readonly blackEmoji: string = '♜'
-    hasMoved: boolean = false
 
     legalMovesNoChecks(): Set<string> {
         const direcs: [number, number][] = [

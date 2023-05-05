@@ -1,5 +1,5 @@
 import { Board } from "../../chessLogic/Board";
-import Piece from "../../chessLogic/pieces/Piece";
+import { Piece } from "../../chessLogic/pieces/Piece";
 import { compareSetToArray } from "./testUtilts";
 
 test('legalMovesNoChecks', () => {
@@ -80,3 +80,23 @@ test('legalMovesNoChecks', () => {
     pawnMoves = (b2.pieceAt('e5') as Piece).legalMovesNoChecks()
     compareSetToArray(pawnMoves, ['d4', 'e4'])
 }) 
+
+test('en passant', () => {
+    const b = new Board()
+    b.movePiece('e2', 'e4')
+    b.movePiece('b8', 'c6')
+    b.movePiece('e4', 'e5')
+    b.movePiece('d7', 'd5')
+    
+    let pawnMoves = (b.pieceAt('e5') as Piece).legalMovesNoChecks()
+    compareSetToArray(pawnMoves, ['d6', 'e6'])
+
+    b.movePiece('f7', 'f5')
+    pawnMoves = (b.pieceAt('e5') as Piece).legalMovesNoChecks()
+    compareSetToArray(pawnMoves, ['e6', 'f6'])
+
+    b.movePiece('h7', 'h6')
+    pawnMoves = (b.pieceAt('e5') as Piece).legalMovesNoChecks()
+    compareSetToArray(pawnMoves, ['e6'])
+})
+

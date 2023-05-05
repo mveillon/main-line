@@ -3,12 +3,15 @@ import { Board } from "../Board"
 import { indicesToNotation, notationToIndices } from "../notationIndices";
 import { addArrays } from "../../utils/numJS";
 
-abstract class Piece {
+export type PieceT = new (_color: Color, _coords: string, board: Board) => Piece
+
+export abstract class Piece {
     readonly color: Color
     coords: string
     readonly whiteEmoji: string = ''
     readonly blackEmoji: string = ''
     protected _board: Board
+    hasMoved: boolean = false
 
     constructor(_color: Color, _coords: string, board: Board) {
         this.color = _color
@@ -96,5 +99,3 @@ abstract class Piece {
         return `${cStr} ${this.whiteEmoji} at ${this.coords}`
     }
 }
-
-export default Piece;

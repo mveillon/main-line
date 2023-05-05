@@ -1,4 +1,4 @@
-import Piece from "./Piece";
+import { Piece } from "./Piece";
 
 class Queen extends Piece {
     readonly whiteEmoji: string = '♕'

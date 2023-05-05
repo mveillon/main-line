@@ -5,7 +5,7 @@ import Bishop from "../../chessLogic/pieces/Bishop";
 import King from "../../chessLogic/pieces/King";
 import Knight from "../../chessLogic/pieces/Knight";
 import Pawn from "../../chessLogic/pieces/Pawn";
-import Piece from "../../chessLogic/pieces/Piece";
+import { Piece } from "../../chessLogic/pieces/Piece";
 import Queen from "../../chessLogic/pieces/Queen";
 import Rook from "../../chessLogic/pieces/Rook";
 
