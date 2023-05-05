@@ -47,21 +47,18 @@ const PieceComponent = (props: { piece: Piece, selected: boolean }) => {
   const src = pieceToSrc(props.piece)
 
   const [style, setStyle] = useState({})
-  // TODO : This code doesn't work. Supposed to have selected piece
-  // follow mouse cursor, which does work, but doesn't "unselect" piece
-  // on click
-  
-  // if (props.selected) {
-  //   window.onmousemove = (e) => {
-  //     setStyle({
-  //       position: 'absolute',
-  //       zIndex: 5,
-  //       top: e.pageY - 10,
-  //       left: e.pageX - 10,
-  //       pointerEvents: 'none'
-  //     })
-  //   }
-  // }
+
+  if (props.selected) {
+    window.onmousemove = (e) => {
+      setStyle({
+        position: 'absolute',
+        zIndex: 5,
+        top: e.pageY - 10,
+        left: e.pageX - 10,
+        pointerEvents: 'none'
+      })
+    }
+  }
 
   return (
     <img 

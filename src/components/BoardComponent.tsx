@@ -2,10 +2,9 @@ import "./styling/BoardComponent.css"
 import { useState } from "react";
 
 import PieceComponent from "./PieceComponent";
-import { Board } from "../chessLogic/Board";
 import { arange, full, getShape } from "../utils/numJS";
 import { Piece } from "../chessLogic/pieces/Piece";
-import { indicesToNotation } from "../chessLogic/notationIndices";
+import { indicesToNotation, notationToIndices } from "../chessLogic/notationIndices";
 import Game from "../chessLogic/Game";
 
 const BoardComponent = (
@@ -17,6 +16,7 @@ const BoardComponent = (
   const board = props.game.board
   const [reversed, setReversed] = useState(true)
   const [pieceSelected, setPieceSelected] = useState<Piece | null>(null)
+
   const [isSelected, setIsSelected] = useState(
     full(getShape(board.board), false) as boolean[][]
   )
@@ -29,6 +29,15 @@ const BoardComponent = (
     }
   }
 
+  const unselectPiece = () => {
+    if (pieceSelected === null) return
+    const [origI, origJ] = notationToIndices(pieceSelected.coords)
+    isSelected[getInd(origI)][getInd(origJ)] = false
+    setIsSelected(isSelected)
+
+    setPieceSelected(null)
+  }
+
   const getOnClick = (i: number, j: number): (() => void) => {
     return () => {
       const realI = getInd(i)
@@ -39,16 +48,23 @@ const BoardComponent = (
       if (pieceSelected === null || isOwnPiece) {
         if (isOwnPiece) {
           setPieceSelected(p)
-          isSelected[realI][realJ] = true
+          isSelected[i][j] = true
           setIsSelected(isSelected)
         }
       } else if (p === null || p.color !== props.game.turn) {
-        isSelected[realI][realJ] = false
-        setIsSelected(isSelected)
+        const toMove = pieceSelected
+        unselectPiece()
+
         props.playMove(pieceSelected.coords, indicesToNotation(realI, realJ))
-        setPieceSelected(null)
       }
     }
+  }
+
+  const reverseBoard = () => {
+    if (pieceSelected !== null) {
+      unselectPiece()
+    }
+    setReversed(!reversed)
   }
 
   const inds = arange(board.board.length)
@@ -62,9 +78,9 @@ const BoardComponent = (
               <tr key={i}>
                 {inds.map((j) => {
                   const square = board.board[getInd(i)][getInd(j)]
-                  const selected = isSelected[getInd(i)][getInd(j)]
+                  const selected = isSelected[i][j]
                   return (
-                    <td 
+                    <td
                       key={j} 
                       className={(i + j) % 2 === 0 ? "white-square" : "black-square"}
                       onClick={getOnClick(i, j)}
@@ -82,7 +98,7 @@ const BoardComponent = (
         </tbody>
       </table>
 
-      <button onClick={() => setReversed(!reversed)}>
+      <button onClick={reverseBoard}>
         Reverse board
       </button>
     </div>
