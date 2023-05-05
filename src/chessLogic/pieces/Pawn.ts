@@ -70,15 +70,6 @@ class Pawn extends Piece {
 
         return res
     }
-
-    /**
-     * Promotes the pawn into whatever piece the player chooses
-     * @param pieceType what kind of piece to promote to
-     * TODO : write me!
-     */
-    promote(pieceType: typeof Piece) {
-        
-    }
 }
 
 export default Pawn

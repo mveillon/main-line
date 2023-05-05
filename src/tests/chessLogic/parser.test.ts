@@ -9,7 +9,7 @@ import { Piece } from "../../chessLogic/pieces/Piece";
 import Queen from "../../chessLogic/pieces/Queen";
 import Rook from "../../chessLogic/pieces/Rook";
 
-const setUpBoard = (startingMoves: string[]): Board => {
+export const setUpBoard = (startingMoves: string[]): Board => {
     const res = new Board()
     for (const move of startingMoves) {
         doubleMove(move, res)

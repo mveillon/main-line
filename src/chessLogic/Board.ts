@@ -5,6 +5,7 @@ import { notationToIndices } from "./notationIndices"
 import King from "./pieces/King"
 import Pawn from "./pieces/Pawn"
 import type { MoveInfo } from "./moveInfo"
+import { doubleMove } from "./parser"
 
 /**
  * An array of pieces. An empty square is `null`. A `BoardT`[0] refers
@@ -24,6 +25,27 @@ export class Board {
     constructor(pgn?: string) {
         this._board = startingPosition(this)
         this.movesMade = []
+
+        if (typeof pgn !== 'undefined') {
+            const r = /[0-9]+\./ // matches the move numbers
+
+            // matches parenthesis and text between them. Also matches
+            // curly braces
+            // from https://stackoverflow.com/questions/640001/how-can-i-remove-text-within-parentheses-with-a-regex
+            const paren = /(\(|\{)[^)]*(\)|\})/
+
+            // matches the game result e.g. 0-1 or 1-0
+            const result = /(0-1|1-0|1\/2-1\/2)/
+
+            pgn.replace(paren, '')
+            pgn.replace(result, '')
+
+            const moves = pgn.split(r)
+
+            for (let i = 1; i < moves.length; i++) {
+                doubleMove(moves[i].trim(), this)
+            }
+        }
     }
 
     toString(): string {
@@ -231,5 +253,15 @@ export class Board {
 
         backToNormal()
         return false
+    }
+
+    /**
+     * Checks whether the two boards have the pieces in the same position.
+     * Does not check whose turn it is or who still has castling rights
+     * @param b2 the other board to check
+     * @returns whether the two boards are the same
+     */
+    sameBoard(b2: Board): boolean {
+        return this.toString() === b2.toString()
     }
 }
