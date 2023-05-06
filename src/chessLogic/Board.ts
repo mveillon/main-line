@@ -30,15 +30,15 @@ export class Board {
       const r = /[0-9]+\./ // matches the move numbers
 
       // matches parenthesis and text between them. Also matches
-      // curly braces
-      // from https://stackoverflow.com/questions/640001/how-can-i-remove-text-within-parentheses-with-a-regex
-      const paren = /(\(|\{)[^)]*(\)|\})/
+      // curly braces and square braces
+      // modified from https://stackoverflow.com/questions/640001/how-can-i-remove-text-within-parentheses-with-a-regex
+      const paren = /(\(|\{|\[).*(\)|\}|\])/gm
 
       // matches the game result e.g. 0-1 or 1-0
       const result = /(0-1|1-0|1\/2-1\/2)/
 
-      pgn.replace(paren, '')
-      pgn.replace(result, '')
+      pgn = pgn.replace(paren, '')
+      pgn = pgn.replace(result, '')
 
       const moves = pgn.split(r)
 
@@ -51,10 +51,10 @@ export class Board {
   toString(): string {
     const line: string = '   --- --- --- --- --- --- --- --- '
     let rows: string[] = [line]
-    for (let i = 0; i < this.board.length; i++) {
-      const row = this.board[i]
-      let current: string[] = [`${i} |`]
-      for (const square of row) {
+    for (let i = this.board.length - 1; i >= 0; i--) {
+      let current: string[] = [`${i + 1} |`]
+      for (let j = this.board[i].length - 1; j >= 0; j--) {
+        const square = this.board[i][j]
         current.push(' ')
         if (square === null) {
           current.push(' ')

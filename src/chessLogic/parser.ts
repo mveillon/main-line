@@ -30,7 +30,8 @@ const acronyms = (): { [index: string]: PieceT } => {
  */
 const trimMoveNumber = (notation: string): string => {
   const r = /^[0-9]+\./ // matches the turn number e.g. 4.
-  return notation.replace(r, '').trim()
+  const s = /\s{2,}/ // matches double (or more) whitespace
+  return notation.replace(r, '').replace(s, ' ').trim()
 }
 
 /**
@@ -110,13 +111,20 @@ export const parseMove = (notation: string, board: Board) => {
   const acs = acronyms()
   let promotionType: PieceT | undefined = undefined
   let lastInd = notation.length - 1
-  while (isNaN(parseInt(notation[lastInd])) && notation[lastInd] !== 'O') {
+  while (
+    lastInd >= 0 && 
+    isNaN(parseInt(notation[lastInd])) && 
+    notation[lastInd] !== 'O'
+  ) {
     // handles promotion, checks, checkmate, and decorations
     if (typeof acs[notation[lastInd]] !== "undefined") {
       promotionType = acs[notation[lastInd]]
     }
 
     lastInd--
+  }
+  if (lastInd < 0) {
+    throw new Error(`Invalid move ${notation}`)
   }
   
   if (lastInd < notation.length - 1) {
