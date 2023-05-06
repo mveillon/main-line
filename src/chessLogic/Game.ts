@@ -4,6 +4,7 @@ import King from "./pieces/King";
 import Pawn from "./pieces/Pawn";
 import { Piece } from "./pieces/Piece";
 import Rook from "./pieces/Rook";
+import Stockfish from "../../stockfish.wasm"
 
 class Game {
   board: Board
