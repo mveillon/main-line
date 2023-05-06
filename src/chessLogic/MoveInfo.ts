@@ -1,4 +1,4 @@
-import { Piece } from "./pieces/Piece"
+import { Piece, PieceT } from "./pieces/Piece"
 
 /**
  * All information needed to undo a move
@@ -9,5 +9,6 @@ export type MoveInfo = {
   captured: Piece | null,
   hadMoved: boolean,
   promoted: boolean,
-  enPassant: boolean
+  enPassant: boolean,
+  pieceMoved: Piece
 }

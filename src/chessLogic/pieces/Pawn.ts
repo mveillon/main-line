@@ -51,14 +51,12 @@ class Pawn extends Piece {
           const opStartRank = (
             this.color === Color.White ? '7' : '2'
           )
-          const lastMove = (
-            this._board.movesMade[this._board.movesMade.length - 1]
-          )
+          const lastMove = this._board.lastMove
 
           const canPassant = (
             lastMove.to === notation[0] + epRank &&
             lastMove.from === notation[0] + opStartRank &&
-            this._board.pieceAt(lastMove.to) instanceof Pawn
+            lastMove.pieceMoved instanceof Pawn
           )
 
           if (canPassant) {

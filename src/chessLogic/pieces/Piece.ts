@@ -29,6 +29,8 @@ export abstract class Piece {
   /**
    * Finds all of the piece's legal moves, including checking if they 
    * put the king in check
+   * TODO : store these moves after calculating them to not have to
+   * recalculate multiple times in the same move
    * @returns the set of legal moves of the piece
    */
   legalMoves(): Set<string> {

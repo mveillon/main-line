@@ -22,6 +22,10 @@ export class Board {
   }
   movesMade: MoveInfo[]
 
+  public get lastMove(): MoveInfo {
+    return this.movesMade[this.movesMade.length - 1]
+  }
+
   constructor(pgn?: string) {
     this._board = startingPosition(this)
     this.movesMade = []
@@ -37,8 +41,11 @@ export class Board {
       // matches the game result e.g. 0-1 or 1-0
       const result = /(0-1|1-0|1\/2-1\/2)/
 
+      const asterisk = /\*/
+
       pgn = pgn.replace(paren, '')
       pgn = pgn.replace(result, '')
+      pgn = pgn.replace(asterisk, '')
 
       const moves = pgn.split(r)
 
@@ -152,7 +159,8 @@ export class Board {
         p instanceof Pawn &&
         toJ !== fromJ &&
         this.pieceAt(to) === null
-      )
+      ),
+      pieceMoved: p
     }
 
     this._board[toI][toJ] = p
@@ -235,7 +243,7 @@ export class Board {
       this._board[i][j] = oldPiece
     }
 
-    const opposingColor = p.color === Color.White ? Color.Black : Color.White
+    const opposingColor = +!p.color
     const kingPos = this.findPieces(King, p.color)[0].coords
 
     for (const row of this._board) {
