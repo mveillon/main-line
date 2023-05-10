@@ -188,3 +188,23 @@ export const parseMove = (notation: string, board: Board) => {
   }
 }
 
+/**
+ * Converts a move in UCI long algebraic notation into something that can be
+ * passed to Board.movePiece
+ * @param uci the move notation
+ * @returns where the piece moved from, where the piece moved to, and the 
+ * initial of the piece type promoted to, or undefined if there was no
+ * promotion
+ */
+export const uciToMove = (uci: string): [string, string, string | undefined] => {
+  let promotionType = undefined
+  if (uci.length > 4) {
+    promotionType = uci[uci.length - 1]
+  }
+  return [
+    uci.slice(0, 2),
+    uci.slice(2, 4),
+    promotionType
+  ]
+}
+

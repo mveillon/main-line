@@ -4,12 +4,12 @@ import King from "./pieces/King";
 import Pawn from "./pieces/Pawn";
 import { Piece } from "./pieces/Piece";
 import Rook from "./pieces/Rook";
-import Stockfish from "../../stockfish.wasm"
 
 class Game {
   board: Board
   turn: Color = Color.White
   result: string = ''
+  engineColors: Color[]
 
   constructor(pgn?: string) {
     this.board = new Board(pgn)
@@ -18,6 +18,8 @@ class Game {
         +!this.board.lastMove.pieceMoved.color
       )
     }
+
+    this.engineColors = [Color.Black]
   }
 
   /**

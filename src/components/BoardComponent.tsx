@@ -30,8 +30,7 @@ const BoardComponent = (
   }
 
   const unselectPiece = () => {
-    if (pieceSelected === null) return
-    const [origI, origJ] = notationToIndices(pieceSelected.coords)
+    const [origI, origJ] = notationToIndices((pieceSelected as Piece).coords)
     isSelected[getInd(origI)][getInd(origJ)] = false
     setIsSelected(isSelected)
 
@@ -44,18 +43,19 @@ const BoardComponent = (
       const realJ = getInd(j)
 
       const p = board.board[realI][realJ]
+      const playerTurn = !props.game.engineColors.includes(props.game.turn)
       const isOwnPiece = p !== null && p.color === props.game.turn
-      if (pieceSelected === null || isOwnPiece) {
+      if (playerTurn && (pieceSelected === null || isOwnPiece)) {
         if (isOwnPiece) {
           setPieceSelected(p)
           isSelected[i][j] = true
           setIsSelected(isSelected)
         }
-      } else if (p === null || p.color !== props.game.turn) {
+      } else if (pieceSelected !== null && !isOwnPiece) {
         const toMove = pieceSelected
         unselectPiece()
 
-        props.playMove(pieceSelected.coords, indicesToNotation(realI, realJ))
+        props.playMove(toMove.coords, indicesToNotation(realI, realJ))
       }
     }
   }
