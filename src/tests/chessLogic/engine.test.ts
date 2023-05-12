@@ -3,6 +3,10 @@ import { Engine } from "../../chessLogic/Engine";
 import { uciToMove } from "../../chessLogic/parser";
 import Color from "../../chessLogic/Color";
 import { Piece } from "../../chessLogic/pieces/Piece";
+import Queen from "../../chessLogic/pieces/Queen";
+import Rook from "../../chessLogic/pieces/Rook";
+import Knight from "../../chessLogic/pieces/Knight";
+import Bishop from "../../chessLogic/pieces/Bishop";
 
 // jest.setTimeout(2_147_483_647)
 jest.setTimeout(20000)
@@ -17,7 +21,7 @@ const checkMove = (move: string, mover: Color, game: Game) => {
   expect(toPiece === null || toPiece.color !== mover).toBeTruthy()
 
   if (typeof promoType !== 'undefined') {
-    expect(['q', 'n', 'b', 'r']).toContain(promoType)
+    expect([Queen, Rook, Knight, Bishop]).toContain(promoType)
   }
 }
 

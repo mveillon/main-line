@@ -78,7 +78,7 @@ export class Board {
       rows.push(current.join(''))
       rows.push(line)
     }
-    rows.push('    h   g   f   e   d   c   b   a  ')
+    rows.push('    a   b   c   d   e   f   g   h  ')
     return rows.join('\n')
   }
 
@@ -142,6 +142,12 @@ export class Board {
     sideEffects: boolean = true,
     promoteType?: PieceT) {
 
+    if (to === 'O-O' || to === 'O-O-O') {
+      throw new Error(
+        'To castle, move the king from the e file to either the c or g file'
+      )
+    }
+
     const [fromI, fromJ] = notationToIndices(from)
     const [toI, toJ] = notationToIndices(to)
     const p = this._board[fromI][fromJ]
@@ -161,6 +167,23 @@ export class Board {
         this.pieceAt(to) === null
       ),
       pieceMoved: p
+    }
+
+    if (
+      sideEffects &&
+      p instanceof King && 
+      p.coords[0] === 'e' && 
+      (to[0] === 'c' || to[0] === 'g')
+    ) {
+      const rookFile = to[0] === 'c' ? 'a' : 'h'
+      const rook = this.pieceAt(rookFile + p.coords[1])
+      if (rook === null) {
+        throw new Error('No rook to castle with!')
+      }
+
+      const newRookFile = to[0] === 'c' ? 'd' : 'f'
+
+      this.movePiece(rook.coords, newRookFile + to[1], sideEffects, promoteType)
     }
 
     this._board[toI][toJ] = p

@@ -3,14 +3,15 @@ import { useState } from "react";
 
 import PieceComponent from "./PieceComponent";
 import { arange, full, getShape } from "../utils/numJS";
-import { Piece } from "../chessLogic/pieces/Piece";
+import { Piece, PieceT } from "../chessLogic/pieces/Piece";
 import { indicesToNotation, notationToIndices } from "../chessLogic/notationIndices";
 import Game from "../chessLogic/Game";
+import Queen from "../chessLogic/pieces/Queen";
 
 const BoardComponent = (
   props: {
     game: Game, 
-    playMove: (from: string, to: string) => void
+    playMove: (from: string, to: string, promoType?: PieceT) => void
   }) => {
   
   const board = props.game.board
@@ -44,7 +45,14 @@ const BoardComponent = (
 
       const p = board.board[realI][realJ]
       const playerTurn = !props.game.engineColors.includes(props.game.turn)
-      const isOwnPiece = p !== null && p.color === props.game.turn
+      const isOwnPiece = (
+        p !== null && 
+        p.color === props.game.turn &&
+        (
+          pieceSelected === null ||
+          pieceSelected.coords !== indicesToNotation(realI, realJ)
+        )
+      )
       if (playerTurn && (pieceSelected === null || isOwnPiece)) {
         if (isOwnPiece) {
           setPieceSelected(p)
@@ -55,7 +63,12 @@ const BoardComponent = (
         const toMove = pieceSelected
         unselectPiece()
 
-        props.playMove(toMove.coords, indicesToNotation(realI, realJ))
+        // TODO : get actual promotion type
+        props.playMove(
+          toMove.coords, 
+          indicesToNotation(realI, realJ),
+          Queen
+        )
       }
     }
   }

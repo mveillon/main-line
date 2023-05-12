@@ -1,6 +1,6 @@
 import { Board } from "../../chessLogic/Board";
 import Color from "../../chessLogic/Color";
-import { doubleMove, parseMove } from "../../chessLogic/parser";
+import { doubleMove, parseMove, uciToMove } from "../../chessLogic/parser";
 import Bishop from "../../chessLogic/pieces/Bishop";
 import King from "../../chessLogic/pieces/King";
 import Knight from "../../chessLogic/pieces/Knight";
@@ -228,4 +228,9 @@ test('promotion', () => {
   expect(q2).toBeInstanceOf(Queen)
   expect((q2 as Piece).color).toBe(Color.Black)
   expect((q2 as Piece).coords).toBe('d1')
+})
+
+test('uci', () => {
+  expect(uciToMove('e2e4')).toEqual(['e2', 'e4', undefined])
+  expect(uciToMove('e7e8q')).toEqual(['e7', 'e8', Queen])
 })

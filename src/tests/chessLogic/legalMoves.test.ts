@@ -165,31 +165,31 @@ test('castling', () => {
   expect(b.putsKingInCheck('e1', 'g1')).toBeFalsy()
   expect(b.putsKingInCheck('h1', 'g1')).toBeFalsy()
 
-  compareSetToArray(wKingMoves(), ['O-O', 'f1'])
+  compareSetToArray(wKingMoves(), ['g1', 'f1'])
 
   b.movePiece('f8', 'c5')
   b.movePiece('g8', 'f6')
-  compareSetToArray(bKingMoves(), ['O-O', 'f8'])
+  compareSetToArray(bKingMoves(), ['g8', 'f8'])
 
   b.movePiece('b1', 'c3')
   b.movePiece('c1', 'f4')
   b.movePiece('d1', 'd3')
-  compareSetToArray(wKingMoves(), ['O-O', 'O-O-O', 'd1', 'f1'])
+  compareSetToArray(wKingMoves(), ['g1', 'c1', 'd1', 'f1'])
 
   b.movePiece('b8', 'c6')
   b.movePiece('c8', 'f5')
   b.movePiece('d8', 'd6')
-  compareSetToArray(bKingMoves(), ['O-O', 'O-O-O', 'd8', 'f8'])
+  compareSetToArray(bKingMoves(), ['g8', 'c8', 'd8', 'f8'])
 
   b.movePiece('d6', 'd3')
   b.movePiece('e2', 'e3')
-  compareSetToArray(wKingMoves(), ['O-O-O', 'd1'])
+  compareSetToArray(wKingMoves(), ['c1', 'd1'])
 
   b.movePiece('d3', 'c2')
-  compareSetToArray(wKingMoves(), ['O-O', 'e2', 'f1'])
+  compareSetToArray(wKingMoves(), ['g1', 'e2', 'f1'])
 
   b.movePiece('f4', 'c7')
-  compareSetToArray(bKingMoves(), ['O-O', 'f8'])
+  compareSetToArray(bKingMoves(), ['g8', 'f8'])
 
   b.movePiece('c4', 'f7')
   compareSetToArray(bKingMoves(), ['f8', 'f7'])

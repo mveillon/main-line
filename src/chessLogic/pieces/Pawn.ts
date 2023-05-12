@@ -1,6 +1,6 @@
 import { addArrays } from "../../utils/numJS";
 import Color from "../Color";
-import { indicesToNotation, notationToIndices, indexToLetter } from "../notationIndices";
+import { indicesToNotation, notationToIndices } from "../notationIndices";
 import { Piece } from "./Piece";
 
 class Pawn extends Piece {

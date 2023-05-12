@@ -51,32 +51,6 @@ const pieceAcronym = (acronym: string): PieceT => {
 }
 
 /**
- * Castles for whoever's turn it is. Moves the king to the new `kingFile`
- * and whichever rook is on `oldRookFile` to `newRookFile`
- * @param kingFile which file should the king move to
- * @param oldRookFile which file the rook should currently be on
- * @param newRookFile which file should the rook move to
- * @param board the current board
- */
-const castle = (
-  turn: Color,
-  kingFile: string, 
-  oldRookFile: string, 
-  newRookFile: string, 
-  board: Board) => {
-
-  const king = board.findPieces(King, turn)[0]
-  const allRooks = board.findPieces(Rook, turn, oldRookFile)
-  if (allRooks.length === 0) {
-    throw new Error(`There is no rook on the correct square!`)
-  }
-  
-  const rank = turn === Color.White ? '1' : '8'
-  board.movePiece(king.coords, kingFile + rank)
-  board.movePiece(allRooks[0].coords, newRookFile + rank, false)
-}
-
-/**
  * Performs both moves of a PGN line such as 1. e4 e5
  * @param moveNotation the two moves to perform
  * @param board the board to perform the moves on
@@ -131,10 +105,11 @@ export const parseMove = (notation: string, board: Board) => {
     notation = notation.slice(0, lastInd + 1)
   }
 
+  const king = board.findPieces(King, turn)[0]
   if (notation === 'O-O') {
-    castle(turn, 'g', 'h', 'f', board)
+    board.movePiece(king.coords, 'g' + king.coords[1])
   } else if (notation === 'O-O-O') {
-    castle(turn, 'c', 'a', 'd', board)
+    board.movePiece(king.coords, 'c' + king.coords[1])
   } else {
     const pieceType = pieceAcronym(notation[0])
 
@@ -196,10 +171,11 @@ export const parseMove = (notation: string, board: Board) => {
  * initial of the piece type promoted to, or undefined if there was no
  * promotion
  */
-export const uciToMove = (uci: string): [string, string, string | undefined] => {
+export const uciToMove = (uci: string): [string, string, PieceT | undefined] => {
   let promotionType = undefined
   if (uci.length > 4) {
-    promotionType = uci[uci.length - 1]
+    const p = uci[uci.length - 1]
+    promotionType = acronyms()[p.toUpperCase()]
   }
   return [
     uci.slice(0, 2),

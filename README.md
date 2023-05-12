@@ -1,1 +1,3 @@
 # chess-openings
+
+This app uses Stockfish.wasm from Lichess. To install the dependencies, you first need to download and install [enscripten](https://emscripten.org). You can put the enscripten folder anywhere on your computer, but anytime you compile Stockfish, you have to run the `./emsdk_env.sh` script within that enscripten folder. It resets when you open a new Terminal window, so be sure to rerun it whem you need to. Once you've run that, clone [the Stockfish repo](https://github.com/lichess-org/stockfish.wasm) and put it in the root directory. `cd` into the `stockfish.wasm` directory and run `npm run-script prepare`. `cd` back into the `chess-openings` root directory and run `npm i` (and pray it works because this whole thing is such a dang mess). 

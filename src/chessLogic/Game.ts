@@ -2,7 +2,7 @@ import { Board } from "./Board";
 import Color from "./Color";
 import King from "./pieces/King";
 import Pawn from "./pieces/Pawn";
-import { Piece } from "./pieces/Piece";
+import { Piece, PieceT } from "./pieces/Piece";
 import Rook from "./pieces/Rook";
 
 class Game {
@@ -28,8 +28,9 @@ class Game {
    * game is over
    * @param from the square of the piece to move
    * @param to the square to move the piece to
+   * @param promoType what kind of piece to promote to
    */
-  playMove(from: string, to: string) {
+  playMove(from: string, to: string, promoType?: PieceT) {
     const moving = this.board.pieceAt(from)
     if (
       this.result === '' && 
@@ -37,7 +38,8 @@ class Game {
       moving.color === this.turn &&
       moving.legalMoves().has(to)
     ) {
-      this.board.movePiece(from, to)
+      
+      this.board.movePiece(from, to, true, promoType)
       this.turn = this.turn === Color.White ? Color.Black : Color.White
 
       const allPieces = this.board.findPieces(Piece, this.turn)

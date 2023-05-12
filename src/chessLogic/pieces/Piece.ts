@@ -8,8 +8,8 @@ export type PieceT = new (_color: Color, _coords: string, board: Board) => Piece
 export abstract class Piece {
   readonly color: Color
   coords: string
-  readonly whiteEmoji: string = ''
-  readonly blackEmoji: string = ''
+  abstract readonly whiteEmoji: string
+  abstract readonly blackEmoji: string
   protected _board: Board
   hasMoved: boolean = false
 

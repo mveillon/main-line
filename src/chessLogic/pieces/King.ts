@@ -40,7 +40,7 @@ class King extends Piece {
         ) // is the king in check now?
       )
       if (canShortCastle) {
-        res.add('O-O')
+        res.add('g' + rank)
       }
 
       const longRook = this._board.pieceAt('a1')
@@ -58,7 +58,7 @@ class King extends Piece {
         ) // is the king in check now?
       )
       if (canLongCastle) {
-        res.add('O-O-O')
+        res.add('c' + rank)
       }
     }
 

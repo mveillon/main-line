@@ -1,15 +1,26 @@
 import { useState } from "react";
 import BoardComponent from "./BoardComponent";
 import Game from "../chessLogic/Game";
+import { Engine } from "../chessLogic/Engine";
+import { uciToMove } from "../chessLogic/parser";
 
 function GameComponent() {
   const [game, setGame] = useState(new Game())
   const [result, setResult] = useState(game.result)
 
-  const playMove = (from: string, to: string) => {
+  const sf = new Engine(5, 1)
+
+  const playMove = async (from: string, to: string) => {
     game.playMove(from, to)
     setGame(game)
     setResult(game.result)
+
+    if (game.result === '') {
+      const moves = await sf.getBestMoves(game.toFEN())
+      game.playMove(...uciToMove(moves[0].move))
+      setGame(game)
+      setResult(game.result)
+    }
   }
 
   return (

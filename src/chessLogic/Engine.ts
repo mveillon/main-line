@@ -1,5 +1,3 @@
-import Stockfish from "../../stockfish.wasm"
-
 interface IStockfish {
   postMessage(cmd: string): void
   addMessageListener(listener: (message: string) => void): void
@@ -27,7 +25,10 @@ export class Engine {
    * @returns the initialized engine
    */
   protected async _loadEngine(): Promise<IStockfish> {
-    return Stockfish().then((sf: IStockfish) => {
+    // @ts-ignore
+    const Stockfish = await import("stockfish.wasm")
+
+    return Stockfish.default().then((sf: IStockfish) => {
       sf.postMessage('uci')
       sf.postMessage(`setoption name multipv value ${this.numMoves}`)
       sf.postMessage('isready')
@@ -48,7 +49,7 @@ export class Engine {
 
       const listener = (message: string) => {
         if (message.includes('readyok')) {
-          (this._sf as IStockfish).removeMessageListener(listener)
+          this._sf?.removeMessageListener(listener)
           resolve(undefined)
         }
       }
@@ -72,12 +73,8 @@ export class Engine {
     await this._waitForReady()
 
     return new Promise<MoveScore[]>((resolve, reject) => {
-      if (typeof this._sf === 'undefined') {
-        reject('Stockfish not yet loaded!')
-        return
-      }
-      
       const messages: MoveScore[] = []
+      
       const listener = (message: string) => {
         if (message.includes(`info depth ${this.depth}`)) {
           const words = message.split(' ')
@@ -92,11 +89,11 @@ export class Engine {
           resolve(messages)
         }
       }
-      this._sf.addMessageListener(listener)
+      this._sf?.addMessageListener(listener)
 
-      this._sf.postMessage('ucinewgame')
-      this._sf.postMessage(`position fen ${fen}`)
-      this._sf.postMessage(`go depth ${this.depth}`)
+      this._sf?.postMessage('ucinewgame')
+      this._sf?.postMessage(`position fen ${fen}`)
+      this._sf?.postMessage(`go depth ${this.depth}`)
     })
   }
 
