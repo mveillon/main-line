@@ -189,7 +189,7 @@ test('differentiate pieces', () => {
   expect(b.pieceAt('c4')).toBeInstanceOf(Rook)
 })
 
-test.only('en passant', () => {
+test('en passant', () => {
   const b = setUpBoard([
     '1. e4 c5',
     '2. e5 d5',

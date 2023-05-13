@@ -103,8 +103,8 @@ test('errors', () => {
     1. e4 f5 2. exf5 g6 3. fxg6 Nf6 4. gxh7 Rg8 *
   `)
 
-  expect(() => { b.movePiece('h7', 'g8') }).toThrow()
-  expect(() => b.putsKingInCheck('g6', 'g7')).toThrow()
+  expect(() => { b2.movePiece('h7', 'g8') }).toThrow()
+  expect(() => b2.putsKingInCheck('g6', 'g7')).toThrow()
 })
 
 test('undo', () => {
