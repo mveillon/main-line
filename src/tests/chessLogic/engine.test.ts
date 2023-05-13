@@ -8,8 +8,17 @@ import Rook from "../../chessLogic/pieces/Rook";
 import Knight from "../../chessLogic/pieces/Knight";
 import Bishop from "../../chessLogic/pieces/Bishop";
 
-// jest.setTimeout(2_147_483_647)
-jest.setTimeout(5000)
+jest.setTimeout(2_147_483_647)
+// jest.setTimeout(5000)
+
+beforeEach(() => {
+  // we do this because Stockfish makes some `fetch` calls, but only if `fetch`
+  // is a function. Should NOT be done anywhere else. You should use a mock function
+  // instead. 
+  
+  // @ts-ignore
+  global.fetch = undefined
+})
 
 const checkMove = (move: string, mover: Color, game: Game) => {
   const [from, to, promoType] = uciToMove(move)
@@ -28,22 +37,25 @@ const checkMove = (move: string, mover: Color, game: Game) => {
 test('engine', async () => {
   const g = new Game()
   const e = new Engine(5, 5)
-  g.playMove('e2', 'e4')
 
-  let moves = await e.getBestMoves(g.toFEN())
-  expect(moves.length).toBe(5)
+  try {
+    g.playMove('e2', 'e4')
 
-  for (const m of moves) {
-    checkMove(m.move, Color.Black, g)
+    let moves = await e.getBestMoves(g.toFEN())
+    expect(moves.length).toBe(5)
+  
+    for (const m of moves) {
+      checkMove(m.move, Color.Black, g)
+    }
+  
+    g.playMove('d7', 'd5')
+    moves = await e.getBestMoves(g.toFEN())
+    expect(moves.length).toBe(5)
+  
+    for (const m of moves) {
+      checkMove(m.move, Color.White, g)
+    }
+  } finally {
+    e.quit()
   }
-
-  g.playMove('d7', 'd5')
-  moves = await e.getBestMoves(g.toFEN())
-  expect(moves.length).toBe(5)
-
-  for (const m of moves) {
-    checkMove(m.move, Color.White, g)
-  }
-
-  e.quit()
 })

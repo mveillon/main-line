@@ -1,4 +1,4 @@
-import { Piece } from "./pieces/Piece"
+import { Piece, PieceT } from "./pieces/Piece"
 
 /**
  * All information needed to undo a move
@@ -8,7 +8,7 @@ export interface MoveInfo {
   to: string,
   captured: Piece | null,
   hadMoved: boolean,
-  promoted: boolean,
+  promoType?: PieceT,
   enPassant: boolean,
   pieceMoved: Piece
 }

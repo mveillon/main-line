@@ -12,6 +12,7 @@ export abstract class Piece {
   abstract readonly blackEmoji: string
   protected _board: Board
   hasMoved: boolean = false
+  abstract readonly type: PieceT
 
   /**
    * A piece on the board

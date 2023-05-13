@@ -1,12 +1,25 @@
-import React from 'react';
 import './App.css';
-
-import GameComponent from './components/GameComponent';
+import Opening from './components/Opening';
+import Color from './chessLogic/Color';
 
 function App() {
   return (
     <div className="App">
-      <GameComponent />
+      <Opening 
+        name="London System" 
+        pgn={`
+              [Event "?"]
+              [Site "?"]
+              [Date "????.??.??"]
+              [Round "?"]
+              [White "?"]
+              [Black "?"]
+              [Result "*"]
+
+              1. d4 d5 2. Bf4 *
+            `}
+        player={Color.White}
+      />
     </div>
   );
 }

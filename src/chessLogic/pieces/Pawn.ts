@@ -1,11 +1,12 @@
 import { addArrays } from "../../utils/numJS";
 import Color from "../Color";
 import { indicesToNotation, notationToIndices } from "../notationIndices";
-import { Piece } from "./Piece";
+import { Piece, PieceT } from "./Piece";
 
 class Pawn extends Piece {
   readonly blackEmoji: string = '♙'
   readonly whiteEmoji: string = '♟'
+  readonly type: PieceT = Pawn
 
   // assumes the pawn is not on the opposite rank i.e. if it can promote, 
   // it already has

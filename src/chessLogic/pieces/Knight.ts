@@ -1,8 +1,9 @@
-import { Piece } from "./Piece";
+import { Piece, PieceT } from "./Piece";
 
 class Knight extends Piece {
   readonly blackEmoji: string = '♘'
   readonly whiteEmoji: string = '♞'
+  readonly type: PieceT = Knight
 
   legalMovesNoChecks(): Set<string> {
     const direcs: [number, number][] = [

@@ -22,7 +22,7 @@ import whiteRook from "../assets/whiteRook.png"
  * @returns an image of that piece
  */
 const pieceToSrc = (piece: Piece): string => {
-  const name = piece.constructor.name
+  const name = piece.type.name
   const color = piece.color === Color.White ? 'white' : 'black'
 
   const pieces: { [index: string]: string } = {

@@ -198,4 +198,3 @@ test('castling', () => {
   b.movePiece('e2', 'e1')
   compareSetToArray(wKingMoves(), ['f1', 'e2'])
 })
-

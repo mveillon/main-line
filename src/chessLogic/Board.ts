@@ -6,6 +6,8 @@ import King from "./pieces/King"
 import Pawn from "./pieces/Pawn"
 import type { MoveInfo } from "./MoveInfo"
 import { doubleMove } from "./parser"
+import Queen from "./pieces/Queen"
+import Rook from "./pieces/Rook"
 
 /**
  * An array of pieces. An empty square is `null`. A `BoardT`[0] refers
@@ -17,13 +19,14 @@ export type BoardT = (Piece | null)[][]
 
 export class Board {
   protected _board: BoardT
-  public get board() : BoardT {
-    return this._board
-  }
   movesMade: MoveInfo[]
+  protected _movePointer: number = -1
 
   get lastMove(): MoveInfo {
-    return this.movesMade[this.movesMade.length - 1]
+    return this.movesMade[this._movePointer]
+  }
+  get board() : BoardT {
+    return this._board
   }
 
   /**
@@ -136,17 +139,14 @@ export class Board {
    * Moves the piece at `from` to `to`, regardless of whether it's legal
    * @param from the starting square
    * @param to the ending square
-   * @param sideEffects whether or not to update the piece's hasMoved
    * @param promoteType what type of piece to promote to if the move
    * promotes a pawn
-   * field and promote pawns. Good to turn off if making a hypothetical move
    */
   movePiece(
     from: string, 
     to: string, 
-    sideEffects: boolean = true,
-    promoteType?: PieceT) {
-
+    promoteType?: PieceT
+  ) {
     if (to === 'O-O' || to === 'O-O-O') {
       throw new Error(
         'To castle, move the king from the e file to either the c or g file'
@@ -165,7 +165,7 @@ export class Board {
       to: to,
       captured: this.pieceAt(to),
       hadMoved: p.hasMoved,
-      promoted: false,
+      promoType: promoteType,
       enPassant: (
         p instanceof Pawn &&
         toJ !== fromJ &&
@@ -174,8 +174,14 @@ export class Board {
       pieceMoved: p
     }
 
+    if (info.enPassant) {
+      info.captured = this._board[fromI][toJ]
+      this._board[fromI][toJ] = null
+    }
+    this.movesMade.push(info)
+    this._movePointer++
+
     if (
-      sideEffects &&
       p instanceof King && 
       p.coords[0] === 'e' && 
       (to[0] === 'c' || to[0] === 'g')
@@ -188,31 +194,25 @@ export class Board {
 
       const newRookFile = to[0] === 'c' ? 'd' : 'f'
 
-      this.movePiece(rook.coords, newRookFile + to[1], sideEffects, promoteType)
+      this.movePiece(rook.coords, newRookFile + to[1], promoteType)
+      this.movesMade.pop()
+      this._movePointer--
     }
 
     this._board[toI][toJ] = p
     this._board[fromI][fromJ] = null
     p.coords = to
 
-    if (sideEffects && p instanceof Pawn && (toI === 0 || toI === 7)) {
+    if (p instanceof Pawn && (to[1] === '1' || to[1] === '8')) {
       if (typeof promoteType === 'undefined') {
         throw new Error(
           `Undefined promotion type for promoting move when moving ${from} to ${to}`
         )
       }
       this._promotePawn(p, promoteType)
-      info.promoted = true
     }
 
-    if (sideEffects) {
-      p.hasMoved = true
-      if (info.enPassant) {
-        info.captured = this._board[fromI][toJ]
-        this._board[fromI][toJ] = null
-      }
-      this.movesMade.push(info)
-    }
+    p.hasMoved = true
   }
 
   /**
@@ -261,15 +261,11 @@ export class Board {
     if (p === null) {
       throw new Error(`${from} is an empty square`)
     }
-
-    const oldPiece = this.pieceAt(to)
-    this.movePiece(from, to, false)
-    const res = this.isInCheck(p.color)
     
-    this.movePiece(to, from, false)
-    const [i, j] = notationToIndices(to)
-    this._board[i][j] = oldPiece
-
+    // promotion type doesn't matter
+    this.movePiece(from, to, Queen)
+    const res = this.isInCheck(p.color)
+    this.undoLastMove()
     return res
   }
 
@@ -297,5 +293,62 @@ export class Board {
       }
     }
     return false
+  }
+
+  /**
+   * Returns whether `player` has any legal moves
+   * @param player which player to check
+   * @returns whether `player` can move
+   */
+  canMove(player: Color): boolean {
+    const allPieces = this.findPieces(Piece, player)
+    for (const p of allPieces) {
+      if (p.legalMoves().size > 0) {
+        return true
+      }
+    }
+    return false
+  }
+
+  /**
+   * Undoes the last move played, reversing all side effects
+   */
+  undoLastMove() {
+    const toUndo = this.movesMade.pop()
+    this._movePointer--
+    if (typeof toUndo === 'undefined') {
+      throw new Error('Cannot undo when no moves have been played')
+    }
+    const [fromI, fromJ] = notationToIndices(toUndo.from)
+    const [toI, toJ] = notationToIndices(toUndo.to)
+    this._board[fromI][fromJ] = toUndo.pieceMoved
+    toUndo.pieceMoved.coords = toUndo.from
+
+    this._board[toI][toJ] = null
+    if (toUndo.captured !== null) {
+      // can't use toI and toJ because of en passant
+      const [capI, capJ] = notationToIndices(toUndo.captured.coords)
+      this._board[capI][capJ] = toUndo.captured
+    }
+    
+    toUndo.pieceMoved.hasMoved = toUndo.hadMoved
+    if (
+      toUndo.pieceMoved instanceof King &&
+      Math.abs(fromJ - toJ) > 1
+    ) {
+      // castling
+      const rank = toUndo.pieceMoved.coords[1]
+      const oldRook = toUndo.to[0] === 'c' ? 'a' : 'h'
+      const newRook = toUndo.to[0] === 'c' ? 'd' : 'f'
+      const [oldI, oldJ] = notationToIndices(oldRook + rank)
+      const [newI, newJ] = notationToIndices(newRook + rank)
+
+      this._board[newI][newJ] = null
+      this._board[oldI][oldJ] = new Rook(
+        toUndo.pieceMoved.color,
+        oldRook + rank,
+        this
+      )
+    }
   }
 }

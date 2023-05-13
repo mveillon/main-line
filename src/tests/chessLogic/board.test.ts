@@ -5,7 +5,6 @@ import Bishop from "../../chessLogic/pieces/Bishop";
 import King from "../../chessLogic/pieces/King";
 import Knight from "../../chessLogic/pieces/Knight";
 import Pawn from "../../chessLogic/pieces/Pawn";
-import { Piece } from "../../chessLogic/pieces/Piece";
 import Queen from "../../chessLogic/pieces/Queen";
 import Rook from "../../chessLogic/pieces/Rook";
 
@@ -106,4 +105,90 @@ test('errors', () => {
 
   expect(() => { b.movePiece('h7', 'g8') }).toThrow()
   expect(() => b.putsKingInCheck('g6', 'g7')).toThrow()
+})
+
+test('undo', () => {
+  const b = new Board()
+  expect(() => { b.undoLastMove() }).toThrow()
+
+  b.movePiece('e2', 'e4')
+  b.undoLastMove()
+  expect(b.pieceAt('e4')).toBeNull()
+  expect(b.pieceAt('e2')).toBeInstanceOf(Pawn)
+  expect(b.pieceAt('e2')?.hasMoved).toBeFalsy()
+  expect(b.pieceAt('e2')?.coords).toBe('e2')
+
+  b.movePiece('e2', 'e4')
+  b.movePiece('d7', 'd5')
+  b.movePiece('e4', 'd5')
+  b.undoLastMove()
+
+  expect(b.pieceAt('d5')).toBeInstanceOf(Pawn)
+  expect(b.pieceAt('d5')?.color).toBe(Color.Black)
+  expect(b.pieceAt('e4')).toBeInstanceOf(Pawn)
+  expect(b.pieceAt('e4')?.color).toBe(Color.White)
+  expect(b.pieceAt('d5')?.hasMoved).toBeTruthy()
+  expect(b.pieceAt('e4')?.hasMoved).toBeTruthy()
+  expect(b.pieceAt('d5')?.coords).toBe('d5')
+  expect(b.pieceAt('e4')?.coords).toBe('e4')
+
+  b.movePiece('d5', 'd4')
+  b.movePiece('c2', 'c4')
+  b.movePiece('d4', 'c3')
+  b.undoLastMove()
+  
+  expect(b.pieceAt('d4')).toBeInstanceOf(Pawn)
+  expect(b.pieceAt('d4')?.coords).toBe('d4')
+  expect(b.pieceAt('d4')?.color).toBe(Color.Black)
+  expect(b.pieceAt('d4')?.hasMoved).toBeTruthy()
+  expect(b.pieceAt('c4')).toBeInstanceOf(Pawn)
+  expect(b.pieceAt('c4')?.coords).toBe('c4')
+  expect(b.pieceAt('c4')?.color).toBe(Color.White)
+  expect(b.pieceAt('c4')?.hasMoved).toBeTruthy()
+
+  const b2 = new Board(`
+    [Event "?"]
+    [Site "?"]
+    [Date "????.??.??"]
+    [Round "?"]
+    [White "?"]
+    [Black "?"]
+    [Result "*"]
+    
+    1. e4 d5 2. Nf3 Nc6 3. Bd3 Bg4 4. Nc3 Qd6 *
+  `)
+
+  b2.movePiece('e1', 'g1')
+  b2.undoLastMove()
+
+  expect(b2.pieceAt('e1')).toBeInstanceOf(King)
+  expect(b2.pieceAt('e1')?.hasMoved).toBeFalsy()
+  expect(b2.pieceAt('h1')).toBeInstanceOf(Rook)
+  expect(b2.pieceAt('h1')?.hasMoved).toBeFalsy()
+
+  b2.movePiece('e8', 'c8')
+  b2.undoLastMove()
+
+  expect(b2.pieceAt('e8')).toBeInstanceOf(King)
+  expect(b2.pieceAt('e8')?.hasMoved).toBeFalsy()
+  expect(b2.pieceAt('a8')).toBeInstanceOf(Rook)
+  expect(b2.pieceAt('a8')?.hasMoved).toBeFalsy()
+
+  const promotion = new Board(`
+    [Event "?"]
+    [Site "?"]
+    [Date "????.??.??"]
+    [Round "?"]
+    [White "?"]
+    [Black "?"]
+    [Result "*"]
+    
+    1. e4 f5 2. exf5 e6 3. fxe6 Nf6 4. exd7+ Kf7 *
+  `)
+
+  promotion.movePiece('d7', 'c8', Knight)
+  promotion.undoLastMove()
+
+  expect(promotion.pieceAt('c8')).toBeInstanceOf(Bishop)
+  expect(promotion.pieceAt('d7')).toBeInstanceOf(Pawn)
 })

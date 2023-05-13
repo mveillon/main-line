@@ -7,15 +7,17 @@ import { Piece, PieceT } from "../chessLogic/pieces/Piece";
 import { indicesToNotation, notationToIndices } from "../chessLogic/notationIndices";
 import Game from "../chessLogic/Game";
 import Queen from "../chessLogic/pieces/Queen";
+import Color from "../chessLogic/Color";
 
 const BoardComponent = (
   props: {
     game: Game, 
-    playMove: (from: string, to: string, promoType?: PieceT) => void
+    playMove: (from: string, to: string, promoType?: PieceT) => void,
+    player: Color
   }) => {
   
   const board = props.game.board
-  const [reversed, setReversed] = useState(true)
+  const [reversed, setReversed] = useState(props.player === Color.White)
   const [pieceSelected, setPieceSelected] = useState<Piece | null>(null)
 
   const [isSelected, setIsSelected] = useState(

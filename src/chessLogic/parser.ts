@@ -34,7 +34,7 @@ const trimMoveNumber = (notation: string): string => {
   return notation.replace(r, '').replace(s, ' ').trim()
 }
 
-/**
+/** 
  * Converts the piece acronym (e.g. B or N) to the piece it 
  * corresponds to
  * @param acronym the piece acronym. If it is not a typical piece
@@ -157,7 +157,8 @@ export const parseMove = (notation: string, board: Board) => {
     const to = notation.slice(notation.length - 2)
     for (const p of pieces) {
       if (p.legalMoves().has(to)) {
-        board.movePiece(p.coords, to, true, promotionType)
+        board.movePiece(p.coords, to, promotionType)
+        break
       }
     }
   }
@@ -167,9 +168,10 @@ export const parseMove = (notation: string, board: Board) => {
  * Converts a move in UCI long algebraic notation into something that can be
  * passed to Board.movePiece
  * @param uci the move notation
- * @returns where the piece moved from, where the piece moved to, and the 
- * initial of the piece type promoted to, or undefined if there was no
- * promotion
+ * @returns `from`: where the piece moved from
+ * @returns `to`: where the piece moved to
+ * @returns `promoType`: what the piece promoted to, or undefined if there
+ * was no promotion
  */
 export const uciToMove = (uci: string): [string, string, PieceT | undefined] => {
   let promotionType = undefined
@@ -182,5 +184,76 @@ export const uciToMove = (uci: string): [string, string, PieceT | undefined] => 
     uci.slice(2, 4),
     promotionType
   ]
+}
+
+/**
+ * Converts the UCI notation into short algebraic notation e.g. `g1f3` becomes
+ * `Nf3`
+ * @param uci the UCI notation
+ * @param board the board to make the move on
+ * @returns the same move in short algebraic notation
+ */
+export const uciToAlgebraic = (uci: string, board: Board): string => {
+  const [from, to, promoType] = uciToMove(uci)
+  const abbrs: { [index: string]: string } = {
+    [Bishop.name]: 'B',
+    [King.name]: 'K',
+    [Knight.name]: 'N',
+    [Pawn.name]: '',
+    [Queen.name]: 'Q',
+    [Rook.name]: 'R'
+  }
+
+  const piece = board.pieceAt(from)
+  if (piece === null) {
+    throw new Error(`${from} is an empty square`)
+  }
+
+  let parts: string[] = [
+    abbrs[piece.type.name]
+  ]
+
+  if (piece instanceof Pawn && from[0] !== to[0]) {
+    parts.push(from[0])
+  } else {
+    const otherPieces = board.findPieces(piece.type, piece.color)
+    for (const p of otherPieces) {
+      if (p.coords !== piece.coords && p.legalMoves().has(to)) {
+        if (p.coords[0] === piece.coords[0]) {
+          parts.push(piece.coords[1])
+        } else {
+          parts.push(piece.coords[0])
+        }
+
+        break
+      }
+    }
+  }
+
+  if (board.pieceAt(to) !== null) {
+    parts.push('x')
+  }
+
+  parts.push(to)
+
+  if (piece instanceof Pawn && to[1] === '1' || to[1] === '8') {
+    if (typeof promoType === 'undefined') {
+      throw new Error('Undefined promotion type')
+    }
+
+    parts.push(`=${abbrs[promoType.name]}`)
+  }
+
+  board.movePiece(from, to, promoType)
+  if (board.isInCheck(+!piece.color)) {
+    if (board.canMove(+!piece.color)) {
+      parts.push('+')
+    } else {
+      parts.push('#')
+    }
+  }
+  board.undoLastMove()
+
+  return parts.join('')
 }
 

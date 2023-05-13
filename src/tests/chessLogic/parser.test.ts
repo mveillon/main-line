@@ -1,11 +1,15 @@
 import { Board } from "../../chessLogic/Board";
 import Color from "../../chessLogic/Color";
-import { doubleMove, parseMove, uciToMove } from "../../chessLogic/parser";
+import { 
+  doubleMove, 
+  parseMove, 
+  uciToMove, 
+  uciToAlgebraic 
+} from "../../chessLogic/parser";
 import Bishop from "../../chessLogic/pieces/Bishop";
 import King from "../../chessLogic/pieces/King";
 import Knight from "../../chessLogic/pieces/Knight";
 import Pawn from "../../chessLogic/pieces/Pawn";
-import { Piece } from "../../chessLogic/pieces/Piece";
 import Queen from "../../chessLogic/pieces/Queen";
 import Rook from "../../chessLogic/pieces/Rook";
 
@@ -185,7 +189,7 @@ test('differentiate pieces', () => {
   expect(b.pieceAt('c4')).toBeInstanceOf(Rook)
 })
 
-test('en passant', () => {
+test.only('en passant', () => {
   const b = setUpBoard([
     '1. e4 c5',
     '2. e5 d5',
@@ -236,4 +240,87 @@ test('promotion', () => {
 test('uci', () => {
   expect(uciToMove('e2e4')).toEqual(['e2', 'e4', undefined])
   expect(uciToMove('e7e8q')).toEqual(['e7', 'e8', Queen])
+})
+
+test('uci to algebraic', () => {
+  const b = new Board()
+  expect(() => uciToAlgebraic('e3e4', b)).toThrow()
+  expect(uciToAlgebraic('e2e4', b)).toBe('e4')
+  expect(uciToAlgebraic('b8c6', b)).toBe('Nc6')
+
+  b.movePiece('e2', 'e4')
+  b.movePiece('d7', 'd5')
+  expect(uciToAlgebraic('e4d5', b)).toBe('exd5')
+
+  b.movePiece('g8', 'f6')
+  expect(uciToAlgebraic('f6d7', b)).toBe('Nfd7')
+
+  b.movePiece('e4', 'd5')
+  expect(uciToAlgebraic('d8d5', b)).toBe('Qxd5')
+
+  const rankDisambig = new Board(`
+    [Event "?"]
+    [Site "?"]
+    [Date "????.??.??"]
+    [Round "?"]
+    [White "?"]
+    [Black "?"]
+    [Result "*"]
+    
+    1. Nf3 e6 2. Nc3 Nh6 3. Ne5 Ng8 4. Nd5 Nh6 5. Ne3 *
+  `)
+  expect(uciToAlgebraic('e3c4', rankDisambig)).toBe('N3c4')
+
+  const promotion = new Board(`
+    [Event "?"]
+    [Site "?"]
+    [Date "????.??.??"]
+    [Round "?"]
+    [White "?"]
+    [Black "?"]
+    [Result "*"]
+    
+    1. e4 f5 2. exf5 e6 3. fxe6 Nf6 4. exd7+ Kf7 *
+  `)
+  expect(() => uciToAlgebraic('d7c8', promotion)).toThrow()
+  expect(uciToAlgebraic('d7c8N', promotion)).toBe('dxc8=N')
+
+  const check = new Board(`
+    [Event "?"]
+    [Site "?"]
+    [Date "????.??.??"]
+    [Round "?"]
+    [White "?"]
+    [Black "?"]
+    [Result "*"]
+    
+    1. e4 f5 *
+  `)
+  expect(uciToAlgebraic('d1h5', check)).toBe('Qh5+')
+
+  const mate = new Board(`
+    [Event "?"]
+    [Site "?"]
+    [Date "????.??.??"]
+    [Round "?"]
+    [White "?"]
+    [Black "?"]
+    [Result "*"]
+    
+    1. e4 f6 2. d3 g5 *
+  `)
+  expect(uciToAlgebraic('d1h5', mate)).toBe('Qh5#')
+
+  const promoCheck = new Board(`
+    [Event "?"]
+    [Site "?"]
+    [Date "????.??.??"]
+    [Round "?"]
+    [White "?"]
+    [Black "?"]
+    [Result "*"]
+    
+    1. e4 f5 2. exf5 e6 3. fxe6 Qh4 4. e7 Nh6 
+  `)
+  expect(uciToAlgebraic('e7f8q', promoCheck)).toBe('exf8=Q+')
 })

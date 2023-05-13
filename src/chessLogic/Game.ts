@@ -2,8 +2,11 @@ import { Board } from "./Board";
 import Color from "./Color";
 import King from "./pieces/King";
 import Pawn from "./pieces/Pawn";
+import Bishop from "./pieces/Bishop";
+import Knight from "./pieces/Knight";
 import { Piece, PieceT } from "./pieces/Piece";
 import Rook from "./pieces/Rook";
+import Queen from "./pieces/Queen";
 
 class Game {
   board: Board
@@ -24,7 +27,7 @@ class Game {
       this._setResult()
     }
 
-    this.engineColors = [Color.Black]
+    this.engineColors = []
   }
 
   /**
@@ -44,7 +47,7 @@ class Game {
       moving.legalMoves().has(to)
     ) {
       
-      this.board.movePiece(from, to, true, promoType)
+      this.board.movePiece(from, to, promoType)
       this.turn = +!this.turn
       this._setResult()
     }
@@ -55,16 +58,7 @@ class Game {
    * Assumes `this.turn` is accurate
    */
   protected _setResult() {
-    const allPieces = this.board.findPieces(Piece, this.turn)
-    let canMove = false
-    for (const p of allPieces) {
-      if (p.legalMoves().size > 0) {
-        canMove = true
-        break
-      }
-    }
-
-    if (!canMove) {
+    if (!this.board.canMove(this.turn)) {
       if (this.board.isInCheck(this.turn)) {
         this.result = this.turn === Color.White ? '0-1' : '1-0'
       } else {
@@ -79,12 +73,12 @@ class Game {
    */
   toFEN(): string {
     const abbrs: { [index: string]: string } = {
-      Bishop: 'b',
-      King: 'k',
-      Knight: 'n',
-      Pawn: 'p',
-      Queen: 'q',
-      Rook: 'r'
+      [Bishop.name]: 'b',
+      [King.name]: 'k',
+      [Knight.name]: 'n',
+      [Pawn.name]: 'p',
+      [Queen.name]: 'q',
+      [Rook.name]: 'r'
     }
 
     const allRows: string[] = []
@@ -103,7 +97,7 @@ class Game {
             row.push(emptySpaces.toString())
             emptySpaces = 0
           }
-          const a = abbrs[square.constructor.name]
+          const a = abbrs[square.type.name]
           if (square.color === Color.Black) {
             row.push(a)
           } else {
