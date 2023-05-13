@@ -23,7 +23,7 @@ function GameComponent() {
     if (game.result === '') {
       const moves = await sf.getBestMoves(game.toFEN())
       game.playMove(...uciToMove(moves[0].move))
-      setGame(game)
+      setGame(Object.assign(new Game(), game))
       setResult(game.result)
     }
   }

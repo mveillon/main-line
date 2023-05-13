@@ -23,13 +23,13 @@ test('starting position', () => {
   expect(b.pieceAt('h1')).toBeInstanceOf(Rook)
 
   for (const file of files) {
-    expect((b.pieceAt(`${file}1`) as Piece).color).toBe(Color.White)
+    expect(b.pieceAt(`${file}1`)?.color).toBe(Color.White)
     expect(b.pieceAt(`${file}2`)).toBeInstanceOf(Pawn)
-    expect((b.pieceAt(`${file}2`) as Piece).color).toBe(Color.White)
+    expect(b.pieceAt(`${file}2`)?.color).toBe(Color.White)
 
-    expect((b.pieceAt(`${file}8`) as Piece).color).toBe(Color.Black)
+    expect(b.pieceAt(`${file}8`)?.color).toBe(Color.Black)
     expect(b.pieceAt(`${file}7`)).toBeInstanceOf(Pawn)
-    expect((b.pieceAt(`${file}7`) as Piece).color).toBe(Color.Black)
+    expect(b.pieceAt(`${file}7`)?.color).toBe(Color.Black)
   }
 
   expect(typeof b.pieceAt('h1')?.toString()).toBe("string")
@@ -42,14 +42,14 @@ test('movePiece', () => {
   b.movePiece('e2', 'e4')
   expect(b.pieceAt('e2')).toBeNull()
   expect(b.pieceAt('e4')).toBeInstanceOf(Pawn)
-  expect((b.pieceAt('e4') as Piece).coords).toBe('e4')
-  expect((b.pieceAt('e4') as Piece).color).toBe(Color.White)
+  expect(b.pieceAt('e4')?.coords).toBe('e4')
+  expect(b.pieceAt('e4')?.color).toBe(Color.White)
 
   b.movePiece('e7', 'e5')
   expect(b.pieceAt('e7')).toBeNull()
   expect(b.pieceAt('e5')).toBeInstanceOf(Pawn)
-  expect((b.pieceAt('e5') as Piece).coords).toBe('e5')
-  expect((b.pieceAt('e5') as Piece).color).toBe(Color.Black)
+  expect(b.pieceAt('e5')?.coords).toBe('e5')
+  expect(b.pieceAt('e5')?.color).toBe(Color.Black)
 })
 
 test('blockedOOB', () => {

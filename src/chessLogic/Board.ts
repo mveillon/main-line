@@ -22,10 +22,15 @@ export class Board {
   }
   movesMade: MoveInfo[]
 
-  public get lastMove(): MoveInfo {
+  get lastMove(): MoveInfo {
     return this.movesMade[this.movesMade.length - 1]
   }
 
+  /**
+   * A board of pieces. Just handles the pieces, not whose turn it is
+   * or any engine integration
+   * @param pgn the starting PGN
+   */
   constructor(pgn?: string) {
     this._board = startingPosition(this)
     this.movesMade = []

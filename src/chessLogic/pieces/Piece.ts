@@ -13,6 +13,12 @@ export abstract class Piece {
   protected _board: Board
   hasMoved: boolean = false
 
+  /**
+   * A piece on the board
+   * @param _color who owns the piece
+   * @param _coords the algebraic coordinates of the piece
+   * @param board a pointer to the board its on
+   */
   constructor(_color: Color, _coords: string, board: Board) {
     this.color = _color
     this.coords = _coords

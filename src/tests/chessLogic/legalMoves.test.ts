@@ -156,9 +156,9 @@ test('castling', () => {
   b.movePiece('f1', 'c4')
   b.movePiece('g1', 'f3')
 
-  expect((b.pieceAt('e1') as King).hasMoved).toBeFalsy()
+  expect(b.pieceAt('e1')?.hasMoved).toBeFalsy()
   expect(b.pieceAt('h1')).toBeInstanceOf(Rook)
-  expect((b.pieceAt('h1') as Rook).hasMoved).toBeFalsy()
+  expect(b.pieceAt('h1')?.hasMoved).toBeFalsy()
   expect(b.pieceAt('f1')).toBeNull()
   expect(b.pieceAt('g1')).toBeNull()
   expect(b.putsKingInCheck('e1', 'f1')).toBeFalsy()

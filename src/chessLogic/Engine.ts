@@ -12,8 +12,13 @@ export interface MoveScore {
 export class Engine {
   protected _sf: IStockfish | undefined
   depth: number
-  numMoves: number
+  readonly numMoves: number
 
+  /**
+   * A Stockfish wrapper
+   * @param depth what depth to run at
+   * @param numMoves how many of the best moves to return
+   */
   constructor(depth: number, numMoves: number) {
     this._sf = undefined
     this.depth = depth
@@ -25,10 +30,17 @@ export class Engine {
    * @returns the initialized engine
    */
   protected async _loadEngine(): Promise<IStockfish> {
-    // @ts-ignore
-    const Stockfish = await import("stockfish.wasm")
+    let getSF: () => Promise<IStockfish>
+    if (process.env.NODE_ENV === 'test') {
+      // @ts-ignore
+      const Stockfish = await import("../../public/stockfish.wasm")
+      getSF = Stockfish.default
+    } else {
+      // @ts-ignore
+      getSF = window.Stockfish
+    }
 
-    return Stockfish.default().then((sf: IStockfish) => {
+    return getSF().then((sf: IStockfish) => {
       sf.postMessage('uci')
       sf.postMessage(`setoption name multipv value ${this.numMoves}`)
       sf.postMessage('isready')
@@ -80,7 +92,7 @@ export class Engine {
         }
 
         if (message.includes('bestmove')) {
-          (this._sf as IStockfish).removeMessageListener(listener)
+          this._sf?.removeMessageListener(listener)
           resolve(messages)
         }
       }

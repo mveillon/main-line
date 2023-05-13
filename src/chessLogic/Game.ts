@@ -11,6 +11,10 @@ class Game {
   result: string = ''
   engineColors: Color[]
 
+  /**
+   * A game of chess between two players or computers
+   * @param pgn the starting PGN
+   */
   constructor(pgn?: string) {
     this.board = new Board(pgn)
     if (this.board.movesMade.length > 0) {
