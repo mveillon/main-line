@@ -42,20 +42,15 @@ export class Engine {
    */
   protected async _waitForReady() {
     return new Promise((resolve, reject) => {
-      if (typeof this._sf === 'undefined') {
-        reject('Stockfish not yet loaded!')
-        return
-      }
-
       const listener = (message: string) => {
         if (message.includes('readyok')) {
           this._sf?.removeMessageListener(listener)
           resolve(undefined)
         }
       }
-      this._sf.addMessageListener(listener);
+      this._sf?.addMessageListener(listener);
 
-      this._sf.postMessage('isready')
+      this._sf?.postMessage('isready')
     })
   }
 
@@ -97,6 +92,10 @@ export class Engine {
     })
   }
 
+  /**
+   * Closes the engine and clears all threads. Should always be called at the 
+   * end to prevent leaking threads and such nonsense
+   */
   quit() {
     this._sf?.postMessage('quit')
   }

@@ -1,3 +1,6 @@
+const A_CODE = 'a'.charCodeAt(0)
+const H_CODE = 'h'.charCodeAt(0)
+
 /**
  * Within a BoardT, each letter corresponds to one column. For example,
  * the 1st column is the g file, meaning square g3 corresponds to a square
@@ -8,11 +11,10 @@
  */
 export const letterToCol = (letter: string): number => {
   const code = letter.charCodeAt(0)
-  // 104 is h and 97 is a in ASCII
-  if (code > 104 || code < 97) {
+  if (code > H_CODE || code < A_CODE) {
     throw new Error(`Unexpected letter ${letter}. Should be between a and h`)
   }
-  return 104 - code
+  return H_CODE - code
 }
 
 /**
@@ -27,7 +29,7 @@ export const indexToLetter = (ind: number): string => {
   if (ind < 0 || ind > 7) {
     throw new Error(`Index out of bounds ${ind}`)
   }
-  return String.fromCharCode(104 - ind)
+  return String.fromCharCode(H_CODE - ind)
 }
 
 /**

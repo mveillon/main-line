@@ -47,6 +47,7 @@ test('full', () => {
             [3, 3, 3]
         ]
     ]);
+    expect(full([2, 2], undefined, () => true)).toEqual([[true, true], [true, true]]);
 });
 
 test('getShape', () => {

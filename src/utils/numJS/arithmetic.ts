@@ -13,17 +13,17 @@ import { broadcast, zeros } from "./shapes";
  * @returns their element-wise sum
  */
  export const addArrays = (a1: numArray, a2: numArray): numArray => {
-    [a1, a2] = broadcast(a1, a2);
+  [a1, a2] = broadcast(a1, a2);
 
-    if (Array.isArray(a1)) {
-        let res: numArray = [];
-        for (let i = 0; i < a1.length; i++) {
-            res.push(addArrays(a1[i], (a2 as number[])[i]));
-        }
-        return res
+  if (Array.isArray(a1)) {
+    let res: numArray = [];
+    for (let i = 0; i < a1.length; i++) {
+      res.push(addArrays(a1[i], (a2 as number[])[i]));
     }
+    return res
+  }
 
-    return a1 + (a2 as number);
+  return a1 + (a2 as number);
 }
 
 /**
@@ -39,7 +39,7 @@ import { broadcast, zeros } from "./shapes";
  * @returns a1 - a2 element-wise
  */
  export const subArrays = (a1: numArray, a2: numArray): numArray => {
-    return addArrays(a1, scalarMul(a2, -1));
+  return addArrays(a1, scalarMul(a2, -1));
 }
 
 /**
@@ -54,15 +54,15 @@ import { broadcast, zeros } from "./shapes";
  * @returns the result of x * A
  */
  export const scalarMul = (A: numArray, x: number): numArray => {
-    if (Array.isArray(A)) {
-        let res: numArray = [];
-        for (const row of A) {
-            res.push(scalarMul(row, x));
-        }
-        return res;
+  if (Array.isArray(A)) {
+    let res: numArray = [];
+    for (const row of A) {
+      res.push(scalarMul(row, x));
     }
-    
-    return x * A;
+    return res;
+  }
+  
+  return x * A;
 }
 
 /**
@@ -74,12 +74,12 @@ import { broadcast, zeros } from "./shapes";
  * @returns the column-wise average of A
  */
  export const colAverage = (A: number[][]): number[] => {
-    if (A.length === 0) return [];
-    const total = A.reduce(
-        (accum, row) => addArrays(accum, row) as number[],
-        zeros([A[0].length])
-    );
-    return scalarMul(total, 1 / A.length) as number[];
+  if (A.length === 0) return [];
+  const total = A.reduce(
+    (accum, row) => addArrays(accum, row) as number[],
+    zeros([A[0].length])
+  );
+  return scalarMul(total, 1 / A.length) as number[];
 }
 
 /**
@@ -93,9 +93,9 @@ import { broadcast, zeros } from "./shapes";
  * @returns the sum of every element in x
  */
  export const sumList = (x: numArray): number => {
-    if (Array.isArray(x)) {
-        return x.map(sumList).reduce((a, b) => a + b, 0);
-    }
-    return x;
+  if (Array.isArray(x)) {
+    return x.map(sumList).reduce((a, b) => a + b, 0);
+  }
+  return x;
 }
 

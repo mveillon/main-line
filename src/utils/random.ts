@@ -7,11 +7,11 @@ import { copyArr, arrGTEq, all, numArray, reshape } from "./numJS";
  * @returns a random integer in the provided range
  */
  export const randInt = (min: number, max?: number): number => {
-    if (typeof max === 'undefined') {
-        max = min;
-        min = 0;
-    }
-    return Math.floor(Math.random() * (max - min) + min);
+  if (typeof max === 'undefined') {
+    max = min;
+    min = 0;
+  }
+  return Math.floor(Math.random() * (max - min) + min);
 }
 
 /**
@@ -21,41 +21,41 @@ import { copyArr, arrGTEq, all, numArray, reshape } from "./numJS";
  * @returns one choice from the array
  */
 export const choice = <T>(arr: T[], ws?: number[]): T => {
-    if (arr.length === 0) {
-        throw new Error('Empty array not allowed in choice function');
-    }
+  if (arr.length === 0) {
+    throw new Error('Empty array not allowed in choice function');
+  }
 
-    if (typeof ws === 'undefined') {
-        return arr[randInt(arr.length)];
-    }
+  if (typeof ws === 'undefined') {
+    return arr[randInt(arr.length)];
+  }
 
-    if (ws.length !== arr.length) {
-        throw new Error(
-            `Incompatible sizes between ${arr} and ${ws}: ${arr.length} vs ${ws.length}`
-        );
-    }
+  if (ws.length !== arr.length) {
+    throw new Error(
+      `Incompatible sizes between ${arr} and ${ws}: ${arr.length} vs ${ws.length}`
+    );
+  }
 
-    if (!all(arrGTEq(ws, 0))) {
-        throw new Error(
-            `Negative cumulative weights not allowed: ${ws}`
-        );
+  if (!all(arrGTEq(ws, 0))) {
+    throw new Error(
+      `Negative cumulative weights not allowed: ${ws}`
+    );
+  }
+  
+  for (let i = 1; i < ws.length; i++) {
+    if (ws[i] < ws[i - 1]) {
+      throw new Error(
+        `Cumulative weights must be monotonically increasing: ${ws}`
+      );
     }
-    
-    for (let i = 1; i < ws.length; i++) {
-        if (ws[i] < ws[i - 1]) {
-            throw new Error(
-                `Cumulative weights must be monotonically increasing: ${ws}`
-            );
-        }
-    }
+  }
 
-    const seed = Math.random() * ws[ws.length - 1];
-    for (let i = 0; i < arr.length; i++) {
-        if (ws[i] > seed) {
-            return arr[i];
-        }
+  const seed = Math.random() * ws[ws.length - 1];
+  for (let i = 0; i < arr.length; i++) {
+    if (ws[i] > seed) {
+      return arr[i];
     }
-    return arr[arr.length - 1];
+  }
+  return arr[arr.length - 1];
 }
 
 /**
@@ -64,12 +64,12 @@ export const choice = <T>(arr: T[], ws?: number[]): T => {
  * @param arr the array to shuffle
  */
 export const shuffle = <T>(arr: T[]) => {
-    for (var i = arr.length - 1; i > 0; i--) {
-        var j = randInt(i + 1);
-        var temp = arr[j];
-        arr[j] = arr[i];
-        arr[i] = temp;
-    }
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = randInt(i + 1);
+    const temp = arr[j];
+    arr[j] = arr[i];
+    arr[i] = temp;
+  }
 }
 
 /**
@@ -80,9 +80,9 @@ export const shuffle = <T>(arr: T[]) => {
  * @returns n random elements from arr
  */
 export const choices = <T>(arr: T[], n: number): T[] => {
-    var arrCopy: T[] = copyArr(arr) as T[];
-    shuffle(arrCopy);
-    return arrCopy.slice(0, n);
+  const arrCopy: T[] = copyArr(arr) as T[];
+  shuffle(arrCopy);
+  return arrCopy.slice(0, n);
 }
 
 /**
@@ -94,10 +94,10 @@ export const choices = <T>(arr: T[], n: number): T[] => {
  * @returns an array of random integers, each ranging from `[min, max)`
  */
 export const randArr = (shape: number[], min: number, max?: number): numArray => {
-    const size = shape.reduce((a, b) => a * b, 1);
-    let flat: number[] = [];
-    for (let i = 0; i < size; i++) {
-        flat.push(randInt(min, max));
-    }
-    return reshape(flat, shape);
+  const size = shape.reduce((a, b) => a * b, 1);
+  let flat: number[] = [];
+  for (let i = 0; i < size; i++) {
+    flat.push(randInt(min, max));
+  }
+  return reshape(flat, shape);
 }

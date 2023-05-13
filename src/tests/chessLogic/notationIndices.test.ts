@@ -41,3 +41,14 @@ test('randomIndices', () => {
     expect(indicesToNotation(...notationToIndices(square))).toBe(square)
   }
 })
+
+test('errors', () => {
+  expect(() => letterToCol('`')).toThrow()
+  expect(() => letterToCol('i')).toThrow()
+  expect(() => indexToLetter(-1)).toThrow()
+  expect(() => indexToLetter(8)).toThrow()
+  expect(() => notationToIndices('h56')).toThrow()
+  expect(() => notationToIndices('')).toThrow()
+  expect(() => indicesToNotation(-1, 2)).toThrow()
+  expect(() => indicesToNotation(8, 2)).toThrow()
+})

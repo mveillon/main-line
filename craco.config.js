@@ -1,6 +1,7 @@
 // from https://cmdcolin.github.io/posts/2022-08-22-rustwasm
 
 module.exports = {
+  eslint: null,
   webpack: {
     configure: config => {
       const wasmExtensionRegExp = /\.wasm$/

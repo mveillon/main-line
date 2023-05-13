@@ -17,8 +17,8 @@ import { mean } from "./measuresOfCenter";
  * @returns the mean squared error between x and y
  */
  export const mse = (x: numArray, y: numArray): number => {
-    const l = Math.max(getSize(x), getSize(y))
-    return l === 0 ? 0 : squareDistance(x, y) / l;
+  const l = Math.max(getSize(x), getSize(y))
+  return l === 0 ? 0 : squareDistance(x, y) / l;
 }
 
 /**
@@ -34,16 +34,16 @@ import { mean } from "./measuresOfCenter";
  * @returns the squared distance between x and y
  */
 export const squareDistance = (x: numArray, y: numArray): number => {
-    [x, y] = broadcast(x, y);
+  [x, y] = broadcast(x, y);
 
-    if (Array.isArray(x)) {
-        let total = 0;
-        for (let i = 0; i < x.length; i++) {
-            total += squareDistance(x[i], (y as number[])[i]);
-        }
-        return total;
+  if (Array.isArray(x)) {
+    let total = 0;
+    for (let i = 0; i < x.length; i++) {
+      total += squareDistance(x[i], (y as number[])[i]);
     }
-    return Math.pow(x - (y as number), 2);
+    return total;
+  }
+  return Math.pow(x - (y as number), 2);
 }
 
 /**
@@ -59,16 +59,16 @@ export const squareDistance = (x: numArray, y: numArray): number => {
  * @returns the Manhattan distance between x and y
  */
 export const manhattanDistance = (x: numArray, y: numArray): number => {
-    [x, y] = broadcast(x, y);
-    
-    if (Array.isArray(x)) {
-        let total = 0;
-        for (let i = 0; i < x.length; i++) {
-            total += manhattanDistance(x[i], (y as number[])[i]);
-        }
-        return total;
+  [x, y] = broadcast(x, y);
+  
+  if (Array.isArray(x)) {
+    let total = 0;
+    for (let i = 0; i < x.length; i++) {
+      total += manhattanDistance(x[i], (y as number[])[i]);
     }
-    return Math.abs(x - (y as number));
+    return total;
+  }
+  return Math.abs(x - (y as number));
 }
 
 /**
@@ -87,33 +87,33 @@ export const manhattanDistance = (x: numArray, y: numArray): number => {
  * @returns 
  */
 export const correlation = (x: numArray, y: numArray): number => {
-    [x, y] = broadcast(x, y);
+  [x, y] = broadcast(x, y);
 
-    const xAvg = mean(x);
-    const yAvg = mean(y);
+  const xAvg = mean(x);
+  const yAvg = mean(y);
 
-    const helper = (arr1: numArray, arr2: numArray): [number, [number, number]] => {
-        if (Array.isArray(arr1)) {
-            let num = 0;
-            let denom: [number, number] = [0, 0];
-            for (let i = 0; i < arr1.length; i++) {
-                const [subNum, subDenom] = helper(arr1[i], (arr2 as number[])[i]);
-                num += subNum;
-                denom = addArrays(denom, subDenom) as [number, number];
-            }
-            return [num, denom];
-        }
-        const xDiff = arr1 - xAvg;
-        const yDiff = (arr2 as number) - yAvg;
-        return [
-            xDiff * yDiff,
-            [Math.pow(xDiff, 2), Math.pow(yDiff, 2)]
-        ];
+  const helper = (arr1: numArray, arr2: numArray): [number, [number, number]] => {
+    if (Array.isArray(arr1)) {
+      let num = 0;
+      let denom: [number, number] = [0, 0];
+      for (let i = 0; i < arr1.length; i++) {
+        const [subNum, subDenom] = helper(arr1[i], (arr2 as number[])[i]);
+        num += subNum;
+        denom = addArrays(denom, subDenom) as [number, number];
+      }
+      return [num, denom];
     }
+    const xDiff = arr1 - xAvg;
+    const yDiff = (arr2 as number) - yAvg;
+    return [
+      xDiff * yDiff,
+      [Math.pow(xDiff, 2), Math.pow(yDiff, 2)]
+    ];
+  }
 
-    const [num, [d1, d2]] = helper(x, y);
-    const prod = d1 * d2;
-    return prod === 0 ? 0 : num / Math.sqrt(prod);
+  const [num, [d1, d2]] = helper(x, y);
+  const prod = d1 * d2;
+  return prod === 0 ? 0 : num / Math.sqrt(prod);
 }
 
 /**
@@ -128,5 +128,5 @@ export const correlation = (x: numArray, y: numArray): number => {
  * @returns 
  */
 export const squaredMag = (x: numArray): number => {
-    return squareDistance(x, 0);
+  return squareDistance(x, 0);
 }

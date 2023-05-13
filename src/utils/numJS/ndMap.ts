@@ -13,14 +13,10 @@ import { boolArray, ndArray, numArray } from "./types";
  * @returns func mapped onto x
  */
  export const ndMap = <T, U>(x: ndArray<T>, func: (val: T) => U): ndArray<U> => {
-    if (Array.isArray(x)) {
-        let res: ndArray<U> = [];
-        for (const nested of x) {
-            res.push(ndMap(nested, func));
-        }
-        return res;
-    }
-    return func(x);
+  if (Array.isArray(x)) {
+    return x.map(nested => ndMap(nested, func))
+  }
+  return func(x);
 }
 
 /**
@@ -36,7 +32,7 @@ import { boolArray, ndArray, numArray } from "./types";
  * mapped to 0
  */
 export const toNum = (bools: boolArray): numArray => {
-    return ndMap(bools, b => +b);
+  return ndMap(bools, b => +b);
 }
 
 /**
@@ -52,5 +48,5 @@ export const toNum = (bools: boolArray): numArray => {
  * value mapped to `true`
  */
 export const toBool = (nums: numArray): boolArray => {
-    return ndMap(nums, n => !!n);
+  return ndMap(nums, n => !!n);
 }

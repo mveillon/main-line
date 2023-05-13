@@ -15,11 +15,11 @@ import { colAverage, addArrays, scalarMul } from "./arithmetic";
  * @returns the dot product
  */
  export const dot = (x: number[], y: number[]): number => {
-    let res = 0;
-    for (let i = 0; i < Math.min(x.length, y.length); i++) {
-        res += x[i] * y[i];
-    }
-    return res;
+  let res = 0;
+  for (let i = 0; i < Math.min(x.length, y.length); i++) {
+    res += x[i] * y[i];
+  }
+  return res;
 }
 
 /**
@@ -32,7 +32,7 @@ import { colAverage, addArrays, scalarMul } from "./arithmetic";
  * @returns the variance of x
  */
 export const variance = (x: numArray): number => {
-    return squareDistance(x, mean(x)) / (getSize(x) - 1);
+  return squareDistance(x, mean(x)) / (getSize(x) - 1);
 }
 
 /**
@@ -46,7 +46,7 @@ export const variance = (x: numArray): number => {
  * @returns `1 / (1 + Math.exp(-x))`
  */
  export const sigmoid = (x: number): number => {
-    return 1 / (1 + Math.exp(-x));
+  return 1 / (1 + Math.exp(-x));
 }
 
 /**
@@ -58,14 +58,14 @@ export const variance = (x: numArray): number => {
  * @returns the column-wise variances of x
  */
 export const colVariance = (x: number[][]): number[] => {
-    const avgs = colAverage(x);
-    let sums: number[] = zeros([avgs.length]) as number[];
-    for (const row of x) {
-        let diffs: number[] = [];
-        for (let i = 0; i < row.length; i++) {
-            diffs.push(Math.pow(row[i] - avgs[i], 2));
-        }
-        sums = addArrays(sums, diffs) as number[];
+  const avgs = colAverage(x);
+  let sums: number[] = zeros([avgs.length]) as number[];
+  for (const row of x) {
+    let diffs: number[] = [];
+    for (let i = 0; i < row.length; i++) {
+      diffs.push(Math.pow(row[i] - avgs[i], 2));
     }
-    return scalarMul(sums, 1 / (x.length - 1)) as number[];
+    sums = addArrays(sums, diffs) as number[];
+  }
+  return scalarMul(sums, 1 / (x.length - 1)) as number[];
 }

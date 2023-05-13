@@ -9,7 +9,7 @@ import Knight from "../../chessLogic/pieces/Knight";
 import Bishop from "../../chessLogic/pieces/Bishop";
 
 // jest.setTimeout(2_147_483_647)
-jest.setTimeout(20000)
+jest.setTimeout(5000)
 
 const checkMove = (move: string, mover: Color, game: Game) => {
   const [from, to, promoType] = uciToMove(move)

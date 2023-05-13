@@ -31,6 +31,9 @@ test('starting position', () => {
     expect(b.pieceAt(`${file}7`)).toBeInstanceOf(Pawn)
     expect((b.pieceAt(`${file}7`) as Piece).color).toBe(Color.Black)
   }
+
+  expect(typeof b.pieceAt('h1')?.toString()).toBe("string")
+  expect(typeof b.pieceAt('h8')?.toString()).toBe('string')
 })
 
 test('movePiece', () => {
@@ -69,4 +72,38 @@ test('blockedOOB', () => {
   expect(b.blockedOOB([0, -1], Color.Black)).toBeTruthy()
   expect(b.blockedOOB([0, 8], Color.White)).toBeTruthy()
   expect(b.blockedOOB([0, 8], Color.Black)).toBeTruthy()
+})
+
+test('errors', () => {
+  const b = new Board(`
+    [Event "?"]
+    [Site "?"]
+    [Date "????.??.??"]
+    [Round "?"]
+    [White "?"]
+    [Black "?"]
+    [Result "*"]
+    
+    1. e4 e5 2. Nf3 Nf6 3. Bc4 *
+  `)
+
+  expect(() => { b.movePiece('e1', 'O-O') }).toThrow()
+  expect(() => { b.movePiece('f1', 'c4') }).toThrow()
+  b.movePiece('h1', 'f1')
+  expect(() => { b.movePiece('e1', 'g1') }).toThrow()
+
+  const b2 = new Board(`
+    [Event "?"]
+    [Site "?"]
+    [Date "????.??.??"]
+    [Round "?"]
+    [White "?"]
+    [Black "?"]
+    [Result "*"]
+    
+    1. e4 f5 2. exf5 g6 3. fxg6 Nf6 4. gxh7 Rg8 *
+  `)
+
+  expect(() => { b.movePiece('h7', 'g8') }).toThrow()
+  expect(() => b.putsKingInCheck('g6', 'g7')).toThrow()
 })

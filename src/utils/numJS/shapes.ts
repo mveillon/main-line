@@ -21,52 +21,52 @@ import { ndArray, numArray } from "./types";
  * @returns both arrays reshaped to have the same shape
  */
 export const broadcast = <T, U>(
-    a1: ndArray<T>, 
-    a2: ndArray<U>
+  a1: ndArray<T>, 
+  a2: ndArray<U>
 ): [ndArray<T>, ndArray<U>] => {
-    const shape1 = getShape(a1);
-    const shape2 = getShape(a2);
-    const t1 = getSize(a1);
-    const t2 = getSize(a2);
+  const shape1 = getShape(a1);
+  const shape2 = getShape(a2);
+  const t1 = getSize(a1);
+  const t2 = getSize(a2);
 
-    const showArr = Math.max(t1, t2) <= 10;
-    const erStr = (
-        'Arguments could not be broadcast together: ' + 
-        (showArr ? `${a1}: ` : '') +
-        `[${shape1}] (${t1} elements) and ` +
-        (showArr ? `${a2}: ` : '') +
-        `[${shape2}] (${t2} elements).`
-    );
-    if (t1 !== t2 && shape1.length > 0 && shape2.length > 0) {
-        throw new Error(erStr);
+  const showArr = Math.max(t1, t2) <= 10;
+  const erStr = (
+    'Arguments could not be broadcast together: ' + 
+    (showArr ? `${a1}: ` : '') +
+    `[${shape1}] (${t1} elements) and ` +
+    (showArr ? `${a2}: ` : '') +
+    `[${shape2}] (${t2} elements).`
+  );
+  if (t1 !== t2 && shape1.length > 0 && shape2.length > 0) {
+    throw new Error(erStr);
+  }
+
+  if (shape1.length === shape2.length) {
+    let same = true;
+    for (let i = 0; i < shape1.length; i++) {
+      if (shape1[i] !== shape2[i]) {
+        same = false;
+        break;
+      }
+    }
+    if (same) {
+      return [a1, a2];
     }
 
-    if (shape1.length === shape2.length) {
-        let same = true;
-        for (let i = 0; i < shape1.length; i++) {
-            if (shape1[i] !== shape2[i]) {
-                same = false;
-                break;
-            }
-        }
-        if (same) {
-            return [a1, a2];
-        }
+    return [a1, reshape(a2, shape1)];
+  }
 
-        return [a1, reshape(a2, shape1)];
+  if (shape1.length > shape2.length) {
+    if (shape2.length === 0) {
+      return [a1, full(shape1, a2)];
     }
+    return [a1, reshape(a2, shape1)];
+  }
 
-    if (shape1.length > shape2.length) {
-        if (shape2.length === 0) {
-            return [a1, full(shape1, a2)];
-        }
-        return [a1, reshape(a2, shape1)];
-    }
-
-    if (shape1.length === 0) {
-        return [full(shape2, a1), a2];
-    }
-    return [reshape(a1, shape2), a2];
+  if (shape1.length === 0) {
+    return [full(shape2, a1), a2];
+  }
+  return [reshape(a1, shape2), a2];
 }
 
 /**
@@ -80,11 +80,11 @@ export const broadcast = <T, U>(
  * @returns the flattened array
  */
  export const flatten = <T>(A: ndArray<T>): T | T[] => {
-    if (Array.isArray(A)) {
-        return ([] as T[]).concat(...A.map(flatten));
-    } else {
-        return A;
-    }
+  if (Array.isArray(A)) {
+    return ([] as T[]).concat(...A.map(flatten));
+  } else {
+    return A;
+  }
 }
 
 /**
@@ -103,22 +103,22 @@ export const broadcast = <T, U>(
  * @returns an array with the given shape and every value equal to the given value
  */
 export const full = <T>(shape: number[], value?: T, valueGen?: () => T): ndArray<T> => {
-    if (shape.length === 0) {
-        if (typeof value === 'undefined') {
-            if (typeof valueGen === 'undefined') {
-                throw new Error('Both of value and valueGen cannot be undefined');
-            }
-            return valueGen();
-        }
-        return value;
+  if (shape.length === 0) {
+    if (typeof value === 'undefined') {
+      if (typeof valueGen === 'undefined') {
+        throw new Error('Both of value and valueGen cannot be undefined');
+      }
+      return valueGen();
     }
-    let res: ndArray<T> = [];
-    const rest = shape.slice(1, shape.length);
-    for (let i = 0; i < shape[0]; i++) {
-        res.push(full(rest, value, valueGen));
-    }
+    return value;
+  }
+  let res: ndArray<T> = [];
+  const rest = shape.slice(1, shape.length);
+  for (let i = 0; i < shape[0]; i++) {
+    res.push(full(rest, value, valueGen));
+  }
 
-    return res;
+  return res;
 }
 
 /**
@@ -133,14 +133,14 @@ export const full = <T>(shape: number[], value?: T, valueGen?: () => T): ndArray
  * @returns the shape of the array as an array
  */
 export const getShape = <T>(arr: ndArray<T>): number[] => {
-    let res: number[] = [];
-    let current = arr;
-    while (Array.isArray(current)) {
-        res.push(current.length);
-        if (current.length === 0) break;
-        current = current[0];
-    }
-    return res;
+  let res: number[] = [];
+  let current = arr;
+  while (Array.isArray(current)) {
+    res.push(current.length);
+    if (current.length === 0) break;
+    current = current[0];
+  }
+  return res;
 } 
 
 /**
@@ -153,7 +153,7 @@ export const getShape = <T>(arr: ndArray<T>): number[] => {
  * @returns an array of all zeros
  */
  export const zeros = (shape: number[]): numArray => {
-    return full(shape, 0);
+  return full(shape, 0);
 }
 
 /**
@@ -166,7 +166,7 @@ export const getShape = <T>(arr: ndArray<T>): number[] => {
  * @returns an array of all ones
  */
 export const ones = (shape: number[]): numArray => {
-    return full(shape, 1);
+  return full(shape, 1);
 }
 
 /**
@@ -180,33 +180,33 @@ export const ones = (shape: number[]): numArray => {
  * @returns an array of the given shape with all the elements as arr in order
  */
  export const reshape = <T>(arr: ndArray<T>, shape: number[]): ndArray<T> => {
-    const errStr = `Cannot broadcast array with shape ${getShape(arr)} to ${shape}`;
-    if (!Array.isArray(arr)) {
-        throw new Error(`Scalars not allowed in reshape function: ${arr}`);
+  const errStr = `Cannot broadcast array with shape ${getShape(arr)} to ${shape}`;
+  if (!Array.isArray(arr)) {
+    throw new Error(`Scalars not allowed in reshape function: ${arr}`);
+  }
+  
+  if (shape.length === 0) {
+    if (arr.length === 1) {
+      return arr[0];
+    } else {
+      throw new Error(errStr);
     }
-    
-    if (shape.length === 0) {
-        if (arr.length === 1) {
-            return arr[0];
-        } else {
-            throw new Error(errStr);
-        }
-    }
+  }
 
-    const flat: T[] = flatten(arr) as T[];
-    if (flat.length % shape[0] !== 0) {
-        throw new Error(errStr);
-    }
+  const flat: T[] = flatten(arr) as T[];
+  if (flat.length % shape[0] !== 0) {
+    throw new Error(errStr);
+  }
 
-    const perBlock = Math.round(flat.length / shape[0]);
-    const restShape = shape.slice(1, shape.length);
-    let res: ndArray<T> = [];
-    for (let i = 0; i < flat.length; i += perBlock) {
-        const end = i + perBlock;
-        res.push(reshape(flat.slice(i, end), restShape));
-    }
+  const perBlock = Math.round(flat.length / shape[0]);
+  const restShape = shape.slice(1, shape.length);
+  let res: ndArray<T> = [];
+  for (let i = 0; i < flat.length; i += perBlock) {
+    const end = i + perBlock;
+    res.push(reshape(flat.slice(i, end), restShape));
+  }
 
-    return res;
+  return res;
 }
 
 /**
@@ -221,6 +221,6 @@ export const ones = (shape: number[]): numArray => {
  * @returns the number of elements in arr
  */
 export const getSize = <T>(arr: ndArray<T>): number => {
-    return getShape(arr).reduce((a, b) => a * b, 1);
+  return getShape(arr).reduce((a, b) => a * b, 1);
 }
 

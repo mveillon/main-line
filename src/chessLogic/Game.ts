@@ -17,6 +17,7 @@ class Game {
       this.turn = (
         +!this.board.lastMove.pieceMoved.color
       )
+      this._setResult()
     }
 
     this.engineColors = [Color.Black]
@@ -40,23 +41,30 @@ class Game {
     ) {
       
       this.board.movePiece(from, to, true, promoType)
-      this.turn = this.turn === Color.White ? Color.Black : Color.White
+      this.turn = +!this.turn
+      this._setResult()
+    }
+  }
 
-      const allPieces = this.board.findPieces(Piece, this.turn)
-      let canMove = false
-      for (const p of allPieces) {
-        if (p.legalMoves().size > 0) {
-          canMove = true
-          break
-        }
+  /**
+   * Updates the result of the game based on the current board state. 
+   * Assumes `this.turn` is accurate
+   */
+  protected _setResult() {
+    const allPieces = this.board.findPieces(Piece, this.turn)
+    let canMove = false
+    for (const p of allPieces) {
+      if (p.legalMoves().size > 0) {
+        canMove = true
+        break
       }
+    }
 
-      if (!canMove) {
-        if (this.board.isInCheck(this.turn)) {
-          this.result = this.turn === Color.White ? '0-1' : '1-0'
-        } else {
-          this.result = '1/2-1/2'
-        }
+    if (!canMove) {
+      if (this.board.isInCheck(this.turn)) {
+        this.result = this.turn === Color.White ? '0-1' : '1-0'
+      } else {
+        this.result = '1/2-1/2'
       }
     }
   }

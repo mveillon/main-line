@@ -20,6 +20,9 @@ export const setUpBoard = (startingMoves: string[]): Board => {
 test('scholars mate', () => {
   const b = new Board()
 
+  expect(() => { parseMove('', b) }).toThrow()
+  expect(() => { parseMove('[hello]', b) }).toThrow()
+
   parseMove('1. e4', b)
   expect(b.pieceAt('e2')).toBeNull()
   expect(b.pieceAt('e4')).toBeInstanceOf(Pawn)

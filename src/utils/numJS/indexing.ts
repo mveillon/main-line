@@ -9,19 +9,19 @@ import { broadcast, getShape } from "./shapes";
  * @returns arr indexed at every true value of inds
  */
 const boolIndex = <T>(arr: ndArray<T>, inds: boolArray): ndArray<T> => {
-    [arr, inds] = broadcast(arr, inds);
+  [arr, inds] = broadcast(arr, inds);
 
-    if (Array.isArray(arr)) {
-        let res: ndArray<T> = [];
-        for (let i = 0; i < arr.length; i++) {
-            const sub = boolIndex(arr[i], (inds as boolean[])[i]);
-            if (!Array.isArray(sub) || sub.length > 0) {
-                res.push(sub);
-            }
-        }
-        return res;
+  if (Array.isArray(arr)) {
+    let res: ndArray<T> = [];
+    for (let i = 0; i < arr.length; i++) {
+      const sub = boolIndex(arr[i], (inds as boolean[])[i]);
+      if (!Array.isArray(sub) || sub.length > 0) {
+        res.push(sub);
+      }
     }
-    return inds ? arr : [];
+    return res;
+  }
+  return inds ? arr : [];
 }
 
 /**
@@ -34,39 +34,39 @@ const boolIndex = <T>(arr: ndArray<T>, inds: boolArray): ndArray<T> => {
  * @returns all values of arr at the indices specified in inds
  */
 const numIndex = <T>(arr: ndArray<T>, inds: numArray): ndArray<T> => {
-    if (!Array.isArray(arr)) {
-        throw new Error(`Scalars cannot be indexed: ${arr}`);
-    }
+  if (!Array.isArray(arr)) {
+    throw new Error(`Scalars cannot be indexed: ${arr}`);
+  }
 
-    let res: ndArray<T>;
-    switch (getShape(inds).length) {
-        case 0:
-            res = arr[inds as number];
-            break;
-        case 1:
-            res = (inds as number[]).map(i => arr[i]);
-            break;
-        case 2:
-            res = [];
-            for (const i of (inds as number[][])) {
-                let current: ndArray<T> = arr;
-                for (const j of i) {
-                    if (!Array.isArray(current)) {
-                        throw new Error(
-                            `Length of ${i} is greater than dimensionality of ${arr}`
-                        );
-                    }
-                    current = current[j];
-                }
-                res.push(current);
-            }
-            break;
-        default:
+  let res: ndArray<T>;
+  switch (getShape(inds).length) {
+    case 0:
+      res = arr[inds as number];
+      break;
+    case 1:
+      res = (inds as number[]).map(i => arr[i]);
+      break;
+    case 2:
+      res = [];
+      for (const i of (inds as number[][])) {
+        let current: ndArray<T> = arr;
+        for (const j of i) {
+          if (!Array.isArray(current)) {
             throw new Error(
-                `Numerical indices cannot have dimensionality greater than 2: ${inds}`
+              `Length of ${i} is greater than dimensionality of ${arr}`
             );
-    }
-    return res;
+          }
+          current = current[j];
+        }
+        res.push(current);
+      }
+      break;
+    default:
+      throw new Error(
+        `Numerical indices cannot have dimensionality greater than 2: ${inds}`
+      );
+  }
+  return res;
 }
 
 /**
@@ -88,19 +88,19 @@ const numIndex = <T>(arr: ndArray<T>, inds: numArray): ndArray<T> => {
  * @returns arr indexed at each value of inds
  */
 export const arrIndex = <T>(
-    arr: ndArray<T>, 
-    inds: numArray | boolArray
+  arr: ndArray<T>, 
+  inds: numArray | boolArray
 ): ndArray<T> => {
-    let current = inds;
-    while (Array.isArray(current)) {
-        current = current[0];
-    }
+  let current = inds;
+  while (Array.isArray(current)) {
+    current = current[0];
+  }
 
-    if (typeof current === 'number') {
-        return numIndex(arr, inds as numArray);
-    } else if (typeof current === 'boolean') {
-        return boolIndex(arr, inds as boolArray);
-    } else {
-        throw new Error('If this ever happens, something has gone horribly wrong')
-    }
+  if (typeof current === 'number') {
+    return numIndex(arr, inds as numArray);
+  } else if (typeof current === 'boolean') {
+    return boolIndex(arr, inds as boolArray);
+  } else {
+    throw new Error('If this ever happens, something has gone horribly wrong')
+  }
 }

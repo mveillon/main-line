@@ -10,23 +10,23 @@ import { boolArray } from "./types";
  * @returns ifTrue if at least one subarray satisfies criterion, else !ifTrue
  */
  const nestedSatisfies = (
-    bools: boolArray, 
-    criterion: (b: boolArray) => boolean, 
-    ifTrue: boolean
-    ): boolean => {
+  bools: boolArray, 
+  criterion: (b: boolArray) => boolean, 
+  ifTrue: boolean
+  ): boolean => {
 
-    if (Array.isArray(bools)) {
-        if (bools.length === 0) return false;
-        
-        for (const nested of bools) {
-            if (criterion(nested)) {
-                return ifTrue;
-            }
-        }
-
-        return !ifTrue;
+  if (Array.isArray(bools)) {
+    if (bools.length === 0) return false;
+    
+    for (const nested of bools) {
+      if (criterion(nested)) {
+        return ifTrue;
+      }
     }
-    return bools;
+
+    return !ifTrue;
+  }
+  return bools;
 }
 
 /**
@@ -42,7 +42,7 @@ import { boolArray } from "./types";
  * @returns whether all elements of bools are true
  */
 export const all = (bools: boolArray): boolean => {
-    return nestedSatisfies(bools, b => !all(b), false);
+  return nestedSatisfies(bools, b => !all(b), false);
 }
 
 /**
@@ -58,5 +58,5 @@ export const all = (bools: boolArray): boolean => {
  * @returns whether any elements of bools are true
  */
  export const any = (bools: boolArray): boolean => {
-    return nestedSatisfies(bools, b => any(b), true);
+  return nestedSatisfies(bools, b => any(b), true);
 }

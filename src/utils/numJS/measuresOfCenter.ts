@@ -13,11 +13,11 @@ import { numArray } from "./types";
  * @returns the mean of x
  */
  export const mean = (x: numArray): number => {
-    const size = getSize(x);
-    if (size === 0) {
-        throw new Error('Trying to find the mean of empty array');
-    }
-    return sumList(x) / size
+  const size = getSize(x);
+  if (size === 0) {
+    throw new Error('Trying to find the mean of empty array');
+  }
+  return sumList(x) / size
 }
 
 /**
@@ -32,27 +32,27 @@ import { numArray } from "./types";
  * @returns the most common element in arr
  */
  export const mode = (arr: numArray): number => {
-    arr = flatten(arr);
-    if (Array.isArray(arr)) {
-        const flat: number[] = arr as number[];
-        if (arr.length === 0) {
-            throw new Error('Trying to find mode of empty array');
-        };
+  arr = flatten(arr);
+  if (Array.isArray(arr)) {
+    const flat: number[] = arr as number[];
+    if (arr.length === 0) {
+      throw new Error('Trying to find mode of empty array');
+    };
 
-        let counts: { [key: number]: number } = {};
-        for (const n of flat) {
-            counts[n] = n in counts ? counts[n] + 1 : 1;
-        }
-        let best: number = flat[0];
-        for (const k in counts) {
-            if (counts[k] > counts[best]) {
-                best = parseInt(k);
-            }
-        }
-
-        return best;
+    let counts: { [key: number]: number } = {};
+    for (const n of flat) {
+      counts[n] = n in counts ? counts[n] + 1 : 1;
     }
-    return arr;
+    let best: number = flat[0];
+    for (const k in counts) {
+      if (counts[k] > counts[best]) {
+        best = parseInt(k);
+      }
+    }
+
+    return best;
+  }
+  return arr;
 }
 
 /**
@@ -69,17 +69,17 @@ import { numArray } from "./types";
  * @returns the median of arr
  */
 export const median = (arr: numArray): number => {
-    arr = flatten(arr);
-    if (Array.isArray(arr)) {
-        const flat: number[] = arr as number[];
-        if (flat.length === 0) {
-            throw new Error('Trying to find median of empty array');
-        }
-        const s = flat.sort((a, b) => a - b);
-        if (flat.length % 2 === 0) {
-            return (s[arr.length / 2 - 1] + s[arr.length / 2]) / 2;
-        }
-        return s[Math.floor(arr.length / 2)];
+  arr = flatten(arr);
+  if (Array.isArray(arr)) {
+    const flat: number[] = arr as number[];
+    if (flat.length === 0) {
+      throw new Error('Trying to find median of empty array');
     }
-    return arr;
+    const s = flat.sort((a, b) => a - b);
+    if (flat.length % 2 === 0) {
+      return (s[arr.length / 2 - 1] + s[arr.length / 2]) / 2;
+    }
+    return s[Math.floor(arr.length / 2)];
+  }
+  return arr;
 }

@@ -259,31 +259,13 @@ export class Board {
 
     const oldPiece = this.pieceAt(to)
     this.movePiece(from, to, false)
+    const res = this.isInCheck(p.color)
+    
+    this.movePiece(to, from, false)
+    const [i, j] = notationToIndices(to)
+    this._board[i][j] = oldPiece
 
-    const backToNormal = () => {
-      this.movePiece(to, from, false)
-      const [i, j] = notationToIndices(to)
-      this._board[i][j] = oldPiece
-    }
-
-    const opposingColor = +!p.color
-    const kingPos = this.findPieces(King, p.color)[0].coords
-
-    for (const row of this._board) {
-      for (const square of row) {
-        if (
-          square !== null && 
-          square.color === opposingColor && 
-          square.legalMovesNoChecks().has(kingPos)
-        ) {
-          backToNormal()
-          return true
-        }
-      }
-    }
-
-    backToNormal()
-    return false
+    return res
   }
 
   /**
@@ -303,15 +285,12 @@ export class Board {
    */
   isInCheck(color: Color): boolean {
     const kingPos = this.findPieces(King, color)[0].coords
-    const tempSquare = 'a1'
-    const oldPiece = this.pieceAt(tempSquare)
-
-    this.movePiece(kingPos, tempSquare, false)
-    const res = this.putsKingInCheck(tempSquare, kingPos)
-    this.movePiece(tempSquare, kingPos, false)
-    
-    const [i, j] = notationToIndices(tempSquare)
-    this._board[i][j] = oldPiece
-    return res
+    const otherPieces = this.findPieces(Piece, +!color)
+    for (const p of otherPieces) {
+      if (p.legalMovesNoChecks().has(kingPos)) {
+        return true
+      }
+    }
+    return false
   }
 }

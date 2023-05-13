@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import BoardComponent from "./BoardComponent";
 import Game from "../chessLogic/Game";
 import { Engine } from "../chessLogic/Engine";
@@ -9,6 +9,11 @@ function GameComponent() {
   const [result, setResult] = useState(game.result)
 
   const sf = new Engine(5, 1)
+
+  // quit Stockfish when component is unmounted
+  useEffect(() => {
+    return () => { sf.quit() }
+  }, [])
 
   const playMove = async (from: string, to: string) => {
     game.playMove(from, to)
