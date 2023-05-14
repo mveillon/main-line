@@ -4,6 +4,7 @@ import Game from "../chessLogic/Game";
 import { Engine } from "../chessLogic/Engine";
 import { uciToMove, pieceToAcronym, uciToAlgebraic } from "../chessLogic/parser";
 import Color from "../chessLogic/Color";
+import { toFEN } from "../chessLogic/fenPGN";
 
 import "./styling/global.css"
 import { PieceT } from "../chessLogic/pieces/Piece";
@@ -16,6 +17,8 @@ function GameComponent(props: { pgn: string, player: Color }) {
   const [result, setResult] = useState('')
   const [review, setReview] = useState('')
   const [sf, setSF] = useState(new Engine(5, 5))
+  const [line, setLine] = useState('')
+  const [showLine, setShowLine] = useState(false)
 
   // quit Stockfish when component is unmounted
   useEffect(() => {
@@ -25,7 +28,7 @@ function GameComponent(props: { pgn: string, player: Color }) {
   const computerMove = async () => {
     if (!game.engineColors.includes(game.turn)) return
 
-    const moves = await sf.getBestMoves(game.toFEN())
+    const moves = await sf.getBestMoves(toFEN(game))
     game.playMove(...uciToMove(moves[0].move))
     setGame(Object.assign(new Game(), game))
     setResult(game.result)
@@ -37,7 +40,7 @@ function GameComponent(props: { pgn: string, player: Color }) {
       uci += pieceToAcronym(promoType)
     }
     const algebraic = uciToAlgebraic(uci, game.board)
-    const fen = game.toFEN()
+    const fen = toFEN(game)
 
     game.playMove(from, to, promoType)
     setGame(game)
@@ -52,7 +55,7 @@ function GameComponent(props: { pgn: string, player: Color }) {
       for (const move of moves) {
         if (move.move === uci) {
           if (move.score > 0) {
-            revParts.push('is a top engine move!')
+            revParts.push('is one of the top engine moves!')
           } else {
             revParts.push('is ok, but not the best.')
           }
@@ -70,6 +73,20 @@ function GameComponent(props: { pgn: string, player: Color }) {
     }
 
     setReview(revParts.join(' '))
+
+    // let moveNo = game.moveNumber
+    // const lineParts: string[] = []
+    // let formattedMove: string[] = [`${moveNo}. `]
+    // let turn = game.turn
+    // if (turn === Color.Black) {
+    //   formattedMove.push('...')
+    // }
+
+    // for (const move of moves[0].line) {
+    //   formattedMove.push(uciToAlgebraic(move, game.board))
+    // }
+
+    // setLine(lineParts.join('\n'))
 
     if (game.result === '') {
       computerMove()
@@ -95,7 +112,29 @@ function GameComponent(props: { pgn: string, player: Color }) {
         <p>{result}</p>
       </div>
 
-      <p>{review}</p>
+      <div>
+        <p>{review}</p>
+        {
+          line !== '' &&
+          <div>
+            {
+              showLine &&
+              <p>{line}</p>
+            }
+
+            <button onClick={() => setShowLine(!showLine)}>
+              {
+                showLine &&
+                'Hide line'
+              }
+              {
+                !showLine &&
+                'Show line'
+              }
+            </button>
+          </div>
+        }
+      </div>
     </div>
   )
 }

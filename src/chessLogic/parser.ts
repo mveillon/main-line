@@ -36,12 +36,12 @@ const trimMoveNumber = (notation: string): string => {
 
 /** 
  * Converts the piece acronym (e.g. B or N) to the piece it 
- * corresponds to
+ * corresponds to. Acronym should be uppercase
  * @param acronym the piece acronym. If it is not a typical piece
  * acronym, it will default to Pawn
  * @returns the typeof the piece it corresponds to
  */
-const pieceAcronym = (acronym: string): PieceT => {
+export const acronymToPiece = (acronym: string): PieceT => {
   const acs = acronyms()
 
   if (typeof acs[acronym] === 'undefined') {
@@ -109,7 +109,7 @@ export const parseMove = (notation: string, board: Board) => {
     notation[lastInd] !== 'O'
   ) {
     // handles promotion, checks, checkmate, and decorations
-    if (typeof acs[notation[lastInd]] !== "undefined") {
+    if (notation[lastInd] in acs) {
       promotionType = acs[notation[lastInd]]
     }
 
@@ -129,7 +129,7 @@ export const parseMove = (notation: string, board: Board) => {
   } else if (notation === 'O-O-O') {
     board.movePiece(king.coords, 'c' + king.coords[1])
   } else {
-    const pieceType = pieceAcronym(notation[0])
+    const pieceType = acronymToPiece(notation[0])
 
     let pieces: Piece[];
     if (notation.length === 2) {

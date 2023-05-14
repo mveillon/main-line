@@ -7,6 +7,7 @@ import Queen from "../../chessLogic/pieces/Queen";
 import Rook from "../../chessLogic/pieces/Rook";
 import Knight from "../../chessLogic/pieces/Knight";
 import Bishop from "../../chessLogic/pieces/Bishop";
+import { toFEN } from "../../chessLogic/fenPGN";
 
 jest.setTimeout(2_147_483_647)
 // jest.setTimeout(5000)
@@ -41,7 +42,7 @@ test('engine', async () => {
   try {
     g.playMove('e2', 'e4')
 
-    let moves = await e.getBestMoves(g.toFEN())
+    let moves = await e.getBestMoves(toFEN(g))
     expect(moves.length).toBe(5)
   
     for (const m of moves) {
@@ -49,7 +50,7 @@ test('engine', async () => {
     }
   
     g.playMove('d7', 'd5')
-    moves = await e.getBestMoves(g.toFEN())
+    moves = await e.getBestMoves(toFEN(g))
     expect(moves.length).toBe(5)
   
     for (const m of moves) {

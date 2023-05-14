@@ -6,7 +6,8 @@ interface IStockfish {
 
 export interface MoveScore {
   move: string
-  score: number
+  score: number,
+  line: string[]
 }
 
 export class Engine {
@@ -30,7 +31,6 @@ export class Engine {
    * @returns the initialized engine
    */
   protected async _loadEngine(): Promise<IStockfish> {
-    console.log('loading engine')
     let getSF: () => Promise<IStockfish>
     if (process.env.NODE_ENV === 'test') {
       // @ts-ignore
@@ -86,9 +86,11 @@ export class Engine {
       const listener = (message: string) => {
         if (message.includes(`info depth ${this.depth}`)) {
           const words = message.split(' ')
+          const moveInd = words.indexOf('pv') + 1
           messages.push({
-            move: words[words.indexOf('pv') + 1],
-            score: parseInt(words[words.indexOf('cp') + 1])
+            move: words[moveInd],
+            score: parseInt(words[words.indexOf('cp') + 1]),
+            line: words.slice(moveInd + 1)
           })
         }
 

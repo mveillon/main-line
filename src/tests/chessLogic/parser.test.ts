@@ -5,7 +5,8 @@ import {
   parseMove, 
   uciToMove, 
   uciToAlgebraic,
-  pieceToAcronym
+  pieceToAcronym,
+  acronymToPiece
 } from "../../chessLogic/parser";
 import Bishop from "../../chessLogic/pieces/Bishop";
 import King from "../../chessLogic/pieces/King";
@@ -354,10 +355,18 @@ test('uci to algebraic', () => {
   expect(uciToAlgebraic('e1g1', castleCheck)).toBe('O-O+')
 })
 
-test('piece to acronym', () => {
+test('piece acronym conversion', () => {
   expect(pieceToAcronym(Bishop)).toBe('b')
   expect(pieceToAcronym(Knight)).toBe('n')
   expect(pieceToAcronym(King)).toBe('k')
   expect(pieceToAcronym(Queen)).toBe('q')
   expect(pieceToAcronym(Rook)).toBe('r')
+
+  expect(acronymToPiece('B')).toBe(Bishop)
+  expect(acronymToPiece('Q')).toBe(Queen)
+  expect(acronymToPiece('R')).toBe(Rook)
+  expect(acronymToPiece('K')).toBe(King)
+  expect(acronymToPiece('N')).toBe(Knight)
+  expect(acronymToPiece('')).toBe(Pawn)
+  expect(acronymToPiece('P')).toBe(Pawn)
 })

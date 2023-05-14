@@ -1,16 +1,19 @@
 import Game from "../../chessLogic/Game";
+import { toFEN } from "../../chessLogic/fenPGN";
 
 const compareFENtoPGN = (fen: string, pgn: string) => {
-  expect((new Game(pgn)).toFEN()).toBe(fen)
+  expect(toFEN(new Game(pgn))).toBe(fen)
+  expect((new Game(pgn).board).sameBoard(new Game(undefined, fen).board)).toBeTruthy()
+  expect(toFEN(new Game(undefined, fen))).toBe(fen)
 }
 
 test('starting position', () => {
   const fen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
   const g = new Game()
-  expect(g.toFEN()).toBe(fen)
+  expect(toFEN(g)).toBe(fen)
 
   g.playMove('e3', 'e4')
-  expect(g.toFEN()).toBe(fen)
+  expect(toFEN(g)).toBe(fen)
 })
 
 test('more fen', () => {
@@ -126,4 +129,6 @@ test('game over', () => {
   `
   const stalemateGame = new Game(stalematePGN)
   expect(stalemateGame.result).toBe('1/2-1/2')
+
+  expect(() => new Game(undefined, '')).toThrow()
 })

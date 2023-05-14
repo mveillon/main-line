@@ -4,10 +4,10 @@ import startingPosition from "./startingPosition"
 import { notationToIndices } from "./notationIndices"
 import King from "./pieces/King"
 import Pawn from "./pieces/Pawn"
-import type { MoveInfo } from "./MoveInfo"
-import { doubleMove } from "./parser"
+import { MoveInfo } from "./MoveInfo"
 import Queen from "./pieces/Queen"
 import Rook from "./pieces/Rook"
+import { fromPGN } from "./fenPGN"
 
 /**
  * An array of pieces. An empty square is `null`. A `BoardT`[0] refers
@@ -18,15 +18,12 @@ import Rook from "./pieces/Rook"
 export type BoardT = (Piece | null)[][]
 
 export class Board {
-  protected _board: BoardT
+  board: BoardT
   movesMade: MoveInfo[]
-  protected _movePointer: number = -1
+  movePointer: number = -1
 
   get lastMove(): MoveInfo {
-    return this.movesMade[this._movePointer]
-  }
-  get board() : BoardT {
-    return this._board
+    return this.movesMade[this.movePointer]
   }
 
   /**
@@ -35,31 +32,11 @@ export class Board {
    * @param pgn the starting PGN
    */
   constructor(pgn?: string) {
-    this._board = startingPosition(this)
+    this.board = startingPosition(this)
     this.movesMade = []
 
     if (typeof pgn !== 'undefined') {
-      const r = /[0-9]+\./ // matches the move numbers
-
-      // matches parenthesis and text between them. Also matches
-      // curly braces and square braces
-      // modified from https://stackoverflow.com/questions/640001/how-can-i-remove-text-within-parentheses-with-a-regex
-      const paren = /(\(|\{|\[).*(\)|\}|\])/gm
-
-      // matches the game result e.g. 0-1 or 1-0
-      const result = /(0-1|1-0|1\/2-1\/2)/
-
-      const asterisk = /\*/
-
-      pgn = pgn.replace(paren, '')
-      pgn = pgn.replace(result, '')
-      pgn = pgn.replace(asterisk, '')
-
-      const moves = pgn.split(r)
-
-      for (let i = 1; i < moves.length; i++) {
-        doubleMove(moves[i].trim(), this)
-      }
+      fromPGN(pgn, this)
     }
   }
 
@@ -155,7 +132,7 @@ export class Board {
 
     const [fromI, fromJ] = notationToIndices(from)
     const [toI, toJ] = notationToIndices(to)
-    const p = this._board[fromI][fromJ]
+    const p = this.board[fromI][fromJ]
     if (p === null) {
       throw new Error(`${from} is an empty square`)
     }
@@ -175,11 +152,11 @@ export class Board {
     }
 
     if (info.enPassant) {
-      info.captured = this._board[fromI][toJ]
-      this._board[fromI][toJ] = null
+      info.captured = this.board[fromI][toJ]
+      this.board[fromI][toJ] = null
     }
     this.movesMade.push(info)
-    this._movePointer++
+    this.movePointer++
 
     if (
       p instanceof King && 
@@ -196,11 +173,11 @@ export class Board {
 
       this.movePiece(rook.coords, newRookFile + to[1], promoteType)
       this.movesMade.pop()
-      this._movePointer--
+      this.movePointer--
     }
 
-    this._board[toI][toJ] = p
-    this._board[fromI][fromJ] = null
+    this.board[toI][toJ] = p
+    this.board[fromI][fromJ] = null
     p.coords = to
 
     if (p instanceof Pawn && (to[1] === '1' || to[1] === '8')) {
@@ -222,7 +199,7 @@ export class Board {
    */
   protected _promotePawn(pawn: Pawn, promoteType: PieceT) {
     const [i, j] = notationToIndices(pawn.coords)
-    this._board[i][j] = new promoteType(pawn.color, pawn.coords, this)
+    this.board[i][j] = new promoteType(pawn.color, pawn.coords, this)
   }
 
   /**
@@ -238,13 +215,13 @@ export class Board {
    */
   blockedOOB(coords: [number, number], color: Color): boolean {
     if (
-      coords[0] < 0 || coords[0] >= this._board.length ||
-      coords[1] < 0 || coords[1] >= this._board[0].length
+      coords[0] < 0 || coords[0] >= this.board.length ||
+      coords[1] < 0 || coords[1] >= this.board[0].length
     ) {
       return true
     }
 
-    const p = this._board[coords[0]][coords[1]]
+    const p = this.board[coords[0]][coords[1]]
     return p !== null && p.color === color
   }
 
@@ -266,6 +243,7 @@ export class Board {
     this.movePiece(from, to, Queen)
     const res = this.isInCheck(p.color)
     this.undoLastMove()
+
     return res
   }
 
@@ -315,20 +293,20 @@ export class Board {
    */
   undoLastMove() {
     const toUndo = this.movesMade.pop()
-    this._movePointer--
+    this.movePointer--
     if (typeof toUndo === 'undefined') {
       throw new Error('Cannot undo when no moves have been played')
     }
     const [fromI, fromJ] = notationToIndices(toUndo.from)
     const [toI, toJ] = notationToIndices(toUndo.to)
-    this._board[fromI][fromJ] = toUndo.pieceMoved
+    this.board[fromI][fromJ] = toUndo.pieceMoved
     toUndo.pieceMoved.coords = toUndo.from
 
-    this._board[toI][toJ] = null
+    this.board[toI][toJ] = null
     if (toUndo.captured !== null) {
       // can't use toI and toJ because of en passant
       const [capI, capJ] = notationToIndices(toUndo.captured.coords)
-      this._board[capI][capJ] = toUndo.captured
+      this.board[capI][capJ] = toUndo.captured
     }
     
     toUndo.pieceMoved.hasMoved = toUndo.hadMoved
@@ -343,8 +321,8 @@ export class Board {
       const [oldI, oldJ] = notationToIndices(oldRook + rank)
       const [newI, newJ] = notationToIndices(newRook + rank)
 
-      this._board[newI][newJ] = null
-      this._board[oldI][oldJ] = new Rook(
+      this.board[newI][newJ] = null
+      this.board[oldI][oldJ] = new Rook(
         toUndo.pieceMoved.color,
         oldRook + rank,
         this
