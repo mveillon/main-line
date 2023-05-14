@@ -30,6 +30,7 @@ export class Engine {
    * @returns the initialized engine
    */
   protected async _loadEngine(): Promise<IStockfish> {
+    console.log('loading engine')
     let getSF: () => Promise<IStockfish>
     if (process.env.NODE_ENV === 'test') {
       // @ts-ignore

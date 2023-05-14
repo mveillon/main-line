@@ -4,7 +4,8 @@ import {
   doubleMove, 
   parseMove, 
   uciToMove, 
-  uciToAlgebraic 
+  uciToAlgebraic,
+  pieceToAcronym
 } from "../../chessLogic/parser";
 import Bishop from "../../chessLogic/pieces/Bishop";
 import King from "../../chessLogic/pieces/King";
@@ -323,4 +324,40 @@ test('uci to algebraic', () => {
     1. e4 f5 2. exf5 e6 3. fxe6 Qh4 4. e7 Nh6 
   `)
   expect(uciToAlgebraic('e7f8q', promoCheck)).toBe('exf8=Q+')
+
+  const castling = new Board(`
+    [Event "?"]
+    [Site "?"]
+    [Date "????.??.??"]
+    [Round "?"]
+    [White "?"]
+    [Black "?"]
+    [Result "*"]
+    
+    1. e4 d5 2. Nf3 Nc6 3. Bd3 Bf5 4. Nc3 Qd6 *
+  `)
+  expect(uciToAlgebraic('e1g1', castling)).toBe('O-O')
+  expect(uciToAlgebraic('e8c8', castling)).toBe('O-O-O')
+
+  const castleCheck = new Board(`
+    [Event "?"]
+    [Site "?"]
+    [Date "????.??.??"]
+    [Round "?"]
+    [White "?"]
+    [Black "?"]
+    [Result "*"]
+    
+    1. e4 f5 2. exf5 g6 3. fxg6 e5 4. gxh7 Kf7 5. f4 exf4 6. g3 fxg3 7. Bd3 Nh6 8.
+    Nh3 Nc6 *
+  `)
+  expect(uciToAlgebraic('e1g1', castleCheck)).toBe('O-O+')
+})
+
+test('piece to acronym', () => {
+  expect(pieceToAcronym(Bishop)).toBe('b')
+  expect(pieceToAcronym(Knight)).toBe('n')
+  expect(pieceToAcronym(King)).toBe('k')
+  expect(pieceToAcronym(Queen)).toBe('q')
+  expect(pieceToAcronym(Rook)).toBe('r')
 })

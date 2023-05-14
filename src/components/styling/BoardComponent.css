@@ -18,9 +18,13 @@ td {
 }
 
 .white-square {
-  background-color: #f5d4a2;
+  background-color: #ccb7ae;
 }
 
 .black-square {
-  background-color: #7a7772;
+  background-color: #706677;
+}
+
+.highlighted {
+  filter: brightness(85%)
 }

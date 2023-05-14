@@ -51,6 +51,24 @@ const pieceAcronym = (acronym: string): PieceT => {
 }
 
 /**
+ * Returns the abbreviation associated with that piece, or an empty string for pawns
+ * @param piece the piece type
+ * @returns a lowercase char associated with that piece
+ */
+export const pieceToAcronym = (piece: PieceT): string => {
+  const abbrs: { [index: string]: string } = {
+    [Bishop.name]: 'b',
+    [King.name]: 'k',
+    [Knight.name]: 'n',
+    [Pawn.name]: '',
+    [Queen.name]: 'q',
+    [Rook.name]: 'r'
+  }
+
+  return abbrs[piece.name]
+}
+
+/**
  * Performs both moves of a PGN line such as 1. e4 e5
  * @param moveNotation the two moves to perform
  * @param board the board to perform the moves on
@@ -195,53 +213,56 @@ export const uciToMove = (uci: string): [string, string, PieceT | undefined] => 
  */
 export const uciToAlgebraic = (uci: string, board: Board): string => {
   const [from, to, promoType] = uciToMove(uci)
-  const abbrs: { [index: string]: string } = {
-    [Bishop.name]: 'B',
-    [King.name]: 'K',
-    [Knight.name]: 'N',
-    [Pawn.name]: '',
-    [Queen.name]: 'Q',
-    [Rook.name]: 'R'
-  }
-
+  
   const piece = board.pieceAt(from)
   if (piece === null) {
     throw new Error(`${from} is an empty square`)
   }
 
-  let parts: string[] = [
-    abbrs[piece.type.name]
-  ]
+  let parts: string[] = []
 
-  if (piece instanceof Pawn && from[0] !== to[0]) {
-    parts.push(from[0])
+  const castling = (
+    piece instanceof King &&
+    from[0] === 'e' &&
+    (to[0] === 'c' || to[0] === 'g')
+  )
+  if (castling) {
+    parts.push('O-O')
+    if (to[0] === 'c') {
+      parts.push('-O')
+    }
   } else {
-    const otherPieces = board.findPieces(piece.type, piece.color)
-    for (const p of otherPieces) {
-      if (p.coords !== piece.coords && p.legalMoves().has(to)) {
-        if (p.coords[0] === piece.coords[0]) {
-          parts.push(piece.coords[1])
-        } else {
-          parts.push(piece.coords[0])
+    parts.push(pieceToAcronym(piece.type).toUpperCase())
+    if (piece instanceof Pawn && from[0] !== to[0]) {
+      parts.push(from[0])
+    } else {
+      const otherPieces = board.findPieces(piece.type, piece.color)
+      for (const p of otherPieces) {
+        if (p.coords !== piece.coords && p.legalMoves().has(to)) {
+          if (p.coords[0] === piece.coords[0]) {
+            parts.push(piece.coords[1])
+          } else {
+            parts.push(piece.coords[0])
+          }
+  
+          break
         }
-
-        break
       }
     }
-  }
-
-  if (board.pieceAt(to) !== null) {
-    parts.push('x')
-  }
-
-  parts.push(to)
-
-  if (piece instanceof Pawn && to[1] === '1' || to[1] === '8') {
-    if (typeof promoType === 'undefined') {
-      throw new Error('Undefined promotion type')
+  
+    if (board.pieceAt(to) !== null) {
+      parts.push('x')
     }
-
-    parts.push(`=${abbrs[promoType.name]}`)
+  
+    parts.push(to)
+  
+    if (piece instanceof Pawn && to[1] === '1' || to[1] === '8') {
+      if (typeof promoType === 'undefined') {
+        throw new Error('Undefined promotion type')
+      }
+  
+      parts.push(`=${pieceToAcronym(promoType).toUpperCase()}`)
+    }
   }
 
   board.movePiece(from, to, promoType)

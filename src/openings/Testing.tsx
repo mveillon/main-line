@@ -14,7 +14,7 @@ const Testing = () => {
         [Black "?"]
         [Result "*"]
         
-        1. e4 f5 2. exf5 g6 3. fxg6 Nc6 4. gxh7 Nb8 *
+        1. e4 d5 2. Nf3 Nc6 3. Bd3 Bf5 4. Nc3 Qd6 *
       `}
       player={Color.White}
     />

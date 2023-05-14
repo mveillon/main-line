@@ -22,6 +22,7 @@ const BoardComponent = (
   const [reversed, setReversed] = useState(props.player === Color.White)
   const [pieceSelected, setPieceSelected] = useState<Piece | null>(null)
   const [promoting, setPromoting] = useState<{ p: Piece, dest: string }>()
+  const [legalMoves, setLegalMoves] = useState<Set<string>>()
 
   const [isSelected, setIsSelected] = useState(
     full(getShape(board.board), false) as boolean[][]
@@ -41,6 +42,7 @@ const BoardComponent = (
     setIsSelected(isSelected)
 
     setPieceSelected(null)
+    setLegalMoves(undefined)
   }
 
   const getOnClick = (i: number, j: number): (() => void) => {
@@ -61,6 +63,7 @@ const BoardComponent = (
       if (playerTurn && (pieceSelected === null || isOwnPiece)) {
         if (isOwnPiece) {
           setPieceSelected(p)
+          setLegalMoves(p.legalMoves())
           isSelected[i][j] = true
           setIsSelected(isSelected)
         }
@@ -69,11 +72,12 @@ const BoardComponent = (
         unselectPiece()
 
         const dest = indicesToNotation(realI, realJ)
-
-        if (toMove instanceof Pawn && (dest[1] === '1' || dest[1] === '8')) {
-          setPromoting({ p: toMove, dest: dest })
-        } else {
-          props.playMove(toMove.coords, dest)
+        if (toMove.legalMoves().has(dest)) {
+          if (toMove instanceof Pawn && (dest[1] === '1' || dest[1] === '8')) {
+            setPromoting({ p: toMove, dest: dest })
+          } else {
+            props.playMove(toMove.coords, dest)
+          }
         }
       }
     }
@@ -109,15 +113,34 @@ const BoardComponent = (
                   {inds.map((j) => {
                     const square = board.board[getInd(i)][getInd(j)]
                     const selected = isSelected[i][j]
+                    const notation = indicesToNotation(getInd(i), getInd(j))
+                    const highlight = (
+                      (
+                        typeof legalMoves !== 'undefined' &&
+                        legalMoves.has(notation)
+                      ) ||
+                      (
+                        props.game.board.movesMade.length > 0 &&
+                        (
+                          props.game.board.lastMove.from === notation ||
+                          props.game.board.lastMove.to === notation
+                        )
+                      )
+                    )
+                    let className = (i + j) % 2 === 0 ? "white-square" : "black-square"
+                    if (highlight) className += ' highlighted'
                     return (
                       <td
                         key={j} 
-                        className={(i + j) % 2 === 0 ? "white-square" : "black-square"}
+                        className={className}
                         onClick={getOnClick(i, j)}
                       >
                         {
                           square !== null &&
-                          <PieceComponent piece={square} selected={selected} />
+                          <PieceComponent 
+                            piece={square} 
+                            selected={selected}
+                          />
                         }
                       </td>
                     )

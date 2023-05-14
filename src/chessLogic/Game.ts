@@ -2,11 +2,9 @@ import { Board } from "./Board";
 import Color from "./Color";
 import King from "./pieces/King";
 import Pawn from "./pieces/Pawn";
-import Bishop from "./pieces/Bishop";
-import Knight from "./pieces/Knight";
-import { Piece, PieceT } from "./pieces/Piece";
+import { PieceT } from "./pieces/Piece";
 import Rook from "./pieces/Rook";
-import Queen from "./pieces/Queen";
+import { pieceToAcronym } from "./parser";
 
 class Game {
   board: Board
@@ -72,15 +70,6 @@ class Game {
    * @returns a single line of text that describes the entire position
    */
   toFEN(): string {
-    const abbrs: { [index: string]: string } = {
-      [Bishop.name]: 'b',
-      [King.name]: 'k',
-      [Knight.name]: 'n',
-      [Pawn.name]: 'p',
-      [Queen.name]: 'q',
-      [Rook.name]: 'r'
-    }
-
     const allRows: string[] = []
     for (let i = this.board.board.length - 1; i >= 0; i--) {
       const row: string[] = []
@@ -97,7 +86,10 @@ class Game {
             row.push(emptySpaces.toString())
             emptySpaces = 0
           }
-          const a = abbrs[square.type.name]
+          let a = pieceToAcronym(square.type)
+          if (square instanceof Pawn) {
+            a = 'p'
+          }
           if (square.color === Color.Black) {
             row.push(a)
           } else {
