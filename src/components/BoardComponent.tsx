@@ -1,4 +1,5 @@
 import "./styling/BoardComponent.css"
+import "./styling/global.css"
 import { useState } from "react";
 
 import PieceComponent from "./PieceComponent";
@@ -6,8 +7,9 @@ import { arange, full, getShape } from "../utils/numJS";
 import { Piece, PieceT } from "../chessLogic/pieces/Piece";
 import { indicesToNotation, notationToIndices } from "../chessLogic/notationIndices";
 import Game from "../chessLogic/Game";
-import Queen from "../chessLogic/pieces/Queen";
 import Color from "../chessLogic/Color";
+import PromotionSelector from "./PromotionSelector";
+import Pawn from "../chessLogic/pieces/Pawn";
 
 const BoardComponent = (
   props: {
@@ -19,6 +21,7 @@ const BoardComponent = (
   const board = props.game.board
   const [reversed, setReversed] = useState(props.player === Color.White)
   const [pieceSelected, setPieceSelected] = useState<Piece | null>(null)
+  const [promoting, setPromoting] = useState<{ p: Piece, dest: string }>()
 
   const [isSelected, setIsSelected] = useState(
     full(getShape(board.board), false) as boolean[][]
@@ -65,13 +68,24 @@ const BoardComponent = (
         const toMove = pieceSelected
         unselectPiece()
 
-        // TODO : get actual promotion type
-        props.playMove(
-          toMove.coords, 
-          indicesToNotation(realI, realJ),
-          Queen
-        )
+        const dest = indicesToNotation(realI, realJ)
+
+        if (toMove instanceof Pawn && (dest[1] === '1' || dest[1] === '8')) {
+          setPromoting({ p: toMove, dest: dest })
+        } else {
+          props.playMove(toMove.coords, dest)
+        }
       }
+    }
+  }
+
+  const getPromoteClick = () => {
+    return (promoType: PieceT) => {
+      if (typeof promoting === 'undefined') {
+        throw new Error('Cannot promote undefined piece')
+      }
+      props.playMove(promoting.p.coords, promoting.dest, promoType)
+      setPromoting(undefined)
     }
   }
 
@@ -85,37 +99,44 @@ const BoardComponent = (
   const inds = arange(board.board.length)
 
   return (
-    <div>
-      <table>
-        <tbody>
-          {inds.map((i) => {
-            return (
-              <tr key={i}>
-                {inds.map((j) => {
-                  const square = board.board[getInd(i)][getInd(j)]
-                  const selected = isSelected[i][j]
-                  return (
-                    <td
-                      key={j} 
-                      className={(i + j) % 2 === 0 ? "white-square" : "black-square"}
-                      onClick={getOnClick(i, j)}
-                    >
-                      {
-                        square !== null &&
-                        <PieceComponent piece={square} selected={selected} />
-                      }
-                    </td>
-                  )
-                })}
-              </tr>
-            )
-          })}
-        </tbody>
-      </table>
+    <div className='flex-row'>
+      <div>
+        <table>
+          <tbody>
+            {inds.map((i) => {
+              return (
+                <tr key={i}>
+                  {inds.map((j) => {
+                    const square = board.board[getInd(i)][getInd(j)]
+                    const selected = isSelected[i][j]
+                    return (
+                      <td
+                        key={j} 
+                        className={(i + j) % 2 === 0 ? "white-square" : "black-square"}
+                        onClick={getOnClick(i, j)}
+                      >
+                        {
+                          square !== null &&
+                          <PieceComponent piece={square} selected={selected} />
+                        }
+                      </td>
+                    )
+                  })}
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
 
-      <button onClick={reverseBoard}>
-        Reverse board
-      </button>
+        <button onClick={reverseBoard}>
+          Reverse board
+        </button>
+      </div>
+
+      {
+        promoting && 
+        <PromotionSelector turn={props.game.turn} onSelected={getPromoteClick()} />
+      }
     </div>
   )
 }

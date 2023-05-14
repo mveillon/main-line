@@ -1,6 +1,7 @@
 import { Piece } from "../chessLogic/pieces/Piece";
 import Color from "../chessLogic/Color";
 import "./styling/PieceComponent.css"
+import "./styling/global.css"
 import { useState } from "react";
 
 import blackBishop from "../assets/blackBishop.png"

@@ -1,6 +1,8 @@
 import Color from "../chessLogic/Color";
 import GameComponent from "./GameComponent";
 
+import "./styling/global.css"
+
 function Opening(props: { name: string, pgn: string, player: Color }) {
   return (
     <div>

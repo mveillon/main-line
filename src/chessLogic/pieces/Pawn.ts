@@ -18,7 +18,10 @@ class Pawn extends Piece {
     const oneUp = (addArrays(current, [movesTowards, 0]) as [number, number])
     const oneUpNotation = indicesToNotation(...oneUp)
 
-    if (this._board.pieceAt(oneUpNotation) === null) {
+    if (
+      !this._board.blockedOOB(oneUp, this.color) && 
+      this._board.pieceAt(oneUpNotation) === null
+    ) {
       res.add(oneUpNotation)
 
       if (!this.hasMoved) {
@@ -27,7 +30,10 @@ class Pawn extends Piece {
         )
         const twoUpNotation = indicesToNotation(...twoUp)
   
-        if (this._board.pieceAt(twoUpNotation) === null) {
+        if (
+          !this._board.blockedOOB(twoUp, this.color) &&
+          this._board.pieceAt(twoUpNotation) === null
+        ) {
           res.add(twoUpNotation)
         }
       }
