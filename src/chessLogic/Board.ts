@@ -155,8 +155,19 @@ export class Board {
       info.captured = this.board[fromI][toJ]
       this.board[fromI][toJ] = null
     }
-    this.movesMade.push(info)
+
     this.movePointer++
+    if (
+      typeof this.lastMove === 'undefined' ||
+      (this.lastMove.to !== to || this.lastMove.from !== from)
+    ) {
+      if (this.movePointer < this.movesMade.length) {
+        this.movesMade[this.movePointer] = info
+        this.movesMade.splice(this.movePointer + 1)
+      } else {
+        this.movesMade.push(info)
+      }
+    }
 
     if (
       p instanceof King && 
@@ -292,7 +303,7 @@ export class Board {
    * Undoes the last move played, reversing all side effects
    */
   undoLastMove() {
-    const toUndo = this.movesMade.pop()
+    const toUndo = this.lastMove
     this.movePointer--
     if (typeof toUndo === 'undefined') {
       throw new Error('Cannot undo when no moves have been played')
@@ -327,6 +338,27 @@ export class Board {
         oldRook + rank,
         this
       )
+    }
+  }
+
+  /**
+   * Skips to the next move in this.movesMade, if possible. Otherwise, this does
+   * nothing
+   */
+  forwardOneMove() {
+    const toMake = this.movesMade[this.movePointer + 1]
+    if (typeof toMake !== 'undefined') {
+      this.movePiece(toMake.from, toMake.to, toMake.promoType)
+    }
+  }
+
+  /**
+   * Skips to the most recent move in this.movesMade, if possible. Otherwise, this does
+   * nothing
+   */
+  backwardOneMove() {
+    if (this.movePointer >= 0) {
+      this.undoLastMove()
     }
   }
 }

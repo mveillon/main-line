@@ -120,7 +120,7 @@ const BoardComponent = (
                         legalMoves.has(notation)
                       ) ||
                       (
-                        props.game.board.movesMade.length > 0 &&
+                        props.game.board.movePointer >= 0 &&
                         (
                           props.game.board.lastMove.from === notation ||
                           props.game.board.lastMove.to === notation

@@ -38,7 +38,7 @@ class Game {
         }
         this.halfMoves = this.board.movePointer - moveInd - 1
 
-        this.moveNumber = 1 + Math.floor(this.board.movesMade.length / 2)
+        this.moveNumber = 1 + Math.floor((this.board.movePointer + 1) / 2)
       }
     }
     this._setResult()
