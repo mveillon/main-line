@@ -303,10 +303,33 @@ export class Board {
    * Undoes the last move played, reversing all side effects
    */
   undoLastMove() {
+    if (this.movePointer < 0) {
+      throw new Error('Nothing to undo')
+    }
+    this.backwardOneMove()
+    this.movesMade.splice(this.movePointer + 1)
+  }
+
+  /**
+   * Skips to the next move in this.movesMade, if possible. Otherwise, this does
+   * nothing
+   */
+  forwardOneMove() {
+    const toMake = this.movesMade[this.movePointer + 1]
+    if (typeof toMake !== 'undefined') {
+      this.movePiece(toMake.from, toMake.to, toMake.promoType)
+    }
+  }
+
+  /**
+   * Skips to the most recent move in this.movesMade, if possible. Otherwise, this does
+   * nothing
+   */
+  backwardOneMove() {
     const toUndo = this.lastMove
     this.movePointer--
     if (typeof toUndo === 'undefined') {
-      throw new Error('Cannot undo when no moves have been played')
+      return
     }
     const [fromI, fromJ] = notationToIndices(toUndo.from)
     const [toI, toJ] = notationToIndices(toUndo.to)
@@ -338,27 +361,6 @@ export class Board {
         oldRook + rank,
         this
       )
-    }
-  }
-
-  /**
-   * Skips to the next move in this.movesMade, if possible. Otherwise, this does
-   * nothing
-   */
-  forwardOneMove() {
-    const toMake = this.movesMade[this.movePointer + 1]
-    if (typeof toMake !== 'undefined') {
-      this.movePiece(toMake.from, toMake.to, toMake.promoType)
-    }
-  }
-
-  /**
-   * Skips to the most recent move in this.movesMade, if possible. Otherwise, this does
-   * nothing
-   */
-  backwardOneMove() {
-    if (this.movePointer >= 0) {
-      this.undoLastMove()
     }
   }
 }

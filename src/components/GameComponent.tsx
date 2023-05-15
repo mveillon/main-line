@@ -2,10 +2,14 @@ import { useEffect, useState } from "react";
 import BoardComponent from "./BoardComponent";
 import Game from "../chessLogic/Game";
 import { Engine } from "../chessLogic/Engine";
-import { uciToMove, pieceToAcronym, uciToAlgebraic } from "../chessLogic/parser";
+import { 
+  uciToMove, 
+  pieceToAcronym, 
+  uciToAlgebraic, 
+  uciLineToPGN 
+} from "../chessLogic/parser";
 import Color from "../chessLogic/Color";
 import { toFEN } from "../chessLogic/fenPGN";
-
 import "./styling/global.css"
 import { PieceT } from "../chessLogic/pieces/Piece";
 
@@ -74,19 +78,8 @@ function GameComponent(props: { pgn: string, player: Color }) {
 
     setReview(revParts.join(' '))
 
-    // let moveNo = game.moveNumber
-    // const lineParts: string[] = []
-    // let formattedMove: string[] = [`${moveNo}. `]
-    // let turn = game.turn
-    // if (turn === Color.Black) {
-    //   formattedMove.push('...')
-    // }
-
-    // for (const move of moves[0].line) {
-    //   formattedMove.push(uciToAlgebraic(move, game.board))
-    // }
-
-    // setLine(lineParts.join('\n'))
+    const pgn = uciLineToPGN(moves[0].line, game)
+    setLine(pgn)
 
     if (game.result === '') {
       computerMove()

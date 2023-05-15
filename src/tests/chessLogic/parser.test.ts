@@ -6,7 +6,8 @@ import {
   uciToMove, 
   uciToAlgebraic,
   pieceToAcronym,
-  acronymToPiece
+  acronymToPiece,
+  uciLineToPGN
 } from "../../chessLogic/parser";
 import Bishop from "../../chessLogic/pieces/Bishop";
 import King from "../../chessLogic/pieces/King";
@@ -14,6 +15,7 @@ import Knight from "../../chessLogic/pieces/Knight";
 import Pawn from "../../chessLogic/pieces/Pawn";
 import Queen from "../../chessLogic/pieces/Queen";
 import Rook from "../../chessLogic/pieces/Rook";
+import Game from "../../chessLogic/Game";
 
 export const setUpBoard = (startingMoves: string[]): Board => {
   const res = new Board()
@@ -369,4 +371,40 @@ test('piece acronym conversion', () => {
   expect(acronymToPiece('N')).toBe(Knight)
   expect(acronymToPiece('')).toBe(Pawn)
   expect(acronymToPiece('P')).toBe(Pawn)
+})
+
+test('uci line to pgn', () => {
+  const g = new Game()
+
+  const pgn = uciLineToPGN([
+    'e2e4',
+    'd7d5',
+    'g1f3',
+    'b8c6'
+  ], g)
+
+  expect(g.board.sameBoard(new Board())).toBeTruthy()
+  g.board.forwardOneMove()
+  expect(g.board.sameBoard(new Board())).toBeTruthy()
+
+  const pgn2 = '1. e4 d5 2. Nf3 Nc6'
+  expect(pgn).toContain(pgn2)
+
+  const pgn3 = uciLineToPGN([
+    'e2e4',
+    'd7d5',
+    'e4d5'
+  ], g)
+
+  const pgn4 = '1. e4 d5 2. exd5'
+  expect(pgn3).toContain(pgn4)
+
+  g.playMove('e2', 'e4')
+  const pgn5 = uciLineToPGN([
+    'd7d5',
+    'g1f3',
+    'e7e5'
+  ], g)
+  const pgn6 = '1. ...d5 2. Nf3 e5'
+  expect(pgn5).toContain(pgn6)
 })

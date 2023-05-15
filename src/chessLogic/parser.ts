@@ -7,6 +7,7 @@ import Knight from "./pieces/Knight"
 import Queen from "./pieces/Queen"
 import Rook from "./pieces/Rook"
 import Pawn from "./pieces/Pawn"
+import Game from "./Game"
 
 /**
  * Returns the acronyms used for pieces in chess notation
@@ -276,5 +277,40 @@ export const uciToAlgebraic = (uci: string, board: Board): string => {
   board.undoLastMove()
 
   return parts.join('')
+}
+
+/**
+ * Converts a list of UCI moves to a single PGN
+ * @param line the moves to make
+ * @param game the game to play them in
+ * @returns the PGN
+ */
+export const uciLineToPGN = (line: string[], game: Game): string => {
+  let moveNo = game.moveNumber
+  const lineParts: string[] = []
+  let formattedMove: string[] = [`${moveNo}. `]
+  let turn = game.turn
+  if (turn === Color.Black) {
+    formattedMove.push('...')
+  }
+
+  for (const move of line) {
+    formattedMove.push(uciToAlgebraic(move, game.board) + ' ')
+    game.board.movePiece(...uciToMove(move))
+
+    if (formattedMove.length === 3) {
+      lineParts.push(formattedMove.join(''))
+      formattedMove = [`${++moveNo}. `]
+    }
+  }
+  if (formattedMove.length > 1) {
+    lineParts.push(formattedMove.join(''))
+  }
+
+  for (let i = 0; i < line.length; i++) {
+    game.board.undoLastMove()
+  }
+
+  return lineParts.join('')
 }
 

@@ -196,9 +196,9 @@ test('undo', () => {
 test('skipping', () => {
   const b = new Board()
   b.forwardOneMove()
-  expect(b.sameBoard(new Board()))
+  expect(b.sameBoard(new Board())).toBeTruthy()
   b.backwardOneMove()
-  expect(b.sameBoard(new Board()))
+  expect(b.sameBoard(new Board())).toBeTruthy()
 
   b.movePiece('e2', 'e4')
   b.movePiece('d7', 'd5')
