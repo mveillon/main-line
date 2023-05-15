@@ -1,5 +1,5 @@
 import Game from "../../chessLogic/Game";
-import { toFEN } from "../../chessLogic/fenPGN";
+import { toFEN, fromFEN } from "../../chessLogic/fenPGN";
 
 const compareFENtoPGN = (fen: string, pgn: string) => {
   expect(toFEN(new Game(pgn))).toBe(fen)
@@ -131,4 +131,17 @@ test('game over', () => {
   expect(stalemateGame.result).toBe('1/2-1/2')
 
   expect(() => new Game(undefined, '')).toThrow()
+})
+
+test('fen mid game', () => {
+  const g = new Game()
+  g.playMove('f2', 'f3')
+  g.playMove('e7', 'e5')
+  g.playMove('g1', 'g4')
+
+  const fen = toFEN(g)
+  g.playMove('d8', 'h5')
+  fromFEN(fen, g)
+
+  expect(toFEN(g)).toBe(fen)
 })

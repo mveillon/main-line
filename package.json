@@ -1,5 +1,5 @@
 {
-  "name": "chess-openings",
+  "name": "main-line",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -27,7 +27,8 @@
     "build": "craco build",
     "test": "craco test",
     "eject": "craco eject",
-    "test-coverage": "npm test -- --coverage --watchAll=false --no-cache"
+    "test-coverage": "npm test -- --coverage --watchAll=false --no-cache",
+    "gen-puzzles": "tsc && node ts-out/src/generatePuzzles.js"
   },
   "eslintConfig": {
     "extends": [

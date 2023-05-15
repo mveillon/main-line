@@ -36,6 +36,10 @@ export class Engine {
       // @ts-ignore
       const Stockfish = await import("../../public/stockfish.wasm")
       getSF = Stockfish.default
+    } else if (typeof process.env.NODE_ENV === 'undefined' ) {
+      // @ts-ignore
+      const Stockfish = await import("../../../public/stockfish.wasm/stockfish")
+      getSF = Stockfish.default
     } else {
       // @ts-ignore
       getSF = window.Stockfish
@@ -82,16 +86,20 @@ export class Engine {
 
     return new Promise<MoveScore[]>((resolve, reject) => {
       const messages: MoveScore[] = []
-      
+      const includedMoves = new Set<string>()
+
       const listener = (message: string) => {
-        if (message.includes(`info depth ${this.depth}`)) {
+        if (message.includes(`info depth ${this.depth} seldepth`)) {
           const words = message.split(' ')
           const moveInd = words.indexOf('pv') + 1
-          messages.push({
-            move: words[moveInd],
-            score: parseInt(words[words.indexOf('cp') + 1]),
-            line: words.slice(moveInd + 1)
-          })
+          if (!includedMoves.has(words[moveInd])) {
+            includedMoves.add(words[moveInd])
+            messages.push({
+              move: words[moveInd],
+              score: parseInt(words[words.indexOf('cp') + 1]),
+              line: words.slice(moveInd + 1)
+            })
+          }
         }
 
         if (message.includes('bestmove')) {

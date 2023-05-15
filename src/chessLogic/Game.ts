@@ -7,10 +7,19 @@ import { fromFEN } from "./fenPGN";
 class Game {
   board: Board
   turn: Color = Color.White
-  result: string = ''
   engineColors: Color[]
   halfMoves: number = 0
   moveNumber: number = 1
+
+  get result(): string {
+    if (!this.board.canMove(this.turn)) {
+      if (this.board.isInCheck(this.turn)) {
+        return this.turn === Color.White ? '0-1' : '1-0'
+      }
+      return '1/2-1/2'
+    }
+    return ''
+  }
 
   /**
    * A game of chess between two players or computers. If both `pgn` and
@@ -41,7 +50,6 @@ class Game {
         this.moveNumber = 1 + Math.floor((this.board.movePointer + 1) / 2)
       }
     }
-    this._setResult()
 
     this.engineColors = []
   }
@@ -87,21 +95,6 @@ class Game {
 
       this.board.movePiece(from, to, promoType)
       this.turn = +!this.turn
-      this._setResult()
-    }
-  }
-
-  /**
-   * Updates the result of the game based on the current board state. 
-   * Assumes `this.turn` is accurate
-   */
-  protected _setResult() {
-    if (!this.board.canMove(this.turn)) {
-      if (this.board.isInCheck(this.turn)) {
-        this.result = this.turn === Color.White ? '0-1' : '1-0'
-      } else {
-        this.result = '1/2-1/2'
-      }
     }
   }
 }

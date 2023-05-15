@@ -8,6 +8,7 @@ import Queen from "./pieces/Queen"
 import Rook from "./pieces/Rook"
 import Pawn from "./pieces/Pawn"
 import Game from "./Game"
+import { toFEN, fromFEN } from "./fenPGN"
 
 /**
  * Returns the acronyms used for pieces in chess notation
@@ -257,9 +258,9 @@ export const uciToAlgebraic = (uci: string, board: Board): string => {
   
     parts.push(to)
   
-    if (piece instanceof Pawn && to[1] === '1' || to[1] === '8') {
+    if (piece instanceof Pawn && (to[1] === '1' || to[1] === '8')) {
       if (typeof promoType === 'undefined') {
-        throw new Error('Undefined promotion type')
+        throw new Error(`Undefined promotion type moving ${from} to ${to}`)
       }
   
       parts.push(`=${pieceToAcronym(promoType).toUpperCase()}`)
@@ -294,6 +295,8 @@ export const uciLineToPGN = (line: string[], game: Game): string => {
     formattedMove.push('...')
   }
 
+  const oldFEN = toFEN(game)
+
   for (const move of line) {
     formattedMove.push(uciToAlgebraic(move, game.board) + ' ')
     game.board.movePiece(...uciToMove(move))
@@ -307,9 +310,7 @@ export const uciLineToPGN = (line: string[], game: Game): string => {
     lineParts.push(formattedMove.join(''))
   }
 
-  for (let i = 0; i < line.length; i++) {
-    game.board.undoLastMove()
-  }
+  fromFEN(oldFEN, game)
 
   return lineParts.join('')
 }
