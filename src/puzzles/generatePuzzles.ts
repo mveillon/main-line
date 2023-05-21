@@ -1,20 +1,14 @@
-import { Engine } from "./chessLogic/Engine"
-import Game from "./chessLogic/Game"
-import { randInt, choice } from "./utils/random"
-import { toFEN, fromFEN } from "./chessLogic/fenPGN"
-import { arange, scalarMul } from "./utils/numJS"
-import { uciToMove } from "./chessLogic/parser"
+import { Engine } from "../chessLogic/Engine"
+import Game from "../chessLogic/Game"
+import { randInt, choice } from "../utils/random"
+import { fromFEN, toFEN } from "../chessLogic/fenPGN"
+import { arange, scalarMul } from "../utils/numJS"
+import { uciToMove } from "../chessLogic/parser"
 import { writeFileSync, readFile, copyFileSync } from "fs"
-import { Piece } from "./chessLogic/pieces/Piece"
-import Color from "./chessLogic/Color"
-import Queen from "./chessLogic/pieces/Queen"
-
-type moveMap = { [index: string]: { score: number, line: string[] }}
-
-interface puzzleInfo {
-  moves: moveMap
-  bestMove: string
-}
+import { Piece } from "../chessLogic/pieces/Piece"
+import Color from "../chessLogic/Color"
+import PuzzleSet from "./PuzzleSet"
+import Pawn from "../chessLogic/pieces/Pawn"
 
 /**
  * Generates `numPuzzles` opening puzzles from the `startPGN` and writes the FENs
@@ -99,7 +93,7 @@ const analyzeLines = async (path: string, depth: number) => {
       }
 
       const puzzles = JSON.parse(data)
-      const res: { [index: string]: puzzleInfo } = {}
+      const res: PuzzleSet = {}
       
       try {
         for (const puzzle in puzzles) {
@@ -113,26 +107,41 @@ const analyzeLines = async (path: string, depth: number) => {
           }
     
           const allPieces = g.board.findPieces(Piece, g.turn)
-          const mapping: moveMap = {}
+          const mapping: {
+            [index: string]: {
+              score: number,
+              line: string[]
+            }
+          } = {}
           let bestMove: string = ''
-    
+
           for (const piece of allPieces) {
+            const startingCoords = piece.coords
             for (const move of piece.legalMoves()) {
-              const uci = piece.coords + move
-              g.playMove(piece.coords, move, Queen)
-              const continuation = (await sf.getBestMoves(toFEN(g)))[0]
-              mapping[uci] = {
-                score: continuation.score,
-                line: [continuation.move, ...continuation.line.slice(0, 5)]
+              let suffixes = ['']
+              if (piece instanceof Pawn && (move[1] === '8' || move[1] === '1')) {
+                suffixes = ['b', 'n', 'q', 'r']
               }
-              fromFEN(puzzle, g)
-    
-              if (
-                bestMove === '' || 
-                betterScore(continuation.score, mapping[bestMove].score)
-              ) {
-                bestMove = uci
-              }
+
+              for (const s of suffixes) {
+                const uci = piece.coords + move + s
+                g.playMove(...uciToMove(uci))
+
+                const continuation = (await sf.getBestMoves(toFEN(g)))[0]
+                mapping[uci] = {
+                  score: continuation.score,
+                  line: [continuation.move, ...continuation.line.slice(0, 5)]
+                }
+                fromFEN(puzzle, g)
+                piece.coords = startingCoords
+      
+                if (
+                  bestMove === '' || 
+                  betterScore(continuation.score, mapping[bestMove].score)
+                ) {
+                  bestMove = uci
+                }
+              }              
             }
           }
     
@@ -177,18 +186,19 @@ const timeAsync = async (func: () => Promise<void>) => {
   console.log(`Completed after ${hours} hours\n`)
 }
 
-const OPENING_NAME = 'London-Black'
+const OPENING_NAME = 'London'
 const DEPTH = 25
+const NUM_PUZZLES = 50
 
 console.log(`Generating puzzles for the ${OPENING_NAME}...`)
 
 timeAsync(() => (
   generatePuzzles(
     '1. d4 d5 2. Bf4',
-    50,
+    NUM_PUZZLES,
     `src/puzzles/${OPENING_NAME}.json`,
     DEPTH,
-    Color.Black
+    Color.White
   )
 )).then(() => {
   copyFileSync(

@@ -195,7 +195,7 @@ export const parseMove = (notation: string, board: Board) => {
  * was no promotion
  */
 export const uciToMove = (uci: string): [string, string, PieceT | undefined] => {
-  let promotionType = undefined
+  let promotionType: PieceT | undefined = undefined
   if (uci.length > 4) {
     const p = uci[uci.length - 1]
     promotionType = acronyms()[p.toUpperCase()]

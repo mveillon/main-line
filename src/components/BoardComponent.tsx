@@ -15,7 +15,8 @@ const BoardComponent = (
   props: {
     game: Game, 
     playMove: (from: string, to: string, promoType?: PieceT) => void,
-    player: Color
+    player: Color,
+    canMove: boolean
   }) => {
   
   const board = props.game.board
@@ -51,7 +52,6 @@ const BoardComponent = (
       const realJ = getInd(j)
 
       const p = board.board[realI][realJ]
-      const playerTurn = !props.game.engineColors.includes(props.game.turn)
       const isOwnPiece = (
         p !== null && 
         p.color === props.game.turn &&
@@ -60,7 +60,7 @@ const BoardComponent = (
           pieceSelected.coords !== indicesToNotation(realI, realJ)
         )
       )
-      if (playerTurn && (pieceSelected === null || isOwnPiece)) {
+      if (props.canMove && (pieceSelected === null || isOwnPiece)) {
         if (isOwnPiece) {
           setPieceSelected(p)
           setLegalMoves(p.legalMoves())

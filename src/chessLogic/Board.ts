@@ -311,14 +311,16 @@ export class Board {
   }
 
   /**
-   * Skips to the next move in this.movesMade, if possible. Otherwise, this does
-   * nothing
+   * Skips to the next move in this.movesMade, if possible. Returns whether
+   * there was a forward move to skip to
    */
   forwardOneMove() {
     const toMake = this.movesMade[this.movePointer + 1]
     if (typeof toMake !== 'undefined') {
       this.movePiece(toMake.from, toMake.to, toMake.promoType)
+      return true
     }
+    return false
   }
 
   /**
@@ -329,7 +331,7 @@ export class Board {
     const toUndo = this.lastMove
     this.movePointer--
     if (typeof toUndo === 'undefined') {
-      return
+      return false
     }
     const [fromI, fromJ] = notationToIndices(toUndo.from)
     const [toI, toJ] = notationToIndices(toUndo.to)
@@ -362,5 +364,6 @@ export class Board {
         this
       )
     }
+    return true
   }
 }

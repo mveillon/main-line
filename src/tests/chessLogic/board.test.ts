@@ -195,28 +195,28 @@ test('undo', () => {
 
 test('skipping', () => {
   const b = new Board()
-  b.forwardOneMove()
+  expect(b.forwardOneMove()).toBeFalsy()
   expect(b.sameBoard(new Board())).toBeTruthy()
-  b.backwardOneMove()
+  expect(b.backwardOneMove()).toBeFalsy()
   expect(b.sameBoard(new Board())).toBeTruthy()
 
   b.movePiece('e2', 'e4')
   b.movePiece('d7', 'd5')
 
-  b.backwardOneMove()
+  expect(b.backwardOneMove()).toBeTruthy()
   expect(b.pieceAt('d5')).toBeNull()
   expect(b.pieceAt('d7')).toBeInstanceOf(Pawn)
   expect(b.pieceAt('e4')).toBeInstanceOf(Pawn)
 
-  b.backwardOneMove()
+  expect(b.backwardOneMove()).toBeTruthy()
   expect(b.pieceAt('e4')).toBeNull()
   expect(b.pieceAt('e2')).toBeInstanceOf(Pawn)
 
-  b.forwardOneMove()
+  expect(b.forwardOneMove()).toBeTruthy()
   expect(b.pieceAt('e4')).toBeInstanceOf(Pawn)
   expect(b.pieceAt('e2')).toBeNull()
   expect(b.pieceAt('d5')).toBeNull()
 
-  b.forwardOneMove()
+  expect(b.forwardOneMove()).toBeTruthy()
   expect(b.pieceAt('d5')).toBeInstanceOf(Pawn)
 })

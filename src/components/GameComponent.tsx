@@ -1,59 +1,48 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import BoardComponent from "./BoardComponent";
 import Game from "../chessLogic/Game";
-import { Engine } from "../chessLogic/Engine";
-import { 
-  uciToMove, 
-  pieceToAcronym, 
-  uciToAlgebraic, 
-  uciLineToPGN 
-} from "../chessLogic/parser";
-import Color from "../chessLogic/Color";
-import { toFEN } from "../chessLogic/fenPGN";
 import "./styling/global.css"
 import { PieceT } from "../chessLogic/pieces/Piece";
-import loading from "../assets/loading.gif"
+import PuzzleSet from "../puzzles/PuzzleSet";
+import { choice } from "../utils/random";
+import { pieceToAcronym, uciToAlgebraic, uciToMove } from "../chessLogic/parser";
+import { isClose } from "../utils/numJS";
+import { uciLineToPGN } from "../chessLogic/parser";
+import Color from "../chessLogic/Color";
 
-const DEPTH = 5
-const LINE_LENGTH = 5
-
-function GameComponent(props: { pgn: string, player: Color }) {
+function GameComponent(props: { 
+  pgn: string,
+  puzzles: PuzzleSet
+}) {
   let g = new Game(props.pgn)
-  g.engineColors = [+!props.player]
+
+  const aPuzzle = Object.keys(props.puzzles)[0]
+  let player: Color
+  if (typeof aPuzzle === 'undefined' || aPuzzle.split(' ')[1] === 'w') {
+    player = Color.White
+  } else {
+    player = Color.Black
+  }
 
   const [game, setGame] = useState(g)
   const [result, setResult] = useState('')
   const [review, setReview] = useState('')
-  const [sf, setSF] = useState(new Engine(DEPTH, LINE_LENGTH))
   const [line, setLine] = useState('')
   const [showLine, setShowLine] = useState(false)
-  const [thinking, setThinking] = useState(false)
+  const [currentFEN, setCurrentFEN] = useState('')
+  const [available, setAvailable] = useState(new Set(Object.keys(props.puzzles)))
+  const [canMove, setCanMove] = useState(false)
 
-  // quit Stockfish when component is unmounted
-  useEffect(() => {
-    if (game.turn !== props.player) {
-      computerMove()
-    }
-
-    return () => { sf.quit() }
-  }, [])
-
-  const computerMove = async () => {
-    if (!game.engineColors.includes(game.turn)) return
-
-    setThinking(true)
-    const moves = await sf.getBestMoves(toFEN(game))
-    game.playMove(...uciToMove(moves[0].move))
-    setGame(Object.assign(new Game(), game))
-    updateRes()
-    setThinking(false)
+  const updateGame = () => {
+    // so inefficient but required because React doesn't notice deep
+    // state changes
+    setGame(Object.assign({}, game))
   }
 
   const updateRes = () => {
     const res = game.result
     switch (res) {
       case '':
-        computerMove()
         break
       case '1-0':
         setResult('White wins by checkmate')
@@ -70,79 +59,105 @@ function GameComponent(props: { pgn: string, player: Color }) {
   }
 
   const playMove = async (from: string, to: string, promoType?: PieceT) => {
+    if (!canMove) return
+
     let uci = from + to
     if (typeof promoType !== 'undefined') {
       uci += pieceToAcronym(promoType)
     }
-    const algebraic = uciToAlgebraic(uci, game.board)
-    const fen = toFEN(game)
+
+    const bestMove = props.puzzles[currentFEN].bestMove
+    if (uci === bestMove) {
+      setReview("That's the best move!")
+    } else {
+      const score = (
+        props.puzzles[currentFEN].moves[uci].score
+      )
+      const bestScore = props.puzzles[currentFEN].moves[bestMove].score
+
+      const reviewParts: string[] = []
+
+      if (isClose(score, bestScore, undefined, 0.2)) {
+        reviewParts.push("That's one of the best moves!")
+      } else {
+        reviewParts.push("That's not the right idea.")
+      }
+
+      reviewParts.push(`The top move is ${uciToAlgebraic(bestMove, game.board)}.`)
+
+      const line = uciLineToPGN(
+        [bestMove, ...props.puzzles[currentFEN].moves[bestMove].line],
+        game
+      )
+      setLine(line)
+      setReview(reviewParts.join(' '))
+    }
 
     game.playMove(from, to, promoType)
-    setGame(game)
 
-    setThinking(true)
-    const moves = await sf.getBestMoves(fen)
-    const revParts: string[] = [algebraic]
-
-    // TODO : check with UCI. If the player is black, will the best move
-    // be moves[0]? They could just be sorted in descending order of cp in which
-    // case moves[0] would the worst for black of the engine suggestions
-    if (uci === moves[0].move) {
-      revParts.push('is the top engine move!')
-    } else {
-      let found = false
-      for (const move of moves) {
-        if (move.move === uci) {
-          revParts.push('is one of the top engine moves!')
-          found = true
-          break
-        }
-      }
-      if (!found) {
-        revParts.push('is not good.')
-      }
-
-      game.board.undoLastMove()
-      revParts.push(`The best move is ${uciToAlgebraic(moves[0].move, game.board)}.`)
-      game.board.movePiece(from, to, promoType)
-    }
-
-    const otherMoves = moves.filter(
-      (m, i) => m.score > 0 && i > 0 && i < LINE_LENGTH + 1
-    )
-    if (otherMoves.length > 0) {
-      game.board.undoLastMove()
-      revParts.push('Sidelines include')
-      const moveStr: string[] = otherMoves.map(
-        m => uciToAlgebraic(m.move, game.board)
-      )
-      moveStr[moveStr.length - 1] = 'and ' + moveStr[moveStr.length - 1]
-      revParts.push(moveStr.join(', ') + '.')
-      game.board.movePiece(from, to, promoType)
-    }
-    setReview(revParts.join(' '))
-
-    game.board.undoLastMove()
-    const pgn = uciLineToPGN([moves[0].move, ...moves[0].line], game)
-    game.board.movePiece(from, to, promoType)
-    setLine(pgn)
-
+    updateGame()
     updateRes()
-    setThinking(false)
+    setCanMove(false)
+
+    let movePointer = 0
+    const line = props.puzzles[currentFEN].moves[uci].line
+    const movePlayer = setInterval(() => {
+      if (movePointer === line.length) {
+        clearInterval(movePlayer)
+      } else {
+        game.playMove(...uciToMove(line[movePointer++]))
+        updateGame()
+        updateRes()
+      }
+    }, 1000)
+  }
+
+  const updatePuzzle = (puzzle: string) => {
+    setCurrentFEN(puzzle)
+    setGame(new Game(undefined, puzzle))
+    setCanMove(true)
+  }
+
+  const pickNextPuzzle = () => {
+    const nextPuzzle = choice(Array.from(available))
+    available.delete(nextPuzzle)
+    setAvailable(available)
+    updatePuzzle(nextPuzzle)
+  }
+
+  const backwardOneMove = () => {
+    if (game.board.backwardOneMove()) {
+      game.turn = +!game.turn
+      updateGame()
+    }
+  }
+
+  const forwardOneMove = () => {
+    if (game.board.forwardOneMove()) {
+      console.log('forward')
+      game.turn = +!game.turn
+      updateGame()
+    }
   }
 
   return (
     <div className='flex-row'>
       <div>
-        <BoardComponent game={game} playMove={playMove} player={props.player} />
+        <BoardComponent 
+          game={game} 
+          playMove={playMove}
+          player={player} 
+          canMove={canMove}
+        />
         <p>{result}</p>
+        {
+          available.size > 0 ?
+          <button onClick={pickNextPuzzle}>Next Puzzle</button> :
+          <p>No puzzles remaining!</p>
+        }
       </div>
 
       <div>
-        {
-          thinking &&
-          <img src={loading} alt='thinking...' height='50px' width='50px' />
-        }
         <p>{review}</p>
         {
           line !== '' &&
@@ -154,13 +169,27 @@ function GameComponent(props: { pgn: string, player: Color }) {
 
             <button onClick={() => setShowLine(!showLine)}>
               {
-                showLine &&
-                'Hide line'
+                showLine ? 'Hide line' : 'Show line'
               }
-              {
-                !showLine &&
-                'Show line'
-              }
+            </button>
+
+            <br></br>
+            <button 
+              className="forward-back"
+              onClick={backwardOneMove}
+            >
+              {"<"}
+            </button>
+            <button
+              className="forward-back"
+              onClick={forwardOneMove}
+            >
+              {">"}
+            </button>
+
+            <br></br>
+            <button onClick={() => updatePuzzle(currentFEN)}>
+              Try another move!
             </button>
           </div>
         }

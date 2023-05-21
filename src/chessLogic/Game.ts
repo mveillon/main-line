@@ -7,7 +7,6 @@ import { fromFEN } from "./fenPGN";
 class Game {
   board: Board
   turn: Color = Color.White
-  engineColors: Color[]
   halfMoves: number = 0
   moveNumber: number = 1
 
@@ -50,8 +49,6 @@ class Game {
         this.moveNumber = 1 + Math.floor((this.board.movePointer + 1) / 2)
       }
     }
-
-    this.engineColors = []
   }
 
   /**

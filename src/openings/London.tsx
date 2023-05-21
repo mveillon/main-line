@@ -1,5 +1,5 @@
 import Opening from "../components/Opening";
-import Color from "../chessLogic/Color";
+import puzzles from "../puzzles/London.json"
 
 const London = () => {
   return (
@@ -16,7 +16,7 @@ const London = () => {
 
               1. d4 d5 2. Bf4 *
             `}
-        player={Color.White}
+        puzzles={puzzles}
       />
   )
 }
