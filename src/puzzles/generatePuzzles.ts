@@ -186,27 +186,34 @@ const timeAsync = async (func: () => Promise<void>) => {
   console.log(`Completed after ${hours} hours\n`)
 }
 
-const OPENING_NAME = 'London'
-const DEPTH = 25
-const NUM_PUZZLES = 50
+const SETTINGS = {
+  openingName: 'London', // the name of the opening
+  depth: 25, // what depth to run Stockfish at
+  numPuzzles: 50, // how many puzzles to generate
+  player: Color.White, // what color the player has when solving the puzzles
+  pgn: '1. d4 d5 2. Bf4' // what is the starting PGN for all puzzles to generate from
+}
 
-console.log(`Generating puzzles for the ${OPENING_NAME}...`)
+console.log(`Generating puzzles for the ${SETTINGS.openingName}...`)
 
 timeAsync(() => (
   generatePuzzles(
     '1. d4 d5 2. Bf4',
-    NUM_PUZZLES,
-    `src/puzzles/${OPENING_NAME}.json`,
-    DEPTH,
+    SETTINGS.numPuzzles,
+    `src/puzzles/${SETTINGS.openingName}.json`,
+    SETTINGS.depth,
     Color.White
   )
 )).then(() => {
   copyFileSync(
-    `src/puzzles/${OPENING_NAME}.json`,
-    `src/puzzles/notAnalyzed/${OPENING_NAME}.json`
+    `src/puzzles/${SETTINGS.openingName}.json`,
+    `src/puzzles/notAnalyzed/${SETTINGS.openingName}.json`
   )
 
   timeAsync(() => (
-    analyzeLines(`src/puzzles/${OPENING_NAME}.json`, DEPTH)
+    analyzeLines(
+      `src/puzzles/${SETTINGS.openingName}.json`, 
+      SETTINGS.depth
+    )
   ))
 })
