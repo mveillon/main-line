@@ -84,17 +84,16 @@ function GameComponent(props: { pgn: string, player: Color }) {
     const moves = await sf.getBestMoves(fen)
     const revParts: string[] = [algebraic]
 
+    // TODO : check with UCI. If the player is black, will the best move
+    // be moves[0]? They could just be sorted in descending order of cp in which
+    // case moves[0] would the worst for black of the engine suggestions
     if (uci === moves[0].move) {
       revParts.push('is the top engine move!')
     } else {
       let found = false
       for (const move of moves) {
         if (move.move === uci) {
-          if (move.score > 0) {
-            revParts.push('is one of the top engine moves!')
-          } else {
-            revParts.push('is ok, but not the best.')
-          }
+          revParts.push('is one of the top engine moves!')
           found = true
           break
         }

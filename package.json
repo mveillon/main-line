@@ -28,7 +28,7 @@
     "test": "craco test",
     "eject": "craco eject",
     "test-coverage": "npm test -- --coverage --watchAll=false --no-cache",
-    "gen-puzzles": "tsc && node ts-out/src/generatePuzzles.js"
+    "gen-puzzles": "tsc && node tsOut/src/generatePuzzles.js"
   },
   "eslintConfig": {
     "extends": [

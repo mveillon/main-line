@@ -86,7 +86,8 @@ export const doubleMove = (moveNotation: string, board: Board) => {
 }
 
 /**
- * Makes the move given by the notation. Assumes the move is legal
+ * Makes the move given by the notation. Assumes the move is legal.
+ * TODO : seperate this into parseMove and algebraicToMove or algebraicToUCI
  * @param notation the move, in chess notation. If it is black's move,
  * the notation should start with "..."
  */

@@ -70,6 +70,7 @@ const PromotionSelector = (props: {
             className="piece-img"
             src={p.img} 
             onClick={p.onClick} 
+            alt={p.img}
           />
         ))
       }

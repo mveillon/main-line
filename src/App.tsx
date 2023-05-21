@@ -7,7 +7,7 @@ import StartingPosition from './openings/StartingPosition';
 function App() {
   return (
     <div className="App">
-      <StartingPosition />
+      <London />
     </div>
   );
 }

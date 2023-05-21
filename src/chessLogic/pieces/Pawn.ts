@@ -61,6 +61,7 @@ class Pawn extends Piece {
           const lastMove = this._board.lastMove
 
           const canPassant = (
+            typeof lastMove !== 'undefined' && 
             lastMove.to === notation[0] + epRank &&
             lastMove.from === notation[0] + opStartRank &&
             lastMove.pieceMoved instanceof Pawn

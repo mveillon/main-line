@@ -6,7 +6,7 @@ interface IStockfish {
 
 export interface MoveScore {
   move: string
-  score: number,
+  score: number
   line: string[]
 }
 
@@ -36,7 +36,7 @@ export class Engine {
       // @ts-ignore
       const Stockfish = await import("../../public/stockfish.wasm")
       getSF = Stockfish.default
-    } else if (typeof process.env.NODE_ENV === 'undefined' ) {
+    } else if (typeof process.env.NODE_ENV === 'undefined') {
       // @ts-ignore
       const Stockfish = await import("../../../public/stockfish.wasm/stockfish")
       getSF = Stockfish.default
