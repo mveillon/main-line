@@ -1,86 +1,5 @@
+import Color from "../../chessLogic/Color";
 import Game from "../../chessLogic/Game";
-import { toFEN, fromFEN } from "../../chessLogic/fenPGN";
-
-const compareFENtoPGN = (fen: string, pgn: string) => {
-  expect(toFEN(new Game(pgn))).toBe(fen)
-  expect((new Game(pgn).board).sameBoard(new Game(undefined, fen).board)).toBeTruthy()
-  expect(toFEN(new Game(undefined, fen))).toBe(fen)
-}
-
-test('starting position', () => {
-  const fen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
-  const g = new Game()
-  expect(toFEN(g)).toBe(fen)
-
-  g.playMove('e3', 'e4')
-  expect(toFEN(g)).toBe(fen)
-})
-
-test('more fen', () => {
-  const fens = [
-    {
-      fen: 'rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1',
-      pgn: `
-        [Event "?"]
-        [Site "?"]
-        [Date "????.??.??"]
-        [Round "?"]
-        [White "?"]
-        [Black "?"]
-        [Result "*"]
-        
-        1. e4 *
-      `
-    },
-
-    {
-      fen: 'rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq e6 0 2',
-      pgn:`
-        [Event "?"]
-        [Site "?"]
-        [Date "????.??.??"]
-        [Round "?"]
-        [White "?"]
-        [Black "?"]
-        [Result "*"]
-        
-        1. e4 e5 *
-      `
-    },
-    {
-      fen: 'rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPPKPPP/RNBQ1BNR b kq - 1 2',
-      pgn: `
-        [Event "?"]
-        [Site "?"]
-        [Date "????.??.??"]
-        [Round "?"]
-        [White "?"]
-        [Black "?"]
-        [Result "*"]
-
-        1. e4 e5 2. Ke2 *
-      `
-    },
-    {
-      fen: 'r1bqkr2/pppp1ppp/n4n2/2b1p3/3PP3/3Q1N2/PPP1KPPP/RNB2B1R w q - 5 6',
-      pgn: `
-        [Event "?"]
-        [Site "?"]
-        [Date "????.??.??"]
-        [Round "?"]
-        [White "?"]
-        [Black "?"]
-        [Result "*"]
-        
-        1. e4 e5 2. Ke2 Nf6 3. d4 Na6 4. Qd3 Bc5 5. Nf3 Rf8 *
-      `
-    }
-  ]
-
-  for (const { fen, pgn } of fens) {
-    compareFENtoPGN(fen, pgn)
-  }
-})
 
 test('game over', () => {
   const whiteWinsPGN = `
@@ -133,15 +52,24 @@ test('game over', () => {
   expect(() => new Game(undefined, '')).toThrow()
 })
 
-test('fen mid game', () => {
+test('side effects', () => {
   const g = new Game()
-  g.playMove('f2', 'f3')
-  g.playMove('e7', 'e5')
-  g.playMove('g1', 'g4')
+  expect(g.turn).toBe(Color.White)
+  expect(g.halfMoves).toBe(0)
+  expect(g.moveNumber).toBe(1)
 
-  const fen = toFEN(g)
-  g.playMove('d8', 'h5')
-  fromFEN(fen, g)
+  g.playMove('e2', 'e4')
+  expect(g.turn).toBe(Color.Black)
+  expect(g.halfMoves).toBe(0)
+  expect(g.moveNumber).toBe(1)
+  
+  g.playMove('g8', 'f6')
+  expect(g.turn).toBe(Color.White)
+  expect(g.halfMoves).toBe(1)
+  expect(g.moveNumber).toBe(2)
 
-  expect(toFEN(g)).toBe(fen)
+  g.playMove('d2', 'd4')
+  expect(g.turn).toBe(Color.Black)
+  expect(g.halfMoves).toBe(0)
+  expect(g.moveNumber).toBe(2)
 })

@@ -44,10 +44,6 @@ export const fromPGN = (pgn: string, board: Board) => {
  * @param game the game to initialize
  */
 export const fromFEN = (fen: string, game: Game) => {
-  const parts = fen.split(' ')
-  if (parts.length !== 6) {
-    throw new Error(`Invalid FEN: ${fen}`)
-  }
   const [
     layout,
     turn,
@@ -55,7 +51,7 @@ export const fromFEN = (fen: string, game: Game) => {
     passantTarget,
     halfMoves,
     fullMoves
-  ] = parts
+  ] = fenToParts(fen)
 
   const boardInd = (n: number): number => game.board.board.length - 1 - n
 
@@ -87,8 +83,8 @@ export const fromFEN = (fen: string, game: Game) => {
 
   game.turn = turn === 'w' ? Color.White : Color.Black
   if (castlingRights === '-') {
-    game.board.findPieces(King, Color.White)[0].hasMoved = false
-    game.board.findPieces(King, Color.Black)[0].hasMoved = false
+    game.board.findPieces(King, Color.White)[0].hasMoved = true
+    game.board.findPieces(King, Color.Black)[0].hasMoved = true
   } else {
     const sides: { [index: string]: string } = {
       k: 'h8', q: 'a8', K: 'h1', Q: 'a1'
@@ -220,4 +216,29 @@ export const toFEN = (game: Game): string => {
   parts.push(game.moveNumber.toString())
 
   return parts.join(' ')
+}
+
+/**
+ * Splits the FEN into all relevant parts
+ * @param fen the fen to split
+ * @returns the piece layout
+ * @returns whose turn it is
+ * @returns castling rights
+ * @returns en passant target
+ * @returns half moves since last pawn move or capture
+ * @returns number of full moves in the game
+ */
+export const fenToParts = (fen: string): [
+  string, 
+  string, 
+  string, 
+  string, 
+  string, 
+  string
+] => {
+  const parts = fen.split(' ')
+  if (parts.length !== 6) {
+    throw new Error(`Invalid FEN: ${fen}`)
+  }
+  return (parts as [string, string, string, string, string, string])
 }

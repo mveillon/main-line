@@ -1,3 +1,6 @@
+import Color from "./Color"
+import { fenToParts } from "./fenPGN"
+
 interface IStockfish {
   postMessage(cmd: string): void
   addMessageListener(listener: (message: string) => void): void
@@ -84,6 +87,15 @@ export class Engine {
 
     await this._waitForReady()
 
+    const [
+      layout,
+      turn,
+      castlingRights,
+      passantTarget,
+      halfMoves,
+      fullMoves
+    ] = fenToParts(fen)
+
     return new Promise<MoveScore[]>((resolve, reject) => {
       const messages: MoveScore[] = []
       const includedMoves = new Set<string>()
@@ -103,6 +115,9 @@ export class Engine {
         }
 
         if (message.includes('bestmove')) {
+          messages.sort((ms1, ms2) => (
+            turn === 'w' ? ms1.score - ms2.score : ms2.score - ms1.score
+          ))
           this._sf?.removeMessageListener(listener)
           resolve(messages)
         }

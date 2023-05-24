@@ -32,6 +32,7 @@ function GameComponent(props: {
   const [currentFEN, setCurrentFEN] = useState('')
   const [available, setAvailable] = useState(new Set(Object.keys(props.puzzles)))
   const [canMove, setCanMove] = useState(false)
+  const [disableSkip, setDisableSkip] = useState(false)
 
   const updateGame = () => {
     // so inefficient but required because React doesn't notice deep
@@ -126,18 +127,21 @@ function GameComponent(props: {
   }
 
   const backwardOneMove = () => {
+    setDisableSkip(true)
     if (game.board.backwardOneMove()) {
       game.turn = +!game.turn
       updateGame()
     }
+    setDisableSkip(false)
   }
 
   const forwardOneMove = () => {
+    setDisableSkip(true)
     if (game.board.forwardOneMove()) {
-      console.log('forward')
       game.turn = +!game.turn
       updateGame()
     }
+    setDisableSkip(false)
   }
 
   return (
@@ -177,12 +181,14 @@ function GameComponent(props: {
             <button 
               className="forward-back"
               onClick={backwardOneMove}
+              disabled={disableSkip}
             >
               {"<"}
             </button>
             <button
               className="forward-back"
               onClick={forwardOneMove}
+              disabled={disableSkip}
             >
               {">"}
             </button>

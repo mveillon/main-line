@@ -60,3 +60,23 @@ test('engine', async () => {
     e.quit()
   }
 })
+
+test('sorted by score', async () => {
+  // bigger is better for Black. Don't ask why
+
+  const g = new Game()
+  const e = new Engine(5, 5)
+
+  let moves = await e.getBestMoves(toFEN(g))
+  for (let i = 1; i < moves.length; i++) {
+    expect(moves[i - 1].score <= moves[i].score)
+  }
+
+  g.playMove('e2', 'e4')
+  moves = await e.getBestMoves(toFEN(g))
+  for (let i = 1; i < moves.length; i++) {
+    expect(moves[i - 1].score >= moves[i].score)
+  }
+
+  e.quit()
+})

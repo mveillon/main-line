@@ -100,7 +100,7 @@ const analyzeLines = async (path: string, depth: number) => {
           const g = new Game(undefined, puzzle)
     
           const betterScore = (s1: number, s2: number): boolean => {
-            if (g.turn === Color.White) {
+            if (g.turn === Color.Black) {
               return s1 > s2
             }
             return s2 < s1
@@ -188,8 +188,8 @@ const timeAsync = async (func: () => Promise<void>) => {
 
 const SETTINGS = {
   openingName: 'London', // the name of the opening
-  depth: 25, // what depth to run Stockfish at
-  numPuzzles: 50, // how many puzzles to generate
+  depth: 20, // what depth to run Stockfish at
+  numPuzzles: 20, // how many puzzles to generate
   player: Color.White, // what color the player has when solving the puzzles
   pgn: '1. d4 d5 2. Bf4' // what is the starting PGN for all puzzles to generate from
 }
@@ -198,7 +198,7 @@ console.log(`Generating puzzles for the ${SETTINGS.openingName}...`)
 
 timeAsync(() => (
   generatePuzzles(
-    '1. d4 d5 2. Bf4',
+    SETTINGS.pgn, 
     SETTINGS.numPuzzles,
     `src/puzzles/${SETTINGS.openingName}.json`,
     SETTINGS.depth,
