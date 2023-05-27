@@ -3,6 +3,7 @@ import GameComponent from "./GameComponent";
 import PuzzleSet from "../puzzles/PuzzleSet";
 
 import "./styling/global.css"
+import { fenToParts } from "../chessLogic/fenPGN";
 
 function Opening(props: { 
   name: string, 
@@ -11,7 +12,7 @@ function Opening(props: {
 }) {
   const aPuzzle = Object.keys(props.puzzles)[0]
   let c: string
-  if (typeof aPuzzle === 'undefined' || aPuzzle.split(' ')[1] === 'w') {
+  if (typeof aPuzzle === 'undefined' || fenToParts(aPuzzle)[1] === 'w') {
     c = 'white'
   } else {
     c = 'black'

@@ -62,8 +62,6 @@ test('engine', async () => {
 })
 
 test('sorted by score', async () => {
-  // bigger is better for Black. Don't ask why
-
   const g = new Game()
   const e = new Engine(5, 5)
 

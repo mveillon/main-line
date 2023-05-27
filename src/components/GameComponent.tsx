@@ -9,6 +9,7 @@ import { pieceToAcronym, uciToAlgebraic, uciToMove } from "../chessLogic/parser"
 import { isClose } from "../utils/numJS";
 import { uciLineToPGN } from "../chessLogic/parser";
 import Color from "../chessLogic/Color";
+import { fenToParts } from "../chessLogic/fenPGN";
 
 function GameComponent(props: { 
   pgn: string,
@@ -18,7 +19,7 @@ function GameComponent(props: {
 
   const aPuzzle = Object.keys(props.puzzles)[0]
   let player: Color
-  if (typeof aPuzzle === 'undefined' || aPuzzle.split(' ')[1] === 'w') {
+  if (typeof aPuzzle === 'undefined' || fenToParts(aPuzzle)[1] === 'w') {
     player = Color.White
   } else {
     player = Color.Black

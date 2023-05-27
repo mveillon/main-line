@@ -20,5 +20,5 @@ This does some weird stuff with the `craco` and `react-scripts` configurations. 
 This runs all the unit tests outside of `watcher` mode and generates a coverage report.
 
 ## npm run gen-puzzles
-This will generate puzzles and analyze every possible move the player can play for whatever opening and settings are specified in `src/puzzles/generatePuzzles.ts` in the `SETTINGS` object at the bottom of the file.
+This will generate puzzles and analyze every possible move the player can play for all puzzles in `PGNs.ts`. New puzzles can be added or commented out to this file as needed.
 

@@ -9,6 +9,7 @@ import { Piece } from "../chessLogic/pieces/Piece"
 import Color from "../chessLogic/Color"
 import PuzzleSet from "./PuzzleSet"
 import Pawn from "../chessLogic/pieces/Pawn"
+import { PuzzleInfo, PGNs } from "./PGNs"
 
 /**
  * Generates `numPuzzles` opening puzzles from the `startPGN` and writes the FENs
@@ -40,9 +41,6 @@ const generatePuzzles = async (
         const bestMoves = await sf.getBestMoves(toFEN(g))
   
         let scores = bestMoves.map(m => m.score)
-        if (player === Color.Black) {
-          scores = scalarMul(scores, -1) as number[]
-        }
         const smallest = Math.min(...scores)
         const adj = smallest < 0 ? smallest : 0
         scores[0] -= adj
@@ -99,13 +97,6 @@ const analyzeLines = async (path: string, depth: number) => {
         for (const puzzle in puzzles) {
           const g = new Game(undefined, puzzle)
     
-          const betterScore = (s1: number, s2: number): boolean => {
-            if (g.turn === Color.Black) {
-              return s1 > s2
-            }
-            return s2 < s1
-          }
-    
           const allPieces = g.board.findPieces(Piece, g.turn)
           const mapping: {
             [index: string]: {
@@ -137,7 +128,7 @@ const analyzeLines = async (path: string, depth: number) => {
       
                 if (
                   bestMove === '' || 
-                  betterScore(continuation.score, mapping[bestMove].score)
+                  continuation.score > mapping[bestMove].score
                 ) {
                   bestMove = uci
                 }
@@ -186,34 +177,45 @@ const timeAsync = async (func: () => Promise<void>) => {
   console.log(`Completed after ${hours} hours\n`)
 }
 
-const SETTINGS = {
-  openingName: 'London', // the name of the opening
-  depth: 20, // what depth to run Stockfish at
-  numPuzzles: 20, // how many puzzles to generate
-  player: Color.White, // what color the player has when solving the puzzles
-  pgn: '1. d4 d5 2. Bf4' // what is the starting PGN for all puzzles to generate from
-}
+/**
+ * Generates and analyzes puzzles given the info in settings, timing how long it takes
+ * both to generate and analyze the puzzles.
+ * @param settings all needed information about the puzzle. See `PGNs.ts:PuzzleInfo` 
+ * for arg info
+ */
+const genPuzzles = async (settings: PuzzleInfo) => {
+  console.log(`Generating puzzles for the ${settings.openingName}...`)
 
-console.log(`Generating puzzles for the ${SETTINGS.openingName}...`)
-
-timeAsync(() => (
-  generatePuzzles(
-    SETTINGS.pgn, 
-    SETTINGS.numPuzzles,
-    `src/puzzles/${SETTINGS.openingName}.json`,
-    SETTINGS.depth,
-    Color.White
-  )
-)).then(() => {
-  copyFileSync(
-    `src/puzzles/${SETTINGS.openingName}.json`,
-    `src/puzzles/notAnalyzed/${SETTINGS.openingName}.json`
-  )
-
-  timeAsync(() => (
-    analyzeLines(
-      `src/puzzles/${SETTINGS.openingName}.json`, 
-      SETTINGS.depth
+  await timeAsync(() => (
+    generatePuzzles(
+      settings.pgn, 
+      settings.numPuzzles,
+      `src/puzzles/${settings.openingName}.json`,
+      settings.depth,
+      settings.player
     )
   ))
-})
+
+  copyFileSync(
+    `src/puzzles/${settings.openingName}.json`,
+    `src/puzzles/notAnalyzed/${settings.openingName}.json`
+  )
+
+  await timeAsync(() => (
+    analyzeLines(
+      `src/puzzles/${settings.openingName}.json`, 
+      settings.depth
+    )
+  ))
+}
+
+/**
+ * Generates and analyzes all puzzles in `PGNs.ts`
+ */
+const allPuzzles = async () => {
+  for (const pgn in PGNs) {
+    await genPuzzles(PGNs[pgn])
+  }
+}
+
+allPuzzles()

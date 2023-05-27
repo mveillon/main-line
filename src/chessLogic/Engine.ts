@@ -87,14 +87,7 @@ export class Engine {
 
     await this._waitForReady()
 
-    const [
-      layout,
-      turn,
-      castlingRights,
-      passantTarget,
-      halfMoves,
-      fullMoves
-    ] = fenToParts(fen)
+    const turn = fenToParts(fen)[1]
 
     return new Promise<MoveScore[]>((resolve, reject) => {
       const messages: MoveScore[] = []
@@ -115,9 +108,8 @@ export class Engine {
         }
 
         if (message.includes('bestmove')) {
-          messages.sort((ms1, ms2) => (
-            turn === 'w' ? ms1.score - ms2.score : ms2.score - ms1.score
-          ))
+          messages.sort((ms1, ms2) => ms2.score - ms1.score)
+
           this._sf?.removeMessageListener(listener)
           resolve(messages)
         }
