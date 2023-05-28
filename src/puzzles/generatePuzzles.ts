@@ -2,7 +2,7 @@ import { Engine } from "../chessLogic/Engine"
 import Game from "../chessLogic/Game"
 import { randInt, choice } from "../utils/random"
 import { fromFEN, toFEN } from "../chessLogic/fenPGN"
-import { arange, scalarMul } from "../utils/numJS"
+import { arange } from "../utils/numJS"
 import { uciToMove } from "../chessLogic/parser"
 import { writeFileSync, readFile, copyFileSync } from "fs"
 import { Piece } from "../chessLogic/pieces/Piece"
@@ -184,29 +184,28 @@ const timeAsync = async (func: () => Promise<void>) => {
  * for arg info
  */
 const genPuzzles = async (settings: PuzzleInfo) => {
-  console.log(`Generating puzzles for the ${settings.openingName}...`)
+  for (const c of [Color.White, Color.Black]) {
+    const cStr = c === Color.White ? 'white' : 'black'
+    console.log(`Generating puzzles for the ${settings.openingName} for ${cStr}...`)
 
-  await timeAsync(() => (
-    generatePuzzles(
-      settings.pgn, 
-      settings.numPuzzles,
-      `src/puzzles/${settings.openingName}.json`,
-      settings.depth,
-      settings.player
-    )
-  ))
+    await timeAsync(() => (
+      generatePuzzles(
+        settings.pgn, 
+        settings.numPuzzles,
+        `src/puzzles/${settings.openingName}/${cStr}.json`,
+        settings.depth,
+        c
+      )
+    ))
 
-  copyFileSync(
-    `src/puzzles/${settings.openingName}.json`,
-    `src/puzzles/notAnalyzed/${settings.openingName}.json`
-  )
-
-  await timeAsync(() => (
-    analyzeLines(
-      `src/puzzles/${settings.openingName}.json`, 
-      settings.depth
-    )
-  ))
+    await timeAsync(() => (
+      analyzeLines(
+        `src/puzzles/${settings.openingName}/${cStr}.json`, 
+        settings.depth
+      )
+    ))
+  }
+  
 }
 
 /**

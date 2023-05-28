@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import BoardComponent from "./BoardComponent";
 import Game from "../chessLogic/Game";
-import "./styling/global.css"
+import "../styling/global.css"
 import { PieceT } from "../chessLogic/pieces/Piece";
 import PuzzleSet from "../puzzles/PuzzleSet";
 import { choice } from "../utils/random";

@@ -1,15 +1,26 @@
-import './App.css';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
-import London from './openings/London';
-import Testing from './openings/Testing';
-import StartingPosition from './openings/StartingPosition';
-import CaroKann from './openings/CaroKann';
+import Home from './Home';
+import { LondonBlack, LondonWhite } from './openings/London';
+import { CaroKannBlack, CaroKannWhite } from './openings/CaroKann';
 
 function App() {
   return (
-    <div className="App">
-      <London />
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element ={<Home />} />
+
+        <Route path="london/">
+          <Route path="black" element={<LondonBlack />} />
+          <Route path="white" element={<LondonWhite />} />
+        </Route>
+
+        <Route path="caro-kann/">
+          <Route path="black" element={<CaroKannBlack />} />
+          <Route path="white" element={<CaroKannWhite />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
   );
 }
 

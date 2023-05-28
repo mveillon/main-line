@@ -1,8 +1,8 @@
-import Color from "../chessLogic/Color";
 import GameComponent from "./GameComponent";
 import PuzzleSet from "../puzzles/PuzzleSet";
+import { useNavigate } from "react-router-dom";
 
-import "./styling/global.css"
+import "../styling/global.css"
 import { fenToParts } from "../chessLogic/fenPGN";
 
 function Opening(props: { 
@@ -17,8 +17,15 @@ function Opening(props: {
   } else {
     c = 'black'
   }
+
+  const navigate = useNavigate()
+  const navBack = () => {
+    navigate('/')
+  }
+
   return (
     <div>
+      <button onClick={navBack}>Go back</button>
       <h1>{props.name}</h1>
 
       <p>Find the best move for {c}</p>

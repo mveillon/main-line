@@ -1,5 +1,5 @@
 import "./styling/BoardComponent.css"
-import "./styling/global.css"
+import "../styling/global.css"
 import { useState } from "react";
 
 import PieceComponent from "./PieceComponent";

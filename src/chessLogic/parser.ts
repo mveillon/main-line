@@ -8,7 +8,7 @@ import Queen from "./pieces/Queen"
 import Rook from "./pieces/Rook"
 import Pawn from "./pieces/Pawn"
 import Game from "./Game"
-import { toFEN, fromFEN } from "./fenPGN"
+import { toFEN } from "./fenPGN"
 
 /**
  * Returns the acronyms used for pieces in chess notation

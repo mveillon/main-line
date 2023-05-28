@@ -1,4 +1,4 @@
-import "./styling/global.css"
+import "../styling/global.css"
 import "./styling/PromotionSelector.css"
 
 import blackBishop from "../assets/blackBishop.png"

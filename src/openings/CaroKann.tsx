@@ -1,24 +1,25 @@
 import Opening from "../components/Opening";
-import puzzles from "../puzzles/Caro-Kann.json"
+import black from "../puzzles/Caro-Kann/black.json"
+import white from "../puzzles/Caro-Kann/white.json"
 
-const CaroKann = () => {
+const PGN = '1. e4 c6 2. d4 d5'
+
+export const CaroKannBlack = () => {
   return (
     <Opening 
         name="Caro-Kann" 
-        pgn={`
-              [Event "?"]
-              [Site "?"]
-              [Date "????.??.??"]
-              [Round "?"]
-              [White "?"]
-              [Black "?"]
-              [Result "*"]
-
-              1. e4 c6 2. d4 d5 *
-            `}
-        puzzles={puzzles}
+        pgn={PGN}
+        puzzles={black}
       />
   )
 }
 
-export default CaroKann
+export const CaroKannWhite = () => {
+  return (
+    <Opening
+      name="Caro-Kann"
+      pgn={PGN}
+      puzzles={white}
+    />
+  )
+}
