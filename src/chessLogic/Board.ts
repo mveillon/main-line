@@ -329,10 +329,10 @@ export class Board {
    */
   backwardOneMove() {
     const toUndo = this.lastMove
-    this.movePointer--
     if (typeof toUndo === 'undefined') {
       return false
     }
+    this.movePointer--
     const [fromI, fromJ] = notationToIndices(toUndo.from)
     const [toI, toJ] = notationToIndices(toUndo.to)
     this.board[fromI][fromJ] = toUndo.pieceMoved

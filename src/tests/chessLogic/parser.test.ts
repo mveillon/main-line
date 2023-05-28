@@ -384,7 +384,8 @@ test('uci line to pgn', () => {
   ], g)
 
   expect(g.board.sameBoard(new Board())).toBeTruthy()
-  g.board.forwardOneMove()
+  expect(g.board.forwardOneMove()).toBeFalsy()
+  expect(g.board.backwardOneMove()).toBeFalsy()
   expect(g.board.sameBoard(new Board())).toBeTruthy()
 
   const pgn2 = '1. e4 d5 2. Nf3 Nc6'

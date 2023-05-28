@@ -1,5 +1,6 @@
 import { Board } from "../../chessLogic/Board";
 import Color from "../../chessLogic/Color";
+import Game from "../../chessLogic/Game";
 import { notationToIndices } from "../../chessLogic/notationIndices";
 import Bishop from "../../chessLogic/pieces/Bishop";
 import King from "../../chessLogic/pieces/King";
@@ -219,4 +220,79 @@ test('skipping', () => {
 
   expect(b.forwardOneMove()).toBeTruthy()
   expect(b.pieceAt('d5')).toBeInstanceOf(Pawn)
+})
+
+test('over skipping', () => {
+  const pgn = `
+    [Event "?"]
+    [Site "?"]
+    [Date "????.??.??"]
+    [Round "?"]
+    [White "?"]
+    [Black "?"]
+    [Result "*"]
+    
+    1. d4 d5 2. Bf4 Bg4 3. Nf3 c5 4. e3 *
+  `
+  const b = new Board(pgn)
+
+  expect(b.movesMade.length).toBe(7)
+
+  expect(b.pieceAt('e3')).toBeInstanceOf(Pawn)
+  expect(b.backwardOneMove()).toBeTruthy()
+  expect(b.pieceAt('e3')).toBeNull()
+  expect(b.pieceAt('e2')).toBeInstanceOf(Pawn)
+
+  expect(b.forwardOneMove()).toBeTruthy()
+  expect(b.pieceAt('e2')).toBeNull()
+  expect(b.pieceAt('e3')).toBeInstanceOf(Pawn)
+  expect(b.pieceAt('e3')?.coords).toBe('e3')
+
+  expect(b.movesMade.length).toBe(7)
+  expect(b.movePointer).toBe(6)
+
+  for (let i = b.movePointer; i >= 0; i--) {
+    expect(b.movePointer).toBe(i)
+    expect(b.backwardOneMove()).toBeTruthy()
+  }
+
+  expect(b.movePointer).toBe(-1)
+  expect(b.backwardOneMove()).toBeFalsy()
+  expect(b.sameBoard(new Board())).toBeTruthy()
+
+  for (let i = 0; i < 7; i++) {
+    expect(b.forwardOneMove()).toBeTruthy()
+    expect(b.movePointer).toBe(i)
+  }
+
+  expect(b.pieceAt('e3')).toBeInstanceOf(Pawn)
+})
+
+test('fen over skipping', () => {
+  const fen = 'rn1qkbnr/pp2pppp/8/2pp4/3P1Bb1/4PN2/PPP2PPP/RN1QKB1R b KQkq - 0 4'
+  const g = new Game(undefined, fen)
+
+  expect(g.board.movesMade.length).toBe(0)
+  expect(g.board.movePointer).toBe(-1)
+
+  expect(g.board.backwardOneMove()).toBeFalsy()
+  expect(g.board.forwardOneMove()).toBeFalsy()
+
+  g.playMove('g4', 'f3')
+  expect(g.board.pieceAt('f3')).toBeInstanceOf(Bishop)
+  expect(g.board.pieceAt('f3')?.color).toBe(Color.Black)
+
+  expect(g.board.backwardOneMove()).toBeTruthy()
+  expect(g.board.pieceAt('f3')).toBeInstanceOf(Knight)
+  expect(g.board.pieceAt('f3')?.color).toBe(Color.White)
+  expect(g.board.backwardOneMove()).toBeFalsy()
+
+  expect(g.board.forwardOneMove()).toBeTruthy()
+  expect(g.board.pieceAt('f3')).toBeInstanceOf(Bishop)
+  expect(g.board.pieceAt('f3')?.color).toBe(Color.Black)
+
+  expect(g.board.backwardOneMove()).toBeTruthy()
+  expect(g.board.pieceAt('f3')).toBeInstanceOf(Knight)
+  expect(g.board.pieceAt('f3')?.color).toBe(Color.White)
+  expect(g.board.backwardOneMove()).toBeFalsy()
 })

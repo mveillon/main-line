@@ -10,7 +10,6 @@ import Bishop from "../../chessLogic/pieces/Bishop";
 import { toFEN } from "../../chessLogic/fenPGN";
 
 jest.setTimeout(2_147_483_647)
-// jest.setTimeout(5000)
 
 beforeEach(() => {
   // we do this because Stockfish makes some `fetch` calls, but only if `fetch`

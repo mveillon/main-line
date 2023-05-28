@@ -296,11 +296,11 @@ export const uciLineToPGN = (line: string[], game: Game): string => {
     formattedMove.push('...')
   }
 
-  const oldFEN = toFEN(game)
+  const gameCopy = new Game(undefined, toFEN(game))
 
   for (const move of line) {
-    formattedMove.push(uciToAlgebraic(move, game.board) + ' ')
-    game.board.movePiece(...uciToMove(move))
+    formattedMove.push(uciToAlgebraic(move, gameCopy.board) + ' ')
+    gameCopy.board.movePiece(...uciToMove(move))
 
     if (formattedMove.length === 3) {
       lineParts.push(formattedMove.join(''))
@@ -311,7 +311,6 @@ export const uciLineToPGN = (line: string[], game: Game): string => {
     lineParts.push(formattedMove.join(''))
   }
 
-  fromFEN(oldFEN, game)
 
   return lineParts.join('')
 }

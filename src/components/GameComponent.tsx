@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import BoardComponent from "./BoardComponent";
 import Game from "../chessLogic/Game";
 import "./styling/global.css"
@@ -8,13 +8,14 @@ import { choice } from "../utils/random";
 import { pieceToAcronym, uciToAlgebraic, uciToMove } from "../chessLogic/parser";
 import { uciLineToPGN } from "../chessLogic/parser";
 import Color from "../chessLogic/Color";
-import { fenToParts } from "../chessLogic/fenPGN";
+import { fenToParts, toFEN } from "../chessLogic/fenPGN";
 
 function GameComponent(props: { 
   pgn: string,
   puzzles: PuzzleSet
 }) {
-  let g = new Game(props.pgn)
+  // clear out moves made because it breaks the back button
+  const g2 = new Game(undefined, toFEN(new Game(props.pgn)))
 
   const aPuzzle = Object.keys(props.puzzles)[0]
   let player: Color
@@ -24,7 +25,7 @@ function GameComponent(props: {
     player = Color.Black
   }
 
-  const [game, setGame] = useState(g)
+  const [game, setGame] = useState(g2)
   const [result, setResult] = useState('')
   const [review, setReview] = useState('')
   const [line, setLine] = useState('')
@@ -33,6 +34,10 @@ function GameComponent(props: {
   const [available, setAvailable] = useState(new Set(Object.keys(props.puzzles)))
   const [canMove, setCanMove] = useState(false)
   const [disableSkip, setDisableSkip] = useState(false)
+
+  useEffect(() => {
+    pickNextPuzzle()
+  }, [])
 
   const updateGame = () => {
     // so inefficient but required because React doesn't notice deep
@@ -70,6 +75,11 @@ function GameComponent(props: {
     const bestMove = props.puzzles[currentFEN].bestMove
     if (uci === bestMove) {
       setReview("That's the best move!")
+      game.moveNumber = 1
+      setLine(uciLineToPGN(
+        [uci, ...props.puzzles[currentFEN].moves[uci].line],
+        game
+      ))
     } else {
       const score = (
         props.puzzles[currentFEN].moves[uci].score
@@ -86,11 +96,12 @@ function GameComponent(props: {
 
       reviewParts.push(`The top move is ${uciToAlgebraic(bestMove, game.board)}.`)
 
-      const line = uciLineToPGN(
+      game.moveNumber = 1
+      const newLine = uciLineToPGN(
         [bestMove, ...props.puzzles[currentFEN].moves[bestMove].line],
         game
       )
-      setLine(line)
+      setLine(newLine)
       setReview(reviewParts.join(' '))
     }
 
@@ -101,12 +112,12 @@ function GameComponent(props: {
     setCanMove(false)
 
     let movePointer = 0
-    const line = props.puzzles[currentFEN].moves[uci].line
+    const moveLine = props.puzzles[currentFEN].moves[uci].line
     const movePlayer = setInterval(() => {
-      if (movePointer === line.length) {
+      if (movePointer === moveLine.length) {
         clearInterval(movePlayer)
       } else {
-        game.playMove(...uciToMove(line[movePointer++]))
+        game.playMove(...uciToMove(moveLine[movePointer++]))
         updateGame()
         updateRes()
       }
