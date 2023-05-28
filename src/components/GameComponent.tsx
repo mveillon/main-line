@@ -6,7 +6,6 @@ import { PieceT } from "../chessLogic/pieces/Piece";
 import PuzzleSet from "../puzzles/PuzzleSet";
 import { choice } from "../utils/random";
 import { pieceToAcronym, uciToAlgebraic, uciToMove } from "../chessLogic/parser";
-import { isClose } from "../utils/numJS";
 import { uciLineToPGN } from "../chessLogic/parser";
 import Color from "../chessLogic/Color";
 import { fenToParts } from "../chessLogic/fenPGN";
@@ -79,7 +78,7 @@ function GameComponent(props: {
 
       const reviewParts: string[] = []
 
-      if (isClose(score, bestScore, undefined, 0.2)) {
+      if (Math.abs(score - bestScore) < 30) {
         reviewParts.push("That's one of the best moves!")
       } else {
         reviewParts.push("That's not the right idea.")
@@ -125,6 +124,8 @@ function GameComponent(props: {
     available.delete(nextPuzzle)
     setAvailable(available)
     updatePuzzle(nextPuzzle)
+    setLine('')
+    setReview('')
   }
 
   const backwardOneMove = () => {

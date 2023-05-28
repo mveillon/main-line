@@ -8,7 +8,7 @@ import CaroKann from './openings/CaroKann';
 function App() {
   return (
     <div className="App">
-      <CaroKann />
+      <London />
     </div>
   );
 }

@@ -128,7 +128,7 @@ const analyzeLines = async (path: string, depth: number) => {
       
                 if (
                   bestMove === '' || 
-                  continuation.score > mapping[bestMove].score
+                  continuation.score < mapping[bestMove].score
                 ) {
                   bestMove = uci
                 }

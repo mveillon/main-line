@@ -87,8 +87,6 @@ export class Engine {
 
     await this._waitForReady()
 
-    const turn = fenToParts(fen)[1]
-
     return new Promise<MoveScore[]>((resolve, reject) => {
       const messages: MoveScore[] = []
       const includedMoves = new Set<string>()
@@ -104,6 +102,10 @@ export class Engine {
               score: parseInt(words[words.indexOf('cp') + 1]),
               line: words.slice(moveInd + 1)
             })
+
+            if (isNaN(messages[messages.length - 1].score)) {
+              reject(`NaN score in "${message}"`)
+            }
           }
         }
 
