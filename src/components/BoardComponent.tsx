@@ -1,5 +1,5 @@
 import "./styling/BoardComponent.css"
-import "../styling/global.css"
+import "./styling/global.css"
 import { useState } from "react";
 
 import PieceComponent from "./PieceComponent";
@@ -11,16 +11,23 @@ import Color from "../chessLogic/Color";
 import PromotionSelector from "./PromotionSelector";
 import Pawn from "../chessLogic/pieces/Pawn";
 
+/**
+ * A board to play chess on
+ * @param game the game to render
+ * @param playMove what to call when the player plays a move
+ * @param perspective whose pieces should be on the bottom of the board
+ * @param canMove whether the player is allowed to move at this moment
+ */
 const BoardComponent = (
   props: {
     game: Game, 
     playMove: (from: string, to: string, promoType?: PieceT) => void,
-    player: Color,
+    perspective: Color,
     canMove: boolean
   }) => {
   
   const board = props.game.board
-  const [reversed, setReversed] = useState(props.player === Color.White)
+  const [reversed, setReversed] = useState(props.perspective === Color.White)
   const [pieceSelected, setPieceSelected] = useState<Piece | null>(null)
   const [promoting, setPromoting] = useState<{ p: Piece, dest: string }>()
   const [legalMoves, setLegalMoves] = useState<Set<string>>()

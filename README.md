@@ -1,6 +1,14 @@
 # Main Line
 
-This app uses Stockfish.wasm from Lichess. To install the dependencies, you first need to download and install [enscripten](https://emscripten.org/docs/getting_started/downloads.html). You can put the enscripten folder anywhere on your computer, but anytime you compile Stockfish, you have to run the `./emsdk_env.sh` script within that enscripten folder. It resets when you open a new Terminal window, so be sure to rerun it when you need to. Once you've run that, clone [the Stockfish repo](https://github.com/lichess-org/stockfish.wasm) and put it in the `public` directory. `cd` into the `stockfish.wasm` directory and run `npm run-script prepare` to compile Stockfish. `cd` back into the `chess-openings` root directory and run `npm i` (and pray it works because this whole thing is such a dang mess). From there, you can run any of the scripts below from the root directory.
+This app uses [Stockfish.wasm with NNUE](https://github.com/hi-ogawa/Stockfish) from Lichess. To install the dependencies, you first need to download and install [enscripten](https://emscripten.org/docs/getting_started/downloads.html). You can put the enscripten folder anywhere on your computer, but anytime you compile Stockfish, you have to run the `./emsdk_env.sh` script within that enscripten folder. It resets when you open a new Terminal window, so be sure to rerun it when you need to. Once you've run that, clone [the Stockfish repo](https://github.com/hi-ogawa/Stockfish) and put it in the `public` directory. `cd` into the `stockfish.wasm` directory and run `npm run-script prepare` to compile Stockfish. `cd` back into the `chess-openings` root directory and run `npm i` (and pray it works because this whole thing is such a dang mess). From there, you can run any of the scripts below from the root directory.
+
+`sh ~/emsdk/emsdk_env.sh`
+`source ~/emsdk/emsdk_env.sh`
+`cd public`
+`git clone https://github.com/hi-ogawa/Stockfish.git`
+`cd Stockfish/src/emscripten`
+`npm i`
+
 
 # Scripts
 

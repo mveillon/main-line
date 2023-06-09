@@ -1,7 +1,7 @@
 import { Piece } from "../chessLogic/pieces/Piece";
 import Color from "../chessLogic/Color";
 import "./styling/PieceComponent.css"
-import "../styling/global.css"
+import "./styling/global.css"
 import { useState } from "react";
 
 import blackBishop from "../assets/blackBishop.png"
@@ -44,6 +44,13 @@ const pieceToSrc = (piece: Piece): string => {
   return pieces[color + name]
 }
 
+/**
+ * One piece on the board
+ * @param piece the piece ro render
+ * @param selected whether the piece is currently selected and should float
+ * with the player's mouse
+ * @returns 
+ */
 const PieceComponent = (props: { piece: Piece, selected: boolean }) => {
   const src = pieceToSrc(props.piece)
 

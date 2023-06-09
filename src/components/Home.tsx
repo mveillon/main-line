@@ -1,7 +1,10 @@
 import "./styling/global.css"
-import "./styling/home.css"
-import OpeningSelector from "./components/OpeningSelector"
+import "./styling/Home.css"
+import OpeningSelector from "./OpeningSelector"
 
+/**
+ * The home page
+ */
 function Home () {
   return (
     <div className='home'>

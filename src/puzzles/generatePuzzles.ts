@@ -4,7 +4,7 @@ import { randInt, choice } from "../utils/random"
 import { fromFEN, toFEN } from "../chessLogic/fenPGN"
 import { arange } from "../utils/numJS"
 import { uciToMove } from "../chessLogic/parser"
-import { writeFileSync, readFile, copyFileSync } from "fs"
+import { writeFileSync, readFile, existsSync, mkdirSync } from "fs"
 import { Piece } from "../chessLogic/pieces/Piece"
 import Color from "../chessLogic/Color"
 import PuzzleSet from "./PuzzleSet"
@@ -64,9 +64,8 @@ const generatePuzzles = async (
       puzzles[toFEN(g)] = {}
       console.log(`Puzzle No. ${Object.keys(puzzles).length} found!`)
     }
-  
-    sf.quit()
   } finally {
+    sf.quit()
     writeFileSync(
       outFile, 
       JSON.stringify(puzzles), 
@@ -143,8 +142,8 @@ const analyzeLines = async (path: string, depth: number) => {
           console.log(`Puzzle No. ${Object.keys(res).length} analyzed`)
         }
     
-        sf.quit()
       } finally {
+        sf.quit()
         writeFileSync(
           path,
           JSON.stringify(res)
@@ -158,8 +157,8 @@ const analyzeLines = async (path: string, depth: number) => {
 
 /**
  * Runs an async function and prints how long it takes to complete.
- * For reference, depth=30 takes about 30 hours to generate and analyze
- * 50 puzzles
+ * For reference, `depth` = 30 and `numPuzzles` = 50 takes about 30 hours while
+ * `depth` = 20 and `numPuzzles` = 20 takes about 30 minutes
  * @param func the function to run
  */
 const timeAsync = async (func: () => Promise<void>) => {
@@ -188,11 +187,18 @@ const genPuzzles = async (settings: PuzzleInfo) => {
     const cStr = c === Color.White ? 'white' : 'black'
     console.log(`Generating puzzles for the ${settings.openingName} for ${cStr}...`)
 
+    const rootDir = `src/puzzles/${settings.openingName}`
+    const path = `${rootDir}/${cStr}.json`
+
+    if (!existsSync(rootDir)) {
+      mkdirSync(rootDir)
+    }
+
     await timeAsync(() => (
       generatePuzzles(
         settings.pgn, 
         settings.numPuzzles,
-        `src/puzzles/${settings.openingName}/${cStr}.json`,
+        path,
         settings.depth,
         c
       )
@@ -200,7 +206,7 @@ const genPuzzles = async (settings: PuzzleInfo) => {
 
     await timeAsync(() => (
       analyzeLines(
-        `src/puzzles/${settings.openingName}/${cStr}.json`, 
+        path,
         settings.depth
       )
     ))
@@ -212,8 +218,9 @@ const genPuzzles = async (settings: PuzzleInfo) => {
  * Generates and analyzes all puzzles in `PGNs.ts`
  */
 const allPuzzles = async () => {
-  for (const pgn in PGNs) {
-    await genPuzzles(PGNs[pgn])
+  const pgns = PGNs()
+  for (const pgn in pgns) {
+    await genPuzzles(pgns[pgn])
   }
 }
 

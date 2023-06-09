@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import BoardComponent from "./BoardComponent";
 import Game from "../chessLogic/Game";
-import "../styling/global.css"
+import "./styling/global.css"
 import { PieceT } from "../chessLogic/pieces/Piece";
 import PuzzleSet from "../puzzles/PuzzleSet";
 import { choice } from "../utils/random";
@@ -9,13 +9,17 @@ import { pieceToAcronym, uciToAlgebraic, uciToMove } from "../chessLogic/parser"
 import { uciLineToPGN } from "../chessLogic/parser";
 import Color from "../chessLogic/Color";
 import { fenToParts, toFEN } from "../chessLogic/fenPGN";
+import { useNavigate } from "react-router-dom";
 
-function GameComponent(props: { 
-  pgn: string,
+/**
+ * The controller allowing the player to play all the puzzles in `puzzles`
+ * @param puzzles the puzzles the player can play
+ */
+function Puzzles(props: { 
   puzzles: PuzzleSet
 }) {
   // clear out moves made because it breaks the back button
-  const g2 = new Game(undefined, toFEN(new Game(props.pgn)))
+  const g2 = new Game()
 
   const aPuzzle = Object.keys(props.puzzles)[0]
   let player: Color
@@ -75,7 +79,6 @@ function GameComponent(props: {
     const bestMove = props.puzzles[currentFEN].bestMove
     if (uci === bestMove) {
       setReview("That's the best move!")
-      game.moveNumber = 1
       setLine(uciLineToPGN(
         [uci, ...props.puzzles[currentFEN].moves[uci].line],
         game
@@ -96,7 +99,6 @@ function GameComponent(props: {
 
       reviewParts.push(`The top move is ${uciToAlgebraic(bestMove, game.board)}.`)
 
-      game.moveNumber = 1
       const newLine = uciLineToPGN(
         [bestMove, ...props.puzzles[currentFEN].moves[bestMove].line],
         game
@@ -157,13 +159,24 @@ function GameComponent(props: {
     setDisableSkip(false)
   }
 
+  const navigate = useNavigate()
+  const toAnalysis = () => {
+    navigate(
+      "/analysis",
+      {state: {
+        fen: toFEN(game),
+        player: player
+      }}
+    )
+  }
+
   return (
     <div className='flex-row'>
       <div>
         <BoardComponent 
           game={game} 
           playMove={playMove}
-          player={player} 
+          perspective={player} 
           canMove={canMove}
         />
         <p>{result}</p>
@@ -172,6 +185,7 @@ function GameComponent(props: {
           <button onClick={pickNextPuzzle}>Next Puzzle</button> :
           <p>No puzzles remaining!</p>
         }
+        <button onClick={toAnalysis}>Analysis Board</button>
       </div>
 
       <div>
@@ -217,4 +231,4 @@ function GameComponent(props: {
   )
 }
 
-export default GameComponent
+export default Puzzles

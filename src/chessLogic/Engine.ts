@@ -1,10 +1,16 @@
-import Color from "./Color"
-import { fenToParts } from "./fenPGN"
+import { appendFile, writeFileSync } from "fs"
+import { Worker } from "worker_threads"
+import Stockfish from "stockfish"
 
-interface IStockfish {
-  postMessage(cmd: string): void
-  addMessageListener(listener: (message: string) => void): void
-  removeMessageListener(listener: (message: string) => void): void
+writeFileSync("./log.txt", '')
+
+const log = (message: string) => {
+  appendFile("./log.txt", message + '\n', (err) => { if (err) throw err })
+}
+
+interface UCI {
+  postMessage(message: string): void
+  onmessage(event: MessageEvent<string>): void
 }
 
 export interface MoveScore {
@@ -14,9 +20,11 @@ export interface MoveScore {
 }
 
 export class Engine {
-  protected _sf: IStockfish | undefined
-  depth: number
+  protected _uci: UCI | undefined
+  readonly depth: number
   readonly numMoves: number
+  protected _pending: { promise: Promise<any>, dead: boolean }[]
+  protected readonly _intervalTime: number = 500
 
   /**
    * A Stockfish wrapper
@@ -24,54 +32,94 @@ export class Engine {
    * @param numMoves how many of the best moves to return
    */
   constructor(depth: number, numMoves: number) {
-    this._sf = undefined
+    // this._uci = new Worker("./node_modules/stockfish/src/stockfish.js")
+    this._uci = undefined
     this.depth = depth
     this.numMoves = numMoves
+    this._pending = []
   }
 
   /**
-   * Loads the Stockfish engine and initializes it
-   * @returns the initialized engine
+   * Clears the UCI message listener
    */
-  protected async _loadEngine(): Promise<IStockfish> {
-    let getSF: () => Promise<IStockfish>
-    if (process.env.NODE_ENV === 'test') {
-      // @ts-ignore
-      const Stockfish = await import("../../public/stockfish.wasm")
-      getSF = Stockfish.default
-    } else if (typeof process.env.NODE_ENV === 'undefined') {
-      // @ts-ignore
-      const Stockfish = await import("../../../public/stockfish.wasm/stockfish")
-      getSF = Stockfish.default
-    } else {
-      // @ts-ignore
-      getSF = window.Stockfish
+  protected _clearListener() {
+    this._setListener((_) => {})
+  }
+
+  /**
+   * Sets the UCI message listener
+   * @param listener the listener to use
+   */
+  protected _setListener(listener: (message: string) => void) {
+    if (typeof this._uci === 'undefined') {
+      throw new Error('UCI not initialized yet')
+    }
+    this._uci.onmessage = (e: MessageEvent<string>) => {
+      listener(e.data)
     }
 
-    return getSF().then((sf: IStockfish) => {
-      sf.postMessage('uci')
-      sf.postMessage(`setoption name multipv value ${this.numMoves}`)
-      sf.postMessage('isready')
-
-      return sf
-    })
+    // this._uci?.on('message', listener)
   }
 
   /**
-   * Waits for the engine to say its ready for the next command
+   * Posts a message to the UCI engine
+   * @param message the message to send
+   */
+  protected _postMessage(message: string) {
+    this._uci?.postMessage(message)
+  }
+
+  /**
+   * Initializes the engine
+   */
+  protected async _init() {
+    // this._uci?.on('error', (err) => { log(err.message); throw err })
+    this._uci = await Stockfish()()
+    this._postMessage('uci')
+    this._postMessage(`setoption name multipv value ${this.numMoves}`)
+    this._postMessage('setoption name Use NNUE value true')
+  }
+
+  /**
+   * Waits for the engine to say it's ready for the next command
    */
   protected async _waitForReady() {
-    return new Promise((resolve, reject) => {
-      const listener = (message: string) => {
-        if (message.includes('readyok')) {
-          this._sf?.removeMessageListener(listener)
+    if (typeof this._uci === 'undefined') {
+      await this._init()
+    }
+    const promiseInd = this._pending.length
+    const p = new Promise((resolve, reject) => {
+      const cleanup = () => {
+        if (!this._pending[promiseInd].dead) {
+          this._clearListener()
           resolve(undefined)
+          clearInterval(interval)
+          this._pending[promiseInd].dead = true
         }
       }
-      this._sf?.addMessageListener(listener);
 
-      this._sf?.postMessage('isready')
+      const listener = (message: string) => {
+        if (message.includes('readyok')) {
+          cleanup()
+        }
+      }
+
+      this._setListener(listener)
+      this._postMessage('isready')
+
+      const interval = setInterval(() => {
+        if (this._pending[promiseInd]?.dead) {
+          cleanup()
+        }
+      }, this._intervalTime)
     })
+
+    this._pending.push({
+      promise: p,
+      dead: false
+    })
+
+    return p
   }
 
   /**
@@ -81,15 +129,22 @@ export class Engine {
    * @returns the `numMoves` best moves in the position
    */
   async getBestMoves(fen: string): Promise<MoveScore[]> {
-    if (typeof this._sf === 'undefined') {
-      this._sf = await this._loadEngine()
-    }
-
     await this._waitForReady()
 
-    return new Promise<MoveScore[]>((resolve, reject) => {
+    const promiseInd = this._pending.length
+    const p = new Promise<MoveScore[]>((resolve, reject) => {
       const messages: MoveScore[] = []
       const includedMoves = new Set<string>()
+
+      const cleanup = () => {
+        if (!this._pending[promiseInd].dead) {
+          messages.sort((ms1, ms2) => ms2.score - ms1.score)
+          this._clearListener()
+          resolve(messages)
+          clearInterval(interval)
+          this._pending[promiseInd].dead = true
+        }
+      }
 
       const listener = (message: string) => {
         if (message.includes(`info depth ${this.depth} seldepth`)) {
@@ -110,17 +165,48 @@ export class Engine {
         }
 
         if (message.includes('bestmove')) {
-          messages.sort((ms1, ms2) => ms2.score - ms1.score)
-
-          this._sf?.removeMessageListener(listener)
-          resolve(messages)
+          cleanup()
         }
       }
-      this._sf?.addMessageListener(listener)
+      this._setListener(listener)
 
-      this._sf?.postMessage('ucinewgame')
-      this._sf?.postMessage(`position fen ${fen}`)
-      this._sf?.postMessage(`go depth ${this.depth}`)
+      this._postMessage('ucinewgame')
+      this._postMessage(`position fen ${fen}`)
+      this._postMessage(`go depth ${this.depth}`)
+
+      const interval = setInterval(() => {
+        if (this._pending[promiseInd]?.dead) {
+          cleanup()
+        }
+      }, this._intervalTime)
+    })
+
+    this._pending.push({
+      promise: p,
+      dead: false
+    })
+
+    return p
+  }
+
+  /**
+   * Stops the engine's calculation as soon as possible
+   */
+  async stop() {
+    return new Promise<void>((resolve, reject) => {
+      const listener = (message: string) => {
+        if (message.includes('bestmove')) {
+          this._clearListener()
+          resolve(undefined)
+        }
+      }
+
+      for (let i = 0; i < this._pending.length; i++) {
+        this._pending[i].dead = true
+      }
+
+      this._setListener(listener)
+      this._postMessage('stop')
     })
   }
 
@@ -129,6 +215,7 @@ export class Engine {
    * end to prevent leaking threads and such nonsense
    */
   quit() {
-    this._sf?.postMessage('quit')
+    this._postMessage('quit')
+    // this._uci?.terminate()
   }
 }

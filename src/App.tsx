@@ -1,14 +1,17 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
-import Home from './Home';
+import Home from './components/Home';
 import { LondonBlack, LondonWhite } from './openings/London';
 import { CaroKannBlack, CaroKannWhite } from './openings/CaroKann';
+import AnalysisBoard from './components/AnalysisBoard';
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element ={<Home />} />
+        <Route path="/" element={<Home />} />
+
+        <Route path="analysis" element={<AnalysisBoard />} />
 
         <Route path="london/">
           <Route path="black" element={<LondonBlack />} />

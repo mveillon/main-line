@@ -1,4 +1,4 @@
-import "../styling/global.css"
+import "./styling/global.css"
 import "./styling/PromotionSelector.css"
 
 import blackBishop from "../assets/blackBishop.png"
@@ -16,6 +16,12 @@ import Knight from "../chessLogic/pieces/Knight"
 import Queen from "../chessLogic/pieces/Queen"
 import Rook from "../chessLogic/pieces/Rook"
 
+/**
+ * The panel that pops up when promoting a pawn that allows the player to 
+ * select what piece to promote to
+ * @param turn whose turn it is
+ * @param onSelected what to call when the promotion type is selected
+ */
 const PromotionSelector = (props: { 
   turn: Color, 
   onSelected: (promoType: PieceT) => void 

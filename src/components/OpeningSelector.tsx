@@ -1,7 +1,12 @@
 import { Link } from "react-router-dom";
-import "../styling/global.css"
+import "./styling/global.css"
 import "./styling/OpeningSelector.css"
 
+/**
+ * One element in the list of all openings the player can choose to practice
+ * @param name the name of the opening
+ * @returns 
+ */
 function OpeningSelector(props: { name: string }) {
   return (
     <div>
@@ -9,7 +14,6 @@ function OpeningSelector(props: { name: string }) {
 
       <div className={['flex-row', 'link-list'].join(' ')}>
         <Link to={`${props.name}/white`}>White</Link>
-        <div></div>
         <Link to={`${props.name}/black`}>Black</Link>
       </div>
     </div>

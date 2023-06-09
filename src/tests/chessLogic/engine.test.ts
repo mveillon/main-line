@@ -25,6 +25,7 @@ const checkMove = (move: string, mover: Color, game: Game) => {
   const fromPiece = game.board.pieceAt(from)
   expect(fromPiece).toBeInstanceOf(Piece)
   expect(fromPiece?.color).toBe(mover)
+  expect(fromPiece?.legalMoves()).toContain(to)
 
   const toPiece = game.board.pieceAt(to)
   expect(toPiece === null || toPiece.color !== mover).toBeTruthy()
@@ -73,6 +74,31 @@ test('sorted by score', async () => {
   moves = await e.getBestMoves(toFEN(g))
   for (let i = 1; i < moves.length; i++) {
     expect(moves[i - 1].score >= moves[i].score)
+  }
+
+  e.quit()
+})
+
+test.skip('engine stopping', async () => {
+  const numMoves = 5
+  const e = new Engine(15, numMoves)
+  const g = new Game()
+  const moves = await e.getBestMoves(toFEN(g))
+
+  expect(moves.length).toBe(numMoves)
+
+  e.getBestMoves(toFEN(g)).then((moves) => {
+    expect(moves.length).toBeLessThan(numMoves)
+  })
+  await e.stop()
+
+  g.playMove('e2', 'e4')
+  expect(g.turn).toBe(Color.Black)
+  const newMoves = await e.getBestMoves(toFEN(g))
+  expect(newMoves.length).toBe(numMoves)
+
+  for (const move of newMoves) {
+    checkMove(move.move, Color.Black, g)
   }
 
   e.quit()
