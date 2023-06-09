@@ -1,5 +1,4 @@
-import Color from "./Color"
-import { fenToParts } from "./fenPGN"
+import { full } from "../utils/numJS"
 
 interface IStockfish {
   postMessage(cmd: string): void
@@ -14,9 +13,11 @@ export interface MoveScore {
 }
 
 export class Engine {
-  protected _sf: IStockfish | undefined
+  protected _uci: IStockfish | undefined
   depth: number
   readonly numMoves: number
+  protected _dead: boolean[]
+  protected readonly _intervalTime = 500
 
   /**
    * A Stockfish wrapper
@@ -24,9 +25,10 @@ export class Engine {
    * @param numMoves how many of the best moves to return
    */
   constructor(depth: number, numMoves: number) {
-    this._sf = undefined
+    this._uci = undefined
     this.depth = depth
     this.numMoves = numMoves
+    this._dead = []
   }
 
   /**
@@ -61,16 +63,31 @@ export class Engine {
    * Waits for the engine to say its ready for the next command
    */
   protected async _waitForReady() {
+    const deadInd = this._dead.push(false)
+
     return new Promise((resolve, reject) => {
+      const cleanup = () => {
+        this._uci?.removeMessageListener(listener)
+        clearInterval(interval)
+        this._dead[deadInd] = true
+        resolve(undefined)
+      }
+
       const listener = (message: string) => {
         if (message.includes('readyok')) {
-          this._sf?.removeMessageListener(listener)
+          this._uci?.removeMessageListener(listener)
           resolve(undefined)
         }
       }
-      this._sf?.addMessageListener(listener);
 
-      this._sf?.postMessage('isready')
+      const interval = setInterval(() => {
+        if (this._dead[deadInd]) {
+          cleanup()
+        }
+      }, this._intervalTime)
+
+      this._uci?.addMessageListener(listener);
+      this._uci?.postMessage('isready')
     })
   }
 
@@ -81,15 +98,25 @@ export class Engine {
    * @returns the `numMoves` best moves in the position
    */
   async getBestMoves(fen: string): Promise<MoveScore[]> {
-    if (typeof this._sf === 'undefined') {
-      this._sf = await this._loadEngine()
+    if (typeof this._uci === 'undefined') {
+      this._uci = await this._loadEngine()
     }
 
     await this._waitForReady()
 
+    const deadInd = this._dead.push(false)
+
     return new Promise<MoveScore[]>((resolve, reject) => {
       const messages: MoveScore[] = []
       const includedMoves = new Set<string>()
+
+      const cleanup = () => {
+        messages.sort((ms1, ms2) => ms2.score - ms1.score)
+        this._uci?.removeMessageListener(listener)
+        clearInterval(interval)
+        this._dead[deadInd] = true
+        resolve(messages)
+      }
 
       const listener = (message: string) => {
         if (message.includes(`info depth ${this.depth} seldepth`)) {
@@ -110,17 +137,21 @@ export class Engine {
         }
 
         if (message.includes('bestmove')) {
-          messages.sort((ms1, ms2) => ms2.score - ms1.score)
-
-          this._sf?.removeMessageListener(listener)
-          resolve(messages)
+          cleanup()
         }
       }
-      this._sf?.addMessageListener(listener)
 
-      this._sf?.postMessage('ucinewgame')
-      this._sf?.postMessage(`position fen ${fen}`)
-      this._sf?.postMessage(`go depth ${this.depth}`)
+      const interval = setInterval(() => {
+        if (this._dead[deadInd]) {
+          cleanup()
+        }
+      }, this._intervalTime)
+
+      this._uci?.addMessageListener(listener)
+
+      this._uci?.postMessage('ucinewgame')
+      this._uci?.postMessage(`position fen ${fen}`)
+      this._uci?.postMessage(`go depth ${this.depth}`)
     })
   }
 
@@ -129,6 +160,24 @@ export class Engine {
    * end to prevent leaking threads and such nonsense
    */
   quit() {
-    this._sf?.postMessage('quit')
+    this._uci?.postMessage('quit')
+  }
+
+  /**
+   * Stops the engine's calculations as soon as possible
+   */
+  async stop() {
+    return new Promise<void>((resolve, reject) => {
+      const listener = (message: string) => {
+        if (message.includes('bestmove')) {
+          this._uci?.removeMessageListener(listener)
+          resolve(undefined)
+        }
+      }
+
+      this._dead = full([this._dead.length], false) as boolean[]
+      this._uci?.addMessageListener(listener)
+      this._uci?.postMessage('stop')
+    })
   }
 }
