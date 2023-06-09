@@ -8,6 +8,7 @@ import Rook from "../../chessLogic/pieces/Rook";
 import Knight from "../../chessLogic/pieces/Knight";
 import Bishop from "../../chessLogic/pieces/Bishop";
 import { toFEN } from "../../chessLogic/fenPGN";
+import { appendFile, writeFileSync } from "fs";
 
 jest.setTimeout(2_147_483_647)
 
@@ -79,7 +80,7 @@ test('sorted by score', async () => {
   e.quit()
 })
 
-test.skip('engine stopping', async () => {
+test('engine stopping', async () => {
   const numMoves = 5
   const e = new Engine(15, numMoves)
   const g = new Game()

@@ -1,6 +1,6 @@
 import { full } from "../utils/numJS"
 
-interface IStockfish {
+interface UCI {
   postMessage(cmd: string): void
   addMessageListener(listener: (message: string) => void): void
   removeMessageListener(listener: (message: string) => void): void
@@ -13,7 +13,7 @@ export interface MoveScore {
 }
 
 export class Engine {
-  protected _uci: IStockfish | undefined
+  protected _uci: UCI | undefined
   depth: number
   readonly numMoves: number
   protected _dead: boolean[]
@@ -31,12 +31,17 @@ export class Engine {
     this._dead = []
   }
 
+  protected _initialMessages = (uci: UCI) => {
+    uci.postMessage('uci')
+    uci.postMessage(`setoption name multipv value ${this.numMoves}`)
+  }
+
   /**
    * Loads the Stockfish engine and initializes it
    * @returns the initialized engine
    */
-  protected async _loadEngine(): Promise<IStockfish> {
-    let getSF: () => Promise<IStockfish>
+  protected async _loadEngine(): Promise<UCI> {
+    let getSF: () => Promise<UCI>
     if (process.env.NODE_ENV === 'test') {
       // @ts-ignore
       const Stockfish = await import("../../public/stockfish.wasm")
@@ -50,11 +55,8 @@ export class Engine {
       getSF = window.Stockfish
     }
 
-    return getSF().then((sf: IStockfish) => {
-      sf.postMessage('uci')
-      sf.postMessage(`setoption name multipv value ${this.numMoves}`)
-      sf.postMessage('isready')
-
+    return getSF().then((sf: UCI) => {
+      this._initialMessages(sf)
       return sf
     })
   }
@@ -75,8 +77,7 @@ export class Engine {
 
       const listener = (message: string) => {
         if (message.includes('readyok')) {
-          this._uci?.removeMessageListener(listener)
-          resolve(undefined)
+          cleanup()
         }
       }
 
@@ -171,13 +172,19 @@ export class Engine {
       const listener = (message: string) => {
         if (message.includes('bestmove')) {
           this._uci?.removeMessageListener(listener)
-          resolve(undefined)
+          this.quit()
+
+          this._loadEngine().then((engine) => {
+            this._uci = engine
+            resolve(undefined)
+          })
         }
       }
 
-      this._dead = full([this._dead.length], false) as boolean[]
+      this._dead = full([this._dead.length], true) as boolean[]
       this._uci?.addMessageListener(listener)
       this._uci?.postMessage('stop')
+      
     })
   }
 }
