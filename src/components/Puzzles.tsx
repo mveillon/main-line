@@ -7,7 +7,7 @@ import PuzzleSet from "../puzzles/PuzzleSet";
 import { choice } from "../utils/random";
 import { pieceToAcronym, uciToAlgebraic, uciToMove } from "../chessLogic/parser";
 import { uciLineToPGN } from "../chessLogic/parser";
-import Color from "../chessLogic/Color";
+import COLOR from "../chessLogic/Color";
 import { fenToParts, toFEN } from "../chessLogic/fenPGN";
 import { useNavigate } from "react-router-dom";
 
@@ -22,11 +22,11 @@ function Puzzles(props: {
   const g2 = new Game()
 
   const aPuzzle = Object.keys(props.puzzles)[0]
-  let player: Color
-  if (typeof aPuzzle === 'undefined' || fenToParts(aPuzzle)[1] === 'w') {
-    player = Color.White
+  let player: COLOR
+  if (typeof aPuzzle === 'undefined' || fenToParts(aPuzzle).turn === 'w') {
+    player = COLOR.WHITE
   } else {
-    player = Color.Black
+    player = COLOR.BLACK
   }
 
   const [game, setGame] = useState(g2)
@@ -37,7 +37,6 @@ function Puzzles(props: {
   const [currentFEN, setCurrentFEN] = useState('')
   const [available, setAvailable] = useState(new Set(Object.keys(props.puzzles)))
   const [canMove, setCanMove] = useState(false)
-  const [disableSkip, setDisableSkip] = useState(false)
 
   useEffect(() => {
     pickNextPuzzle()
@@ -142,21 +141,17 @@ function Puzzles(props: {
   }
 
   const backwardOneMove = () => {
-    setDisableSkip(true)
     if (game.board.backwardOneMove()) {
       game.turn = +!game.turn
       updateGame()
     }
-    setDisableSkip(false)
   }
 
   const forwardOneMove = () => {
-    setDisableSkip(true)
     if (game.board.forwardOneMove()) {
       game.turn = +!game.turn
       updateGame()
     }
-    setDisableSkip(false)
   }
 
   const navigate = useNavigate()
@@ -208,14 +203,12 @@ function Puzzles(props: {
             <button 
               className="forward-back"
               onClick={backwardOneMove}
-              disabled={disableSkip}
             >
               {"<"}
             </button>
             <button
               className="forward-back"
               onClick={forwardOneMove}
-              disabled={disableSkip}
             >
               {">"}
             </button>

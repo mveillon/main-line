@@ -6,7 +6,7 @@ import Queen from "./pieces/Queen"
 import Rook from "./pieces/Rook"
 import { Board, BoardT } from "./Board"
 import { full } from "../utils/numJS"
-import Color from "./Color"
+import COLOR from "./Color"
 import { indexToLetter } from "./notationIndices"
 
 /**
@@ -18,40 +18,40 @@ import { indexToLetter } from "./notationIndices"
 const startingPosition = (board: Board): BoardT => {
   const res = (full([8, 8], null) as BoardT)
   res[0] = [
-    new Rook(Color.White, 'h1', board),
-    new Knight(Color.White, 'g1', board),
-    new Bishop(Color.White, 'f1', board),
-    new King(Color.White, 'e1', board),
-    new Queen(Color.White, 'd1', board),
-    new Bishop(Color.White, 'c1', board),
-    new Knight(Color.White, 'b1', board),
-    new Rook(Color.White, 'a1', board)
+    new Rook(COLOR.WHITE, 'h1', board),
+    new Knight(COLOR.WHITE, 'g1', board),
+    new Bishop(COLOR.WHITE, 'f1', board),
+    new King(COLOR.WHITE, 'e1', board),
+    new Queen(COLOR.WHITE, 'd1', board),
+    new Bishop(COLOR.WHITE, 'c1', board),
+    new Knight(COLOR.WHITE, 'b1', board),
+    new Rook(COLOR.WHITE, 'a1', board)
   ]
 
   for (let i = 0; i < res[1].length; i++) {
     const file = indexToLetter(i)
     res[1][i] = new Pawn(
-      Color.White,
+      COLOR.WHITE,
       `${file}2`,
       board
     )
 
     res[6][i] = new Pawn(
-      Color.Black,
+      COLOR.BLACK,
       `${file}7`,
       board
     )
   }
 
   res[7] = [
-    new Rook(Color.Black, 'h8', board),
-    new Knight(Color.Black, 'g8', board),
-    new Bishop(Color.Black, 'f8', board),
-    new King(Color.Black, 'e8', board),
-    new Queen(Color.Black, 'd8', board),
-    new Bishop(Color.Black, 'c8', board),
-    new Knight(Color.Black, 'b8', board),
-    new Rook(Color.Black, 'a8', board)
+    new Rook(COLOR.BLACK, 'h8', board),
+    new Knight(COLOR.BLACK, 'g8', board),
+    new Bishop(COLOR.BLACK, 'f8', board),
+    new King(COLOR.BLACK, 'e8', board),
+    new Queen(COLOR.BLACK, 'd8', board),
+    new Bishop(COLOR.BLACK, 'c8', board),
+    new Knight(COLOR.BLACK, 'b8', board),
+    new Rook(COLOR.BLACK, 'a8', board)
   ]
 
   return res

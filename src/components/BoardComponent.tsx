@@ -7,7 +7,7 @@ import { arange, full, getShape } from "../utils/numJS";
 import { Piece, PieceT } from "../chessLogic/pieces/Piece";
 import { indicesToNotation, notationToIndices } from "../chessLogic/notationIndices";
 import Game from "../chessLogic/Game";
-import Color from "../chessLogic/Color";
+import COLOR from "../chessLogic/Color";
 import PromotionSelector from "./PromotionSelector";
 import Pawn from "../chessLogic/pieces/Pawn";
 
@@ -22,12 +22,12 @@ const BoardComponent = (
   props: {
     game: Game, 
     playMove: (from: string, to: string, promoType?: PieceT) => void,
-    perspective: Color,
+    perspective: COLOR,
     canMove: boolean
   }) => {
   
   const board = props.game.board
-  const [reversed, setReversed] = useState(props.perspective === Color.White)
+  const [reversed, setReversed] = useState(props.perspective === COLOR.WHITE)
   const [pieceSelected, setPieceSelected] = useState<Piece | null>(null)
   const [promoting, setPromoting] = useState<{ p: Piece, dest: string }>()
   const [legalMoves, setLegalMoves] = useState<Set<string>>()

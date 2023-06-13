@@ -1,5 +1,5 @@
 import { Board } from "../../chessLogic/Board";
-import Color from "../../chessLogic/Color";
+import COLOR from "../../chessLogic/Color";
 import Game from "../../chessLogic/Game";
 import { notationToIndices } from "../../chessLogic/notationIndices";
 import Bishop from "../../chessLogic/pieces/Bishop";
@@ -23,13 +23,13 @@ test('starting position', () => {
   expect(b.pieceAt('h1')).toBeInstanceOf(Rook)
 
   for (const file of files) {
-    expect(b.pieceAt(`${file}1`)?.color).toBe(Color.White)
+    expect(b.pieceAt(`${file}1`)?.color).toBe(COLOR.WHITE)
     expect(b.pieceAt(`${file}2`)).toBeInstanceOf(Pawn)
-    expect(b.pieceAt(`${file}2`)?.color).toBe(Color.White)
+    expect(b.pieceAt(`${file}2`)?.color).toBe(COLOR.WHITE)
 
-    expect(b.pieceAt(`${file}8`)?.color).toBe(Color.Black)
+    expect(b.pieceAt(`${file}8`)?.color).toBe(COLOR.BLACK)
     expect(b.pieceAt(`${file}7`)).toBeInstanceOf(Pawn)
-    expect(b.pieceAt(`${file}7`)?.color).toBe(Color.Black)
+    expect(b.pieceAt(`${file}7`)?.color).toBe(COLOR.BLACK)
   }
 
   expect(typeof b.pieceAt('h1')?.toString()).toBe("string")
@@ -43,35 +43,35 @@ test('movePiece', () => {
   expect(b.pieceAt('e2')).toBeNull()
   expect(b.pieceAt('e4')).toBeInstanceOf(Pawn)
   expect(b.pieceAt('e4')?.coords).toBe('e4')
-  expect(b.pieceAt('e4')?.color).toBe(Color.White)
+  expect(b.pieceAt('e4')?.color).toBe(COLOR.WHITE)
 
   b.movePiece('e7', 'e5')
   expect(b.pieceAt('e7')).toBeNull()
   expect(b.pieceAt('e5')).toBeInstanceOf(Pawn)
   expect(b.pieceAt('e5')?.coords).toBe('e5')
-  expect(b.pieceAt('e5')?.color).toBe(Color.Black)
+  expect(b.pieceAt('e5')?.color).toBe(COLOR.BLACK)
 })
 
 test('blockedOOB', () => {
   const b = new Board()
-  expect(b.blockedOOB(notationToIndices('a1'), Color.White)).toBeTruthy()
-  expect(b.blockedOOB(notationToIndices('h1'), Color.White)).toBeTruthy()
-  expect(b.blockedOOB(notationToIndices('a1'), Color.Black)).toBeFalsy()
-  expect(b.blockedOOB(notationToIndices('h1'), Color.Black)).toBeFalsy()
+  expect(b.blockedOOB(notationToIndices('a1'), COLOR.WHITE)).toBeTruthy()
+  expect(b.blockedOOB(notationToIndices('h1'), COLOR.WHITE)).toBeTruthy()
+  expect(b.blockedOOB(notationToIndices('a1'), COLOR.BLACK)).toBeFalsy()
+  expect(b.blockedOOB(notationToIndices('h1'), COLOR.BLACK)).toBeFalsy()
 
-  expect(b.blockedOOB(notationToIndices('a8'), Color.Black)).toBeTruthy()
-  expect(b.blockedOOB(notationToIndices('h8'), Color.Black)).toBeTruthy()
-  expect(b.blockedOOB(notationToIndices('a8'), Color.White)).toBeFalsy()
-  expect(b.blockedOOB(notationToIndices('h8'), Color.White)).toBeFalsy()
+  expect(b.blockedOOB(notationToIndices('a8'), COLOR.BLACK)).toBeTruthy()
+  expect(b.blockedOOB(notationToIndices('h8'), COLOR.BLACK)).toBeTruthy()
+  expect(b.blockedOOB(notationToIndices('a8'), COLOR.WHITE)).toBeFalsy()
+  expect(b.blockedOOB(notationToIndices('h8'), COLOR.WHITE)).toBeFalsy()
 
-  expect(b.blockedOOB([-1, 7], Color.White)).toBeTruthy()
-  expect(b.blockedOOB([-1, 7], Color.Black)).toBeTruthy()
-  expect(b.blockedOOB([8, 0], Color.White)).toBeTruthy()
-  expect(b.blockedOOB([8, 0], Color.Black)).toBeTruthy()
-  expect(b.blockedOOB([0, -1], Color.White)).toBeTruthy()
-  expect(b.blockedOOB([0, -1], Color.Black)).toBeTruthy()
-  expect(b.blockedOOB([0, 8], Color.White)).toBeTruthy()
-  expect(b.blockedOOB([0, 8], Color.Black)).toBeTruthy()
+  expect(b.blockedOOB([-1, 7], COLOR.WHITE)).toBeTruthy()
+  expect(b.blockedOOB([-1, 7], COLOR.BLACK)).toBeTruthy()
+  expect(b.blockedOOB([8, 0], COLOR.WHITE)).toBeTruthy()
+  expect(b.blockedOOB([8, 0], COLOR.BLACK)).toBeTruthy()
+  expect(b.blockedOOB([0, -1], COLOR.WHITE)).toBeTruthy()
+  expect(b.blockedOOB([0, -1], COLOR.BLACK)).toBeTruthy()
+  expect(b.blockedOOB([0, 8], COLOR.WHITE)).toBeTruthy()
+  expect(b.blockedOOB([0, 8], COLOR.BLACK)).toBeTruthy()
 })
 
 test('errors', () => {
@@ -125,9 +125,9 @@ test('undo', () => {
   b.undoLastMove()
 
   expect(b.pieceAt('d5')).toBeInstanceOf(Pawn)
-  expect(b.pieceAt('d5')?.color).toBe(Color.Black)
+  expect(b.pieceAt('d5')?.color).toBe(COLOR.BLACK)
   expect(b.pieceAt('e4')).toBeInstanceOf(Pawn)
-  expect(b.pieceAt('e4')?.color).toBe(Color.White)
+  expect(b.pieceAt('e4')?.color).toBe(COLOR.WHITE)
   expect(b.pieceAt('d5')?.hasMoved).toBeTruthy()
   expect(b.pieceAt('e4')?.hasMoved).toBeTruthy()
   expect(b.pieceAt('d5')?.coords).toBe('d5')
@@ -140,11 +140,11 @@ test('undo', () => {
   
   expect(b.pieceAt('d4')).toBeInstanceOf(Pawn)
   expect(b.pieceAt('d4')?.coords).toBe('d4')
-  expect(b.pieceAt('d4')?.color).toBe(Color.Black)
+  expect(b.pieceAt('d4')?.color).toBe(COLOR.BLACK)
   expect(b.pieceAt('d4')?.hasMoved).toBeTruthy()
   expect(b.pieceAt('c4')).toBeInstanceOf(Pawn)
   expect(b.pieceAt('c4')?.coords).toBe('c4')
-  expect(b.pieceAt('c4')?.color).toBe(Color.White)
+  expect(b.pieceAt('c4')?.color).toBe(COLOR.WHITE)
   expect(b.pieceAt('c4')?.hasMoved).toBeTruthy()
 
   const b2 = new Board(`
@@ -280,19 +280,19 @@ test('fen over skipping', () => {
 
   g.playMove('g4', 'f3')
   expect(g.board.pieceAt('f3')).toBeInstanceOf(Bishop)
-  expect(g.board.pieceAt('f3')?.color).toBe(Color.Black)
+  expect(g.board.pieceAt('f3')?.color).toBe(COLOR.BLACK)
 
   expect(g.board.backwardOneMove()).toBeTruthy()
   expect(g.board.pieceAt('f3')).toBeInstanceOf(Knight)
-  expect(g.board.pieceAt('f3')?.color).toBe(Color.White)
+  expect(g.board.pieceAt('f3')?.color).toBe(COLOR.WHITE)
   expect(g.board.backwardOneMove()).toBeFalsy()
 
   expect(g.board.forwardOneMove()).toBeTruthy()
   expect(g.board.pieceAt('f3')).toBeInstanceOf(Bishop)
-  expect(g.board.pieceAt('f3')?.color).toBe(Color.Black)
+  expect(g.board.pieceAt('f3')?.color).toBe(COLOR.BLACK)
 
   expect(g.board.backwardOneMove()).toBeTruthy()
   expect(g.board.pieceAt('f3')).toBeInstanceOf(Knight)
-  expect(g.board.pieceAt('f3')?.color).toBe(Color.White)
+  expect(g.board.pieceAt('f3')?.color).toBe(COLOR.WHITE)
   expect(g.board.backwardOneMove()).toBeFalsy()
 })

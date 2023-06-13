@@ -23,7 +23,6 @@
   },
   "include": [
     "src", 
-    "src/tests",
-    "public/stockfish.wasm"
+    "src/tests"
   ]
 }

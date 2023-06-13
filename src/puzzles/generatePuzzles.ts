@@ -6,7 +6,7 @@ import { arange } from "../utils/numJS"
 import { uciToMove } from "../chessLogic/parser"
 import { writeFileSync, readFile, existsSync, mkdirSync } from "fs"
 import { Piece } from "../chessLogic/pieces/Piece"
-import Color from "../chessLogic/Color"
+import COLOR from "../chessLogic/Color"
 import PuzzleSet from "./PuzzleSet"
 import Pawn from "../chessLogic/pieces/Pawn"
 import { PuzzleInfo, PGNs } from "./PGNs"
@@ -27,7 +27,7 @@ const generatePuzzles = async (
   numPuzzles: number, 
   outFile: string, 
   depth: number,
-  player: Color,
+  player: COLOR,
   movesDeep: number = 10
 ) => {
   const puzzles: { [index: string]: {} } = {}
@@ -183,8 +183,8 @@ const timeAsync = async (func: () => Promise<void>) => {
  * for arg info
  */
 const genPuzzles = async (settings: PuzzleInfo) => {
-  for (const c of [Color.White, Color.Black]) {
-    const cStr = c === Color.White ? 'white' : 'black'
+  for (const c of [COLOR.WHITE, COLOR.BLACK]) {
+    const cStr = c === COLOR.WHITE ? 'white' : 'black'
     console.log(`Generating puzzles for the ${settings.openingName} for ${cStr}...`)
 
     const rootDir = `src/puzzles/${settings.openingName}`

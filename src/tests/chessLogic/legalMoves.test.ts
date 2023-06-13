@@ -1,5 +1,5 @@
 import { Board } from "../../chessLogic/Board";
-import Color from "../../chessLogic/Color";
+import COLOR from "../../chessLogic/Color";
 import King from "../../chessLogic/pieces/King";
 import Pawn from "../../chessLogic/pieces/Pawn";
 import { Piece } from "../../chessLogic/pieces/Piece";
@@ -98,8 +98,8 @@ test('legalMoves', () => {
   b.movePiece('f7', 'f6')
   let queenMoves = (b.pieceAt('h5') as Piece).legalMovesNoChecks()
   expect(queenMoves.has('e8')).toBeTruthy()
-  expect((b.pieceAt('h5') as Piece).color).toBe(Color.White)
-  const kingPos = b.findPieces(King, Color.Black)[0].coords
+  expect((b.pieceAt('h5') as Piece).color).toBe(COLOR.WHITE)
+  const kingPos = b.findPieces(King, COLOR.BLACK)[0].coords
   expect(kingPos).toBe('e8')
   b.movePiece('f6', 'f7')
 

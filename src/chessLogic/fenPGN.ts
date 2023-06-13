@@ -2,7 +2,7 @@ import { Board } from "./Board"
 import Game from "./Game"
 import { indicesToNotation } from "./notationIndices"
 import { acronymToPiece, pieceToAcronym, doubleMove } from "./parser"
-import Color from "./Color"
+import COLOR from "./Color"
 import King from "./pieces/King"
 import { MoveInfo } from "./MoveInfo"
 import Pawn from "./pieces/Pawn"
@@ -43,14 +43,14 @@ export const fromPGN = (pgn: string, board: Board) => {
  * @param game the game to initialize
  */
 export const fromFEN = (fen: string, game: Game) => {
-  const [
+  const {
     layout,
     turn,
     castlingRights,
     passantTarget,
     halfMoves,
     fullMoves
-  ] = fenToParts(fen)
+  } = fenToParts(fen)
 
   const boardInd = (n: number): number => game.board.board.length - 1 - n
 
@@ -63,12 +63,12 @@ export const fromFEN = (fen: string, game: Game) => {
       if (isNaN(numSkip)) {
         const pieceType = acronymToPiece(square.toUpperCase())
         const p = new pieceType(
-          square.toUpperCase() === square ? Color.White : Color.Black,
+          square.toUpperCase() === square ? COLOR.WHITE : COLOR.BLACK,
           indicesToNotation(rankInd, boardInd(j)),
           game.board
         )
         game.board.board[rankInd][boardInd(j++)] = p 
-        const startRank = p.color === Color.White ? '2' : '7'
+        const startRank = p.color === COLOR.WHITE ? '2' : '7'
         if (p instanceof Pawn && p.coords[1] !== startRank) {
           p.hasMoved = false
         }
@@ -80,10 +80,10 @@ export const fromFEN = (fen: string, game: Game) => {
     }
   }
 
-  game.turn = turn === 'w' ? Color.White : Color.Black
+  game.turn = turn === 'w' ? COLOR.WHITE : COLOR.BLACK
   if (castlingRights === '-') {
-    game.board.findPieces(King, Color.White)[0].hasMoved = true
-    game.board.findPieces(King, Color.Black)[0].hasMoved = true
+    game.board.findPieces(King, COLOR.WHITE)[0].hasMoved = true
+    game.board.findPieces(King, COLOR.BLACK)[0].hasMoved = true
   } else {
     const sides: { [index: string]: string } = {
       k: 'h8', q: 'a8', K: 'h1', Q: 'a1'
@@ -148,7 +148,7 @@ export const toFEN = (game: Game): string => {
         if (square instanceof Pawn) {
           a = 'p'
         }
-        if (square.color === Color.Black) {
+        if (square.color === COLOR.BLACK) {
           row.push(a)
         } else {
           row.push(a.toUpperCase())
@@ -159,10 +159,10 @@ export const toFEN = (game: Game): string => {
   }
 
   const parts = [allRows.join('/')]
-  parts.push(game.turn === Color.White ? 'w' : 'b')
+  parts.push(game.turn === COLOR.WHITE ? 'w' : 'b')
 
   const castling: string[] = []
-  for (const c of [Color.White, Color.Black]) {
+  for (const c of [COLOR.WHITE, COLOR.BLACK]) {
     const king = game.board.findPieces(King, c)[0]
     if (!king.hasMoved) {
       const rookFiles = [
@@ -179,7 +179,7 @@ export const toFEN = (game: Game): string => {
         const r = game.board.pieceAt(rook.file + king.coords[1])
         if (r instanceof Rook && r.color === c && !r.hasMoved) {
           castling.push(
-            c === Color.White ? rook.meaning.toUpperCase() : rook.meaning
+            c === COLOR.WHITE ? rook.meaning.toUpperCase() : rook.meaning
           )
         }
       }
@@ -220,24 +220,26 @@ export const toFEN = (game: Game): string => {
 /**
  * Splits the FEN into all relevant parts
  * @param fen the fen to split
- * @returns the piece layout
- * @returns whose turn it is
- * @returns castling rights
- * @returns en passant target
- * @returns half moves since last pawn move or capture
- * @returns number of full moves in the game
+ * @returns all pieces of the fen, labelled
  */
-export const fenToParts = (fen: string): [
-  string, 
-  string, 
-  string, 
-  string, 
-  string, 
-  string
-] => {
+export const fenToParts = (fen: string): {
+  layout: string,
+  turn: string,
+  castlingRights: string,
+  passantTarget: string,
+  halfMoves: string,
+  fullMoves: string
+} => {
   const parts = fen.split(' ')
   if (parts.length !== 6) {
     throw new Error(`Invalid FEN: ${fen}`)
   }
-  return (parts as [string, string, string, string, string, string])
+  return {
+    layout: parts[0],
+    turn: parts[1],
+    castlingRights: parts[2],
+    passantTarget: parts[3],
+    halfMoves: parts[4],
+    fullMoves: parts[5]
+  }
 }

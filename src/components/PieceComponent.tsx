@@ -1,5 +1,5 @@
 import { Piece } from "../chessLogic/pieces/Piece";
-import Color from "../chessLogic/Color";
+import COLOR from "../chessLogic/Color";
 import "./styling/PieceComponent.css"
 import "./styling/global.css"
 import { useState } from "react";
@@ -24,7 +24,7 @@ import whiteRook from "../assets/whiteRook.png"
  */
 const pieceToSrc = (piece: Piece): string => {
   const name = piece.type.name
-  const color = piece.color === Color.White ? 'white' : 'black'
+  const color = piece.color === COLOR.WHITE ? 'white' : 'black'
 
   const pieces: { [index: string]: string } = {
     blackBishop: blackBishop,

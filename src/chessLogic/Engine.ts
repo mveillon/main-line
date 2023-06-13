@@ -1,4 +1,5 @@
 import { full } from "../utils/numJS"
+import ENGINE_STATUS from "./EngineStatus"
 
 interface UCI {
   postMessage(cmd: string): void
@@ -18,6 +19,10 @@ export class Engine {
   readonly numMoves: number
   protected _dead: boolean[]
   protected readonly _intervalTime = 500
+  protected _status: ENGINE_STATUS
+  get status() {
+    return this._status
+  }
 
   /**
    * A Stockfish wrapper
@@ -29,6 +34,7 @@ export class Engine {
     this.depth = depth
     this.numMoves = numMoves
     this._dead = []
+    this._status = ENGINE_STATUS.IDLE
   }
 
   protected _initialMessages = (uci: UCI) => {
@@ -43,14 +49,17 @@ export class Engine {
   protected async _loadEngine(): Promise<UCI> {
     let getSF: () => Promise<UCI>
     if (process.env.NODE_ENV === 'test') {
+      // testing
       // @ts-ignore
       const Stockfish = await import("../../public/stockfish.wasm")
       getSF = Stockfish.default
     } else if (typeof process.env.NODE_ENV === 'undefined') {
+      // gen-puzzles
       // @ts-ignore
       const Stockfish = await import("../../../public/stockfish.wasm/stockfish")
       getSF = Stockfish.default
     } else {
+      // browser
       // @ts-ignore
       getSF = window.Stockfish
     }
@@ -99,10 +108,10 @@ export class Engine {
    * @returns the `numMoves` best moves in the position
    */
   async getBestMoves(fen: string): Promise<MoveScore[]> {
+    this._status = ENGINE_STATUS.CALCULATING
     if (typeof this._uci === 'undefined') {
       this._uci = await this._loadEngine()
     }
-
     await this._waitForReady()
 
     const deadInd = this._dead.push(false)
@@ -116,6 +125,7 @@ export class Engine {
         this._uci?.removeMessageListener(listener)
         clearInterval(interval)
         this._dead[deadInd] = true
+        this._status = ENGINE_STATUS.IDLE
         resolve(messages)
       }
 
@@ -168,23 +178,26 @@ export class Engine {
    * Stops the engine's calculations as soon as possible
    */
   async stop() {
-    return new Promise<void>((resolve, reject) => {
-      const listener = (message: string) => {
-        if (message.includes('bestmove')) {
-          this._uci?.removeMessageListener(listener)
-          this.quit()
+    if (this._status === ENGINE_STATUS.CALCULATING) {
+      this._status = ENGINE_STATUS.STOPPING
+      return new Promise<void>((resolve, reject) => {
+        const listener = (message: string) => {
+          if (message.includes('bestmove')) {
+            this._uci?.removeMessageListener(listener)
+            this.quit()
 
-          this._loadEngine().then((engine) => {
-            this._uci = engine
-            resolve(undefined)
-          })
+            this._loadEngine().then((engine) => {
+              this._uci = engine
+              this._status = ENGINE_STATUS.IDLE
+              resolve(undefined)
+            })
+          }
         }
-      }
 
-      this._dead = full([this._dead.length], true) as boolean[]
-      this._uci?.addMessageListener(listener)
-      this._uci?.postMessage('stop')
-      
-    })
+        this._dead = full([this._dead.length], true) as boolean[]
+        this._uci?.addMessageListener(listener)
+        this._uci?.postMessage('stop')
+      })
+    }
   }
 }

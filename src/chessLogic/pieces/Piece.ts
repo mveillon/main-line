@@ -1,12 +1,12 @@
-import Color from "../Color"
+import COLOR from "../Color"
 import { Board } from "../Board"
 import { indicesToNotation, notationToIndices } from "../notationIndices";
 import { addArrays } from "../../utils/numJS";
 
-export type PieceT = new (_color: Color, _coords: string, board: Board) => Piece
+export type PieceT = new (_color: COLOR, _coords: string, board: Board) => Piece
 
 export abstract class Piece {
-  readonly color: Color
+  readonly color: COLOR
   coords: string
   abstract readonly whiteEmoji: string
   abstract readonly blackEmoji: string
@@ -20,7 +20,7 @@ export abstract class Piece {
    * @param _coords the algebraic coordinates of the piece
    * @param board a pointer to the board its on
    */
-  constructor(_color: Color, _coords: string, board: Board) {
+  constructor(_color: COLOR, _coords: string, board: Board) {
     this.color = _color
     this.coords = _coords
     this._board = board
@@ -104,7 +104,7 @@ export abstract class Piece {
   }
 
   toString() {
-    const cStr = this.color === Color.White ? 'White' : 'Black'
+    const cStr = this.color === COLOR.WHITE ? 'White' : 'Black'
     return `${cStr} ${this.whiteEmoji} at ${this.coords}`
   }
 }

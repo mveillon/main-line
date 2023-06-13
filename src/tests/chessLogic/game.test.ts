@@ -1,4 +1,4 @@
-import Color from "../../chessLogic/Color";
+import COLOR from "../../chessLogic/Color";
 import Game from "../../chessLogic/Game";
 
 test('game over', () => {
@@ -54,22 +54,22 @@ test('game over', () => {
 
 test('side effects', () => {
   const g = new Game()
-  expect(g.turn).toBe(Color.White)
+  expect(g.turn).toBe(COLOR.WHITE)
   expect(g.halfMoves).toBe(0)
   expect(g.moveNumber).toBe(1)
 
   g.playMove('e2', 'e4')
-  expect(g.turn).toBe(Color.Black)
+  expect(g.turn).toBe(COLOR.BLACK)
   expect(g.halfMoves).toBe(0)
   expect(g.moveNumber).toBe(1)
   
   g.playMove('g8', 'f6')
-  expect(g.turn).toBe(Color.White)
+  expect(g.turn).toBe(COLOR.WHITE)
   expect(g.halfMoves).toBe(1)
   expect(g.moveNumber).toBe(2)
 
   g.playMove('d2', 'd4')
-  expect(g.turn).toBe(Color.Black)
+  expect(g.turn).toBe(COLOR.BLACK)
   expect(g.halfMoves).toBe(0)
   expect(g.moveNumber).toBe(2)
 })

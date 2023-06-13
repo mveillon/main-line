@@ -1,5 +1,5 @@
 import { Piece, PieceT } from "./pieces/Piece"
-import Color from "./Color"
+import COLOR from "./Color"
 import startingPosition from "./startingPosition"
 import { notationToIndices } from "./notationIndices"
 import King from "./pieces/King"
@@ -51,7 +51,7 @@ export class Board {
         if (square === null) {
           current.push(' ')
         } else {
-          if (square.color === Color.White) {
+          if (square.color === COLOR.WHITE) {
             current.push(square.whiteEmoji)
           } else {
             current.push(square.blackEmoji)
@@ -90,7 +90,7 @@ export class Board {
    */
   findPieces(
     pieceType: typeof Piece, 
-    color: Color, 
+    color: COLOR, 
     file?: string, 
     rank?: string): Piece[] {
 
@@ -224,7 +224,7 @@ export class Board {
    * occupied by an opposing piece. `true` if the square is blocked,
    * `false` otherwise
    */
-  blockedOOB(coords: [number, number], color: Color): boolean {
+  blockedOOB(coords: [number, number], color: COLOR): boolean {
     if (
       coords[0] < 0 || coords[0] >= this.board.length ||
       coords[1] < 0 || coords[1] >= this.board[0].length
@@ -273,7 +273,7 @@ export class Board {
    * @param color which king to look at
    * @returns whether that king is in check
    */
-  isInCheck(color: Color): boolean {
+  isInCheck(color: COLOR): boolean {
     const kingPos = this.findPieces(King, color)[0].coords
     const otherPieces = this.findPieces(Piece, +!color)
     for (const p of otherPieces) {
@@ -289,7 +289,7 @@ export class Board {
    * @param player which player to check
    * @returns whether `player` can move
    */
-  canMove(player: Color): boolean {
+  canMove(player: COLOR): boolean {
     const allPieces = this.findPieces(Piece, player)
     for (const p of allPieces) {
       if (p.legalMoves().size > 0) {

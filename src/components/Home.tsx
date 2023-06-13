@@ -1,6 +1,8 @@
 import "./styling/global.css"
 import "./styling/Home.css"
 import OpeningSelector from "./OpeningSelector"
+import { Link } from "react-router-dom"
+import COLOR from "../chessLogic/Color"
 
 /**
  * The home page
@@ -11,6 +13,11 @@ function Home () {
       <h1>Main Line</h1>
       <OpeningSelector name='London' />
       <OpeningSelector name='Caro-Kann' />
+      <br></br>
+      <Link to="/analysis" state={{
+        fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
+        player: COLOR.WHITE
+      }}>Analysis Board</Link>
     </div>
   )
 }

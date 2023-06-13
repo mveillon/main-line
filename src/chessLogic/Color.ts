@@ -1,6 +1,6 @@
-enum Color {
-  White,
-  Black
+enum COLOR {
+  WHITE,
+  BLACK
 }
 
-export default Color;
+export default COLOR;

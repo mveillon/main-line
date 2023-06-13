@@ -1,4 +1,4 @@
-import Puzzles from "./GameComponent";
+import Puzzles from "./Puzzles";
 import PuzzleSet from "../puzzles/PuzzleSet";
 import { useNavigate } from "react-router-dom";
 
@@ -16,7 +16,7 @@ function Opening(props: {
 }) {
   const aPuzzle = Object.keys(props.puzzles)[0]
   let c: string
-  if (typeof aPuzzle === 'undefined' || fenToParts(aPuzzle)[1] === 'w') {
+  if (typeof aPuzzle === 'undefined' || fenToParts(aPuzzle).turn === 'w') {
     c = 'white'
   } else {
     c = 'black'

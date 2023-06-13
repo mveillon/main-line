@@ -1,0 +1,7 @@
+enum ENGINE_STATUS {
+  IDLE,
+  CALCULATING,
+  STOPPING
+}
+
+export default ENGINE_STATUS

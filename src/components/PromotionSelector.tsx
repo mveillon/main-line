@@ -9,7 +9,7 @@ import whiteBishop from "../assets/whiteBishop.png"
 import whiteKnight from "../assets/whiteKnight.png"
 import whiteQueen from "../assets/whiteQueen.png"
 import whiteRook from "../assets/whiteRook.png"
-import Color from "../chessLogic/Color"
+import COLOR from "../chessLogic/Color"
 import { PieceT } from "../chessLogic/pieces/Piece"
 import Bishop from "../chessLogic/pieces/Bishop"
 import Knight from "../chessLogic/pieces/Knight"
@@ -23,11 +23,11 @@ import Rook from "../chessLogic/pieces/Rook"
  * @param onSelected what to call when the promotion type is selected
  */
 const PromotionSelector = (props: { 
-  turn: Color, 
+  turn: COLOR, 
   onSelected: (promoType: PieceT) => void 
 }) => {
   let pieces: { img: string, onClick: () => void }[]
-  if (props.turn === Color.White) {
+  if (props.turn === COLOR.WHITE) {
     pieces = [
       {
         img: whiteQueen,

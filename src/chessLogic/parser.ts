@@ -1,5 +1,5 @@
 import { Board } from "./Board"
-import Color from "./Color"
+import COLOR from "./Color"
 import { Piece, PieceT } from "./pieces/Piece"
 import Bishop from "./pieces/Bishop"
 import King from "./pieces/King"
@@ -94,13 +94,13 @@ export const doubleMove = (moveNotation: string, board: Board) => {
 export const parseMove = (notation: string, board: Board) => {
   notation = trimMoveNumber(notation)
 
-  let turn: Color;
+  let turn: COLOR;
   const ellipseRegex = /^\.\.\./
   if (ellipseRegex.test(notation)) {
-    turn = Color.Black
+    turn = COLOR.BLACK
     notation = notation.replace(ellipseRegex, '')
   } else {
-    turn = Color.White
+    turn = COLOR.WHITE
   }
 
   const acs = acronyms()
@@ -292,7 +292,7 @@ export const uciLineToPGN = (line: string[], game: Game): string => {
   const lineParts: string[] = []
   let formattedMove: string[] = [`${moveNo}. `]
   let turn = game.turn
-  if (turn === Color.Black) {
+  if (turn === COLOR.BLACK) {
     formattedMove.push('...')
   }
 

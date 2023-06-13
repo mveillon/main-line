@@ -1,7 +1,7 @@
 import Game from "../../chessLogic/Game"
 import { toFEN, fromFEN } from "../../chessLogic/fenPGN"
 import { Board } from "../../chessLogic/Board"
-import Color from "../../chessLogic/Color"
+import COLOR from "../../chessLogic/Color"
 import King from "../../chessLogic/pieces/King"
 import Pawn from "../../chessLogic/pieces/Pawn"
 import { all } from "../../utils/numJS"
@@ -120,9 +120,9 @@ test('fen mid game', () => {
 test('fen details', () => {
   const fen = `rnbqkbnr/pp2pppp/8/2ppP3/8/8/PPPP1PPP/RNBQKBNR w KQkq d6 0 3`
   const g = new Game(undefined, fen)
-  expect(g.turn).toBe(Color.White)
+  expect(g.turn).toBe(COLOR.WHITE)
 
-  const canCastle = (board: Board, color: Color): boolean => {
+  const canCastle = (board: Board, color: COLOR): boolean => {
     return (
       !board.findPieces(King, color)[0].hasMoved &&
       (
@@ -130,8 +130,8 @@ test('fen details', () => {
       )
     )
   }
-  expect(canCastle(g.board, Color.White)).toBeTruthy()
-  expect(canCastle(g.board, Color.Black)).toBeTruthy()
+  expect(canCastle(g.board, COLOR.WHITE)).toBeTruthy()
+  expect(canCastle(g.board, COLOR.BLACK)).toBeTruthy()
 
   expect(g.board.pieceAt('e5')).toBeInstanceOf(Pawn)
   expect(g.board.pieceAt('d6')).toBeNull()
@@ -143,16 +143,16 @@ test('fen details', () => {
 
   const fen2 = 'rnbqkbnr/pp2pppp/8/2ppP3/8/5P2/PPPP2PP/RNBQKBNR b KQkq - 0 3'
   const g2 = new Game(undefined, fen2)
-  expect(g2.turn).toBe(Color.Black)
-  expect(canCastle(g2.board, Color.White)).toBeTruthy()
-  expect(canCastle(g2.board, Color.White)).toBeTruthy()
+  expect(g2.turn).toBe(COLOR.BLACK)
+  expect(canCastle(g2.board, COLOR.WHITE)).toBeTruthy()
+  expect(canCastle(g2.board, COLOR.WHITE)).toBeTruthy()
 
   expect(g2.board.backwardOneMove()).toBeFalsy()
 
   const noCastleFen = 'rnbq1bnr/pp1kpppp/8/2ppP3/8/5P2/PPPPK1PP/RNBQ1BNR b - - 2 4'
   const noCastle = new Game(undefined, noCastleFen)
 
-  const cantCastle = (board: Board, color: Color): boolean => {
+  const cantCastle = (board: Board, color: COLOR): boolean => {
     return (
       board.findPieces(King, color)[0].hasMoved ||
       (
@@ -161,14 +161,14 @@ test('fen details', () => {
     )
   }
 
-  expect(cantCastle(noCastle.board, Color.White)).toBeTruthy()
-  expect(cantCastle(noCastle.board, Color.Black)).toBeTruthy()
+  expect(cantCastle(noCastle.board, COLOR.WHITE)).toBeTruthy()
+  expect(cantCastle(noCastle.board, COLOR.BLACK)).toBeTruthy()
 
   const blackNoCastleFen = 'rnbq1bnr/pp1kpppp/8/2ppP3/8/5P2/PPPP2PP/RNBQKBNR w KQ - 1 4'
   const blackNoCastle = new Game(undefined, blackNoCastleFen)
 
-  expect(cantCastle(blackNoCastle.board, Color.Black))
-  expect(canCastle(blackNoCastle.board, Color.White))
+  expect(cantCastle(blackNoCastle.board, COLOR.BLACK))
+  expect(canCastle(blackNoCastle.board, COLOR.WHITE))
 })
 
 test('invalid fen', () => {

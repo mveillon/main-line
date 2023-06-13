@@ -1,14 +1,14 @@
 import Game from "../../chessLogic/Game";
 import { Engine } from "../../chessLogic/Engine";
 import { uciToMove } from "../../chessLogic/parser";
-import Color from "../../chessLogic/Color";
+import COLOR from "../../chessLogic/Color";
 import { Piece } from "../../chessLogic/pieces/Piece";
 import Queen from "../../chessLogic/pieces/Queen";
 import Rook from "../../chessLogic/pieces/Rook";
 import Knight from "../../chessLogic/pieces/Knight";
 import Bishop from "../../chessLogic/pieces/Bishop";
 import { toFEN } from "../../chessLogic/fenPGN";
-import { appendFile, writeFileSync } from "fs";
+import ENGINE_STATUS from "../../chessLogic/EngineStatus";
 
 jest.setTimeout(2_147_483_647)
 
@@ -21,7 +21,7 @@ beforeEach(() => {
   global.fetch = undefined
 })
 
-const checkMove = (move: string, mover: Color, game: Game) => {
+const checkMove = (move: string, mover: COLOR, game: Game) => {
   const [from, to, promoType] = uciToMove(move)
   const fromPiece = game.board.pieceAt(from)
   expect(fromPiece).toBeInstanceOf(Piece)
@@ -47,7 +47,7 @@ test('engine', async () => {
     expect(moves.length).toBe(5)
   
     for (const m of moves) {
-      checkMove(m.move, Color.Black, g)
+      checkMove(m.move, COLOR.BLACK, g)
     }
   
     g.playMove('d7', 'd5')
@@ -55,7 +55,7 @@ test('engine', async () => {
     expect(moves.length).toBe(5)
   
     for (const m of moves) {
-      checkMove(m.move, Color.White, g)
+      checkMove(m.move, COLOR.WHITE, g)
     }
   } finally {
     e.quit()
@@ -94,13 +94,42 @@ test('engine stopping', async () => {
   await e.stop()
 
   g.playMove('e2', 'e4')
-  expect(g.turn).toBe(Color.Black)
+  expect(g.turn).toBe(COLOR.BLACK)
   const newMoves = await e.getBestMoves(toFEN(g))
   expect(newMoves.length).toBe(numMoves)
 
   for (const move of newMoves) {
-    checkMove(move.move, Color.Black, g)
+    checkMove(move.move, COLOR.BLACK, g)
   }
 
+  await e.stop()
+  expect((await e.getBestMoves(toFEN(g))).length).toBe(numMoves)
   e.quit()
+})
+
+test('status', async () => {
+  const g = new Game()
+  const e = new Engine(15, 5)
+  expect(e.status).toBe(ENGINE_STATUS.IDLE)
+
+  await new Promise<void>((resolve, reject) => {
+    e.getBestMoves(toFEN(g)).then((moves) => {
+      expect(e.status).toBe(ENGINE_STATUS.IDLE)
+      expect(moves.length).toBe(5)
+      resolve(undefined)
+    })
+    expect(e.status).toBe(ENGINE_STATUS.CALCULATING)
+  })
+  
+  await new Promise<void>((resolve, reject) => {
+    e.getBestMoves(toFEN(g)).then((moves) => {
+      expect(e.status).toBe(ENGINE_STATUS.IDLE)
+      expect(moves.length).toBeLessThan(5)
+    })
+    e.stop().then(() => {
+      resolve(undefined)
+      e.quit()
+    })
+    expect(e.status).toBe(ENGINE_STATUS.STOPPING)
+  })
 })

@@ -1,15 +1,27 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState, useMemo } from "react"
 import BoardComponent from "./BoardComponent"
 import Game from "../chessLogic/Game"
 import "./styling/global.css"
 import "./styling/AnalysisBoard.css"
 import { PieceT } from "../chessLogic/pieces/Piece"
-import Color from "../chessLogic/Color"
 import { useLocation } from "react-router-dom"
-import { MoveScore } from "../chessLogic/Engine"
-import { toFEN } from "../chessLogic/fenPGN"
+import { Engine, MoveScore } from "../chessLogic/Engine"
 import { uciLineToPGN } from "../chessLogic/parser"
 import loadingGif from "../assets/loading.gif"
+import COLOR from "../chessLogic/Color"
+import { toFEN } from "../chessLogic/fenPGN"
+import { WORKER_STATUS, useWorker } from "@koale/useworker"
+
+const engine = new Engine(20, 3)
+
+/**
+ * Finds the best moves in the given position
+ * @param fen the current board position, as a FEN
+ * @returns the best moves
+ */
+const getMoves = async (fen: string): Promise<MoveScore[]> => {
+  return await engine.getBestMoves(fen)
+}
 
 /**
  * A Chess.com-like analysis board for seeing the engine evaluation of
@@ -17,49 +29,47 @@ import loadingGif from "../assets/loading.gif"
  */
 function AnalysisBoard() {
   const location = useLocation()
-  let {
+  const {
     fen,
     player
-  } = location.state as { fen?: string, player?: Color }
+  } = location.state as { fen: string, player: COLOR }
 
   const [game, setGame] = useState(new Game(undefined, fen))
   const [lines, setLines] = useState<MoveScore[]>()
   const [loading, setLoading] = useState(false)
-  const [engineWorker, setEngineWorker] = useState<Worker>()
+  const engine = useMemo(() => new Engine(20, 3), [])
+  const [
+    getMovesWorker, 
+    { status: workerStatus, kill: workerKill }
+  ] = useWorker(getMoves)
 
   useEffect(() => {
     findLines()
 
-    return destroyWorker
+    return () => {
+      engine.quit()
+      workerKill()
+    }
   }, [])
 
-  const destroyWorker = () => {
-    engineWorker?.postMessage('quit')
-    engineWorker?.terminate()
-  }
-
   const findLines = async () => {
-    setLoading(true)
-    return new Promise<void>((resolve, reject) => {
-      const newWorker = new Worker("../chessLogic/analysisWorker")
-
-      newWorker.onmessage = (e: MessageEvent<MoveScore[]>) => {
-        setLines(e.data)
-        setLoading(false)
-        resolve(undefined)
-      }
-
-      newWorker.postMessage(toFEN(game))
-      setEngineWorker(newWorker)
-    })
+    if (workerStatus !== WORKER_STATUS.RUNNING) {
+      setLoading(true)
+      // TODO : setState is always called twice in development, but we're 
+      // not allowed to have multiple parallel worker instances running at 
+      // the same time. This prevents us from using React.StrictMode in
+      // `index.tsx`
+      setLines(await getMovesWorker(toFEN(game)))
+      setLoading(false)
+    }
   }
-
-  player = typeof player === 'undefined' ? game.turn : player
 
   const playMove = (from: string, to: string, promoType?: PieceT) => {
-    game.playMove(from, to, promoType)
-    setGame(Object.assign(new Game(), game))
-    findLines()
+    engine.stop().then(() => {
+      game.playMove(from, to, promoType)
+      setGame(Object.assign(new Game(), game))
+      findLines()
+    })
   }
 
   return (

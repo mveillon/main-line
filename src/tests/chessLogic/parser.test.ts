@@ -1,5 +1,5 @@
 import { Board } from "../../chessLogic/Board";
-import Color from "../../chessLogic/Color";
+import COLOR from "../../chessLogic/Color";
 import { 
   doubleMove, 
   parseMove, 
@@ -35,26 +35,26 @@ test('scholars mate', () => {
   expect(b.pieceAt('e2')).toBeNull()
   expect(b.pieceAt('e4')).toBeInstanceOf(Pawn)
   expect(b.pieceAt('e4')?.hasMoved).toBeTruthy()
-  expect(b.pieceAt('e4')?.color).toBe(Color.White)
+  expect(b.pieceAt('e4')?.color).toBe(COLOR.WHITE)
   expect(b.pieceAt('e4')?.coords).toBe('e4')
   expect(b.pieceAt('e8')).toBeInstanceOf(King)
 
   parseMove('1. ...e5', b)
   expect(b.pieceAt('e7')).toBeNull()
   expect(b.pieceAt('e5')).toBeInstanceOf(Pawn)
-  expect(b.pieceAt('e5')?.color).toBe(Color.Black)
+  expect(b.pieceAt('e5')?.color).toBe(COLOR.BLACK)
   expect(b.pieceAt('e5')?.coords).toBe('e5')
   expect(b.pieceAt('e8')).toBeInstanceOf(King)
 
   parseMove('2. Qh5', b)
   expect(b.pieceAt('d1')).toBeNull()
   expect(b.pieceAt('h5')).toBeInstanceOf(Queen)
-  expect(b.pieceAt('h5')?.color).toBe(Color.White)
+  expect(b.pieceAt('h5')?.color).toBe(COLOR.WHITE)
 
   parseMove('2. ...Nc6', b)
   expect(b.pieceAt('b8')).toBeNull()
   expect(b.pieceAt('c6')).toBeInstanceOf(Knight)
-  expect(b.pieceAt('c6')?.color).toBe(Color.Black)
+  expect(b.pieceAt('c6')?.color).toBe(COLOR.BLACK)
 
   parseMove('3. Bc4', b)
   expect(b.pieceAt('f1')).toBeNull()
@@ -64,13 +64,13 @@ test('scholars mate', () => {
   expect(b.pieceAt('a8')).toBeNull()
   expect(b.pieceAt('b8')).toBeInstanceOf(Rook)
 
-  expect(b.isInCheck(Color.Black)).toBeFalsy()
+  expect(b.isInCheck(COLOR.BLACK)).toBeFalsy()
   parseMove('4. Qxf7#', b)
   expect(b.pieceAt('h5')).toBeNull()
   expect(b.pieceAt('f7')).toBeInstanceOf(Queen)
   expect(b.pieceAt('f7')?.coords).toBe('f7')
-  expect(b.pieceAt('f7')?.color).toBe(Color.White)
-  expect(b.isInCheck(Color.Black)).toBeTruthy()
+  expect(b.pieceAt('f7')?.color).toBe(COLOR.WHITE)
+  expect(b.isInCheck(COLOR.BLACK)).toBeTruthy()
 })
 
 test('double move', () => {
@@ -80,22 +80,22 @@ test('double move', () => {
   expect(b.pieceAt('e2')).toBeNull()
   expect(b.pieceAt('e4')).toBeInstanceOf(Pawn)
   expect(b.pieceAt('e4')?.hasMoved).toBeTruthy()
-  expect(b.pieceAt('e4')?.color).toBe(Color.White)
+  expect(b.pieceAt('e4')?.color).toBe(COLOR.WHITE)
   expect(b.pieceAt('e4')?.coords).toBe('e4')
 
   expect(b.pieceAt('e7')).toBeNull()
   expect(b.pieceAt('e5')).toBeInstanceOf(Pawn)
-  expect(b.pieceAt('e5')?.color).toBe(Color.Black)
+  expect(b.pieceAt('e5')?.color).toBe(COLOR.BLACK)
   expect(b.pieceAt('e5')?.coords).toBe('e5')
 
   doubleMove('2. Qh5 Nc6', b)
   expect(b.pieceAt('d1')).toBeNull()
   expect(b.pieceAt('h5')).toBeInstanceOf(Queen)
-  expect(b.pieceAt('h5')?.color).toBe(Color.White)
+  expect(b.pieceAt('h5')?.color).toBe(COLOR.WHITE)
 
   expect(b.pieceAt('b8')).toBeNull()
   expect(b.pieceAt('c6')).toBeInstanceOf(Knight)
-  expect(b.pieceAt('c6')?.color).toBe(Color.Black)
+  expect(b.pieceAt('c6')?.color).toBe(COLOR.BLACK)
 
   doubleMove('3. Bc4 Rb8??', b)
   expect(b.pieceAt('f1')).toBeNull()
@@ -108,7 +108,7 @@ test('double move', () => {
   expect(b.pieceAt('h5')).toBeNull()
   expect(b.pieceAt('f7')).toBeInstanceOf(Queen)
   expect(b.pieceAt('f7')?.coords).toBe('f7')
-  expect(b.pieceAt('f7')?.color).toBe(Color.White)
+  expect(b.pieceAt('f7')?.color).toBe(COLOR.WHITE)
 })
 
 test('captures', () => {
@@ -119,7 +119,7 @@ test('captures', () => {
 
   expect(b.pieceAt('e4')).toBeNull()
   expect(b.pieceAt('d5')).toBeInstanceOf(Pawn)
-  expect(b.pieceAt('d5')?.color).toBe(Color.White)
+  expect(b.pieceAt('d5')?.color).toBe(COLOR.WHITE)
 
   parseMove('2. ...Qxd5', b)
   expect(b.pieceAt('d8')).toBeNull()
@@ -203,14 +203,14 @@ test('en passant', () => {
   expect(b.pieceAt('e5')).toBeNull()
   expect(b.pieceAt('d5')).toBeNull()
   expect(b.pieceAt('d6')).toBeInstanceOf(Pawn)
-  expect(b.pieceAt('d6')?.color).toBe(Color.White)
+  expect(b.pieceAt('d6')?.color).toBe(COLOR.WHITE)
 
   parseMove('3. ...c4', b)
   doubleMove('4. d4 cxd3', b)
   expect(b.pieceAt('c4')).toBeNull()
   expect(b.pieceAt('d4')).toBeNull()
   expect(b.pieceAt('d3')).toBeInstanceOf(Pawn)
-  expect(b.pieceAt('d3')?.color).toBe(Color.Black)
+  expect(b.pieceAt('d3')?.color).toBe(COLOR.BLACK)
 })
 
 test('promotion', () => {
@@ -224,7 +224,7 @@ test('promotion', () => {
 
   const q = b.pieceAt('h8')
   expect(q).toBeInstanceOf(Queen)
-  expect(q?.color).toBe(Color.White)
+  expect(q?.color).toBe(COLOR.WHITE)
   expect(q?.coords).toBe('h8')
 
   const b2 = setUpBoard([
@@ -237,7 +237,7 @@ test('promotion', () => {
 
   const q2 = b2.pieceAt('d1')
   expect(q2).toBeInstanceOf(Queen)
-  expect(q2?.color).toBe(Color.Black)
+  expect(q2?.color).toBe(COLOR.BLACK)
   expect(q2?.coords).toBe('d1')
 })
 

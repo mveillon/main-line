@@ -1,5 +1,5 @@
 import { addArrays } from "../../utils/numJS";
-import Color from "../Color";
+import COLOR from "../Color";
 import { indicesToNotation, notationToIndices } from "../notationIndices";
 import { Piece, PieceT } from "./Piece";
 
@@ -12,7 +12,7 @@ class Pawn extends Piece {
   // it already has
   legalMovesNoChecks(): Set<string> {
     const res = new Set<string>()
-    const movesTowards = this.color === Color.White ? 1 : -1
+    const movesTowards = this.color === COLOR.WHITE ? 1 : -1
     const current = notationToIndices(this.coords)
 
     const oneUp = (addArrays(current, [movesTowards, 0]) as [number, number])
@@ -53,10 +53,10 @@ class Pawn extends Piece {
           res.add(notation)
         }
 
-        const epRank = this.color === Color.White ? '5' : '4'
+        const epRank = this.color === COLOR.WHITE ? '5' : '4'
         if (this.coords[1] === epRank) {
           const opStartRank = (
-            this.color === Color.White ? '7' : '2'
+            this.color === COLOR.WHITE ? '7' : '2'
           )
           const lastMove = this._board.lastMove
 

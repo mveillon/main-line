@@ -1,19 +1,19 @@
 import { Board } from "./Board";
-import Color from "./Color";
+import COLOR from "./Color";
 import Pawn from "./pieces/Pawn";
 import { PieceT } from "./pieces/Piece";
 import { fromFEN } from "./fenPGN";
 
 class Game {
   board: Board
-  turn: Color = Color.White
+  turn: COLOR = COLOR.WHITE
   halfMoves: number = 0
   moveNumber: number = 1
 
   get result(): string {
     if (!this.board.canMove(this.turn)) {
       if (this.board.isInCheck(this.turn)) {
-        return this.turn === Color.White ? '0-1' : '1-0'
+        return this.turn === COLOR.WHITE ? '0-1' : '1-0'
       }
       return '1/2-1/2'
     }
@@ -86,7 +86,7 @@ class Game {
         this.halfMoves++
       }
 
-      if (this.turn === Color.Black) {
+      if (this.turn === COLOR.BLACK) {
         this.moveNumber++
       }
 

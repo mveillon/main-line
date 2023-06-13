@@ -1,4 +1,4 @@
-import Color from "../Color";
+import COLOR from "../Color";
 import { Piece, PieceT } from "./Piece";
 import Rook from "./Rook";
 
@@ -24,7 +24,7 @@ class King extends Piece {
 
   legalMoves(): Set<string> {
     const res = super.legalMoves()
-    const rank = this.color === Color.White ? '1' : '8'
+    const rank = this.color === COLOR.WHITE ? '1' : '8'
 
     if (!this.hasMoved) {
       const shortRook = this._board.pieceAt('h' + rank)
