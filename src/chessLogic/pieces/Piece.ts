@@ -3,7 +3,7 @@ import { Board } from "../Board"
 import { indicesToNotation, notationToIndices } from "../notationIndices";
 import { addArrays } from "../../utils/numJS";
 
-export type PieceT = new (_color: COLOR, _coords: string, board: Board) => Piece
+export type PieceT = new (color: COLOR, coords: string, board: Board) => Piece
 
 export abstract class Piece {
   readonly color: COLOR
@@ -11,7 +11,7 @@ export abstract class Piece {
   abstract readonly whiteEmoji: string
   abstract readonly blackEmoji: string
   protected _board: Board
-  hasMoved: boolean = false
+  hasMoved = false
   abstract readonly type: PieceT
 
   /**
@@ -20,9 +20,9 @@ export abstract class Piece {
    * @param _coords the algebraic coordinates of the piece
    * @param board a pointer to the board its on
    */
-  constructor(_color: COLOR, _coords: string, board: Board) {
-    this.color = _color
-    this.coords = _coords
+  constructor(color: COLOR, coords: string, board: Board) {
+    this.color = color
+    this.coords = coords
     this._board = board
   }
 
@@ -43,7 +43,7 @@ export abstract class Piece {
   legalMoves(): Set<string> {
     const res = this.legalMovesNoChecks()
 
-    for (let move of res) {
+    for (const move of res) {
       if (this._board.putsKingInCheck(this.coords, move)) {
         res.delete(move)
       }

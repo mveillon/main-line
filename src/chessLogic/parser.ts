@@ -46,7 +46,7 @@ const trimMoveNumber = (notation: string): string => {
 export const acronymToPiece = (acronym: string): PieceT => {
   const acs = acronyms()
 
-  if (typeof acs[acronym] === 'undefined') {
+  if (!(acronym in acs)) {
     return Pawn
   }
   return acs[acronym]
@@ -222,7 +222,7 @@ export const uciToAlgebraic = (uci: string, board: Board): string => {
     throw new Error(`${from} is an empty square`)
   }
 
-  let parts: string[] = []
+  const parts: string[] = []
 
   const castling = (
     piece instanceof King &&
@@ -291,7 +291,7 @@ export const uciLineToPGN = (line: string[], game: Game): string => {
   let moveNo = game.moveNumber
   const lineParts: string[] = []
   let formattedMove: string[] = [`${moveNo}. `]
-  let turn = game.turn
+  const turn = game.turn
   if (turn === COLOR.BLACK) {
     formattedMove.push('...')
   }

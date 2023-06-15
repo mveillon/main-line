@@ -16,7 +16,7 @@ import { mean } from "./measuresOfCenter";
  * @param y the second array of numbers
  * @returns the mean squared error between x and y
  */
- export const mse = (x: numArray, y: numArray): number => {
+export const mse = (x: numArray, y: numArray): number => {
   const l = Math.max(getSize(x), getSize(y))
   return l === 0 ? 0 : squareDistance(x, y) / l;
 }

@@ -9,11 +9,11 @@ import { boolArray } from "./types";
  * @param ifTrue what to return when criterion returns tre
  * @returns ifTrue if at least one subarray satisfies criterion, else !ifTrue
  */
- const nestedSatisfies = (
+const nestedSatisfies = (
   bools: boolArray, 
   criterion: (b: boolArray) => boolean, 
   ifTrue: boolean
-  ): boolean => {
+): boolean => {
 
   if (Array.isArray(bools)) {
     if (bools.length === 0) return false;
@@ -57,6 +57,6 @@ export const all = (bools: boolArray): boolean => {
  * @param bools an n-dimensional array of booleans
  * @returns whether any elements of bools are true
  */
- export const any = (bools: boolArray): boolean => {
+export const any = (bools: boolArray): boolean => {
   return nestedSatisfies(bools, b => any(b), true);
 }

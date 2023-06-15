@@ -4,8 +4,8 @@ import { indicesToNotation, notationToIndices } from "../notationIndices";
 import { Piece, PieceT } from "./Piece";
 
 class Pawn extends Piece {
-  readonly blackEmoji: string = '♙'
-  readonly whiteEmoji: string = '♟'
+  readonly blackEmoji = '♙'
+  readonly whiteEmoji = '♟'
   readonly type: PieceT = Pawn
 
   // assumes the pawn is not on the opposite rank i.e. if it can promote, 

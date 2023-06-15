@@ -9,7 +9,7 @@
  * than the second
  * @returns the index of the best element in x
  */
- export const argBest = <T>(x: T[], comp: (a: T, b: T) => boolean): number => {
+export const argBest = <T>(x: T[], comp: (a: T, b: T) => boolean): number => {
   if (x.length === 0) {
     throw new Error('Empty array');
   }
@@ -30,7 +30,7 @@
  * @param x the array to look at
  * @returns where the smallest element is
  */
- export const argMin = <T>(x: T[]): number => {
+export const argMin = <T>(x: T[]): number => {
   return argBest(x, (a, b) => a < b);
 }
 

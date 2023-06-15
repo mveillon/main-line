@@ -1,3 +1,4 @@
+import React from "react";
 import "./styling/BoardComponent.css"
 import "./styling/global.css"
 import { useState } from "react";
@@ -140,15 +141,19 @@ const BoardComponent = (
                       <td
                         key={j} 
                         className={className}
-                        onClick={getOnClick(i, j)}
                       >
-                        {
-                          square !== null &&
-                          <PieceComponent 
-                            piece={square} 
-                            selected={selected}
-                          />
-                        }
+                        <button 
+                          onClick={getOnClick(i, j)}
+                          className="button-square"
+                        >
+                          {
+                            square !== null &&
+                            <PieceComponent 
+                              piece={square} 
+                              selected={selected}
+                            />
+                          }
+                        </button>
                       </td>
                     )
                   })}

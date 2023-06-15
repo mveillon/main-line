@@ -1,8 +1,8 @@
 import { Piece, PieceT } from "./Piece";
 
 class Bishop extends Piece {
-  readonly blackEmoji: string = '♗' 
-  readonly whiteEmoji: string = '♝'
+  readonly blackEmoji = '♗' 
+  readonly whiteEmoji = '♝'
   readonly type: PieceT = Bishop
 
   legalMovesNoChecks(): Set<string> {

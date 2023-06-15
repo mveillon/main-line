@@ -21,7 +21,7 @@ import {
 const randIters = 5_000
 
 test('randInt', () => {
-  let dists: number[] = zeros([10]) as number[];
+  const dists: number[] = zeros([10]) as number[];
   for (let i = 0; i < randIters; i++) {
     const rand = randInt(dists.length);
     expect(Number.isInteger(rand)).toBe(true);
@@ -33,7 +33,7 @@ test('randInt', () => {
     dists, 
     full([dists.length], randIters / dists.length), 
     0.3
-  ));
+  )).toBeTruthy();
 });
 
 test('choice', () => {
@@ -42,9 +42,9 @@ test('choice', () => {
   expect(() => choice([1, 2, 3], [-1, 2, 3])).toThrow(Error);
   expect(() => choice([1, 2, 3], [1, 0, 2])).toThrow(Error);
   
-  let dists: number[] = zeros([10]) as number[];
-  let wDists: number[] = zeros([dists.length]) as number[];
-  let fwDists: number[] = zeros([dists.length]) as number[];
+  const dists: number[] = zeros([10]) as number[];
+  const wDists: number[] = zeros([dists.length]) as number[];
+  const fwDists: number[] = zeros([dists.length]) as number[];
   const vals = arange(dists.length);
   const ws = vals.map(n => Math.pow(n, 2));
   const floatWs = scalarMul(ws, 1 / sumList(ws)) as number[];
@@ -87,12 +87,12 @@ test('choice', () => {
     floatWs,
     undefined,
     randIters / 100
-  ));
+  )).toBeTruthy();
 });
 
 test('shuffle', () => {
-  let inds = zeros([10]) as number[];
-  let vals = arange(inds.length);
+  const inds = zeros([10]) as number[];
+  const vals = arange(inds.length);
 
   for (let i = 0; i < randIters; i++) {
     shuffle(vals);
@@ -132,7 +132,7 @@ test('rand array', () => {
 
 test('choices', () => {
   const a: number[] = arange(12);
-  let counts: number[] = zeros([a.length]) as number[];
+  const counts: number[] = zeros([a.length]) as number[];
 
   for (let i = 0; i < randIters; i++) {
     const c = choices(a, 3);

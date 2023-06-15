@@ -1,3 +1,4 @@
+import React from "react";
 import Opening from "../components/Opening";
 import black from "../puzzles/London/black.json"
 import white from "../puzzles/London/white.json"
@@ -8,9 +9,9 @@ import white from "../puzzles/London/white.json"
 export const LondonWhite = () => {
   return (
     <Opening 
-        name="London System" 
-        puzzles={white}
-      />
+      name="London System" 
+      puzzles={white}
+    />
   )
 }
 

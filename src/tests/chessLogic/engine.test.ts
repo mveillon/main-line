@@ -12,15 +12,6 @@ import ENGINE_STATUS from "../../chessLogic/EngineStatus";
 
 jest.setTimeout(2_147_483_647)
 
-beforeEach(() => {
-  // we do this because Stockfish makes some `fetch` calls, but only if `fetch`
-  // is a function. Should NOT be done anywhere else. You should use a mock function
-  // instead. 
-  
-  // @ts-ignore
-  global.fetch = undefined
-})
-
 const checkMove = (move: string, mover: COLOR, game: Game) => {
   const [from, to, promoType] = uciToMove(move)
   const fromPiece = game.board.pieceAt(from)
@@ -68,13 +59,13 @@ test('sorted by score', async () => {
 
   let moves = await e.getBestMoves(toFEN(g))
   for (let i = 1; i < moves.length; i++) {
-    expect(moves[i - 1].score <= moves[i].score)
+    expect(moves[i - 1].score).toBeGreaterThanOrEqual(moves[i].score)
   }
 
   g.playMove('e2', 'e4')
   moves = await e.getBestMoves(toFEN(g))
   for (let i = 1; i < moves.length; i++) {
-    expect(moves[i - 1].score >= moves[i].score)
+    expect(moves[i - 1].score).toBeGreaterThanOrEqual(moves[i].score)
   }
 
   e.quit()
@@ -88,6 +79,7 @@ test('engine stopping', async () => {
 
   expect(moves.length).toBe(numMoves)
 
+  // eslint-disable-next-line jest/valid-expect-in-promise
   e.getBestMoves(toFEN(g)).then((moves) => {
     expect(moves.length).toBeLessThan(numMoves)
   })
@@ -112,7 +104,7 @@ test('status', async () => {
   const e = new Engine(15, 5)
   expect(e.status).toBe(ENGINE_STATUS.IDLE)
 
-  await new Promise<void>((resolve, reject) => {
+  await new Promise<void>((resolve, _reject) => {
     e.getBestMoves(toFEN(g)).then((moves) => {
       expect(e.status).toBe(ENGINE_STATUS.IDLE)
       expect(moves.length).toBe(5)
@@ -121,7 +113,7 @@ test('status', async () => {
     expect(e.status).toBe(ENGINE_STATUS.CALCULATING)
   })
   
-  await new Promise<void>((resolve, reject) => {
+  await new Promise<void>((resolve, _reject) => {
     e.getBestMoves(toFEN(g)).then((moves) => {
       expect(e.status).toBe(ENGINE_STATUS.IDLE)
       expect(moves.length).toBeLessThan(5)

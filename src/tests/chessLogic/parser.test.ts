@@ -16,14 +16,7 @@ import Pawn from "../../chessLogic/pieces/Pawn";
 import Queen from "../../chessLogic/pieces/Queen";
 import Rook from "../../chessLogic/pieces/Rook";
 import Game from "../../chessLogic/Game";
-
-export const setUpBoard = (startingMoves: string[]): Board => {
-  const res = new Board()
-  for (const move of startingMoves) {
-    doubleMove(move, res)
-  }
-  return res
-}
+import { setUpBoard } from "./testUtilts";
 
 test('scholars mate', () => {
   const b = new Board()

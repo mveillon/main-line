@@ -45,7 +45,7 @@ test('legalMovesIncludeNoCheck', () => {
   let pawnMoves = (b.pieceAt('e4') as Piece).legalMoves()
   compareSetToArray(pawnMoves, ['e5'])
 
-  let bishopMoves = (b.pieceAt('f1') as Piece).legalMoves()
+  const bishopMoves = (b.pieceAt('f1') as Piece).legalMoves()
   compareSetToArray(bishopMoves, ['e2', 'd3', 'c4', 'b5', 'a6'])
 
   b.movePiece('e4', 'e2')
@@ -59,10 +59,10 @@ test('legalMovesIncludeNoCheck', () => {
   queenMoves = (b.pieceAt('d1') as Piece).legalMoves()
   compareSetToArray(queenMoves, ['d2', 'd3', 'e2', 'f3', 'g4', 'h5'])
 
-  let rookMoves = (b.pieceAt('a8') as Piece).legalMoves()
+  const rookMoves = (b.pieceAt('a8') as Piece).legalMoves()
   compareSetToArray(rookMoves, ['a7', 'a6'])
 
-  let kingMoves = (b.pieceAt('e1') as Piece).legalMoves()
+  const kingMoves = (b.pieceAt('e1') as Piece).legalMoves()
   compareSetToArray(kingMoves, ['d2', 'e2'])
 
   const b2 = new Board()
@@ -96,7 +96,7 @@ test('legalMoves', () => {
 
   expect(b.pieceAt('h5')).toBeInstanceOf(Queen)
   b.movePiece('f7', 'f6')
-  let queenMoves = (b.pieceAt('h5') as Piece).legalMovesNoChecks()
+  const queenMoves = (b.pieceAt('h5') as Piece).legalMovesNoChecks()
   expect(queenMoves.has('e8')).toBeTruthy()
   expect((b.pieceAt('h5') as Piece).color).toBe(COLOR.WHITE)
   const kingPos = b.findPieces(King, COLOR.BLACK)[0].coords

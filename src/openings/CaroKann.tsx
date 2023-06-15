@@ -1,3 +1,4 @@
+import React from "react";
 import Opening from "../components/Opening";
 import black from "../puzzles/Caro-Kann/black.json"
 import white from "../puzzles/Caro-Kann/white.json"
@@ -8,9 +9,9 @@ import white from "../puzzles/Caro-Kann/white.json"
 export const CaroKannBlack = () => {
   return (
     <Opening 
-        name="Caro-Kann" 
-        puzzles={black}
-      />
+      name="Caro-Kann" 
+      puzzles={black}
+    />
   )
 }
 

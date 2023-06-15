@@ -79,7 +79,7 @@ export const broadcast = <T, U>(
  * @param A the array to flatten
  * @returns the flattened array
  */
- export const flatten = <T>(A: ndArray<T>): T | T[] => {
+export const flatten = <T>(A: ndArray<T>): T | T[] => {
   if (Array.isArray(A)) {
     return ([] as T[]).concat(...A.map(flatten));
   } else {
@@ -112,7 +112,7 @@ export const full = <T>(shape: number[], value?: T, valueGen?: () => T): ndArray
     }
     return value;
   }
-  let res: ndArray<T> = [];
+  const res: ndArray<T> = [];
   const rest = shape.slice(1, shape.length);
   for (let i = 0; i < shape[0]; i++) {
     res.push(full(rest, value, valueGen));
@@ -133,7 +133,7 @@ export const full = <T>(shape: number[], value?: T, valueGen?: () => T): ndArray
  * @returns the shape of the array as an array
  */
 export const getShape = <T>(arr: ndArray<T>): number[] => {
-  let res: number[] = [];
+  const res: number[] = [];
   let current = arr;
   while (Array.isArray(current)) {
     res.push(current.length);
@@ -152,7 +152,7 @@ export const getShape = <T>(arr: ndArray<T>): number[] => {
  * @param shape the shape of the array to create
  * @returns an array of all zeros
  */
- export const zeros = (shape: number[]): numArray => {
+export const zeros = (shape: number[]): numArray => {
   return full(shape, 0);
 }
 
@@ -179,7 +179,7 @@ export const ones = (shape: number[]): numArray => {
  * @param shape the shape of the output array
  * @returns an array of the given shape with all the elements as arr in order
  */
- export const reshape = <T>(arr: ndArray<T>, shape: number[]): ndArray<T> => {
+export const reshape = <T>(arr: ndArray<T>, shape: number[]): ndArray<T> => {
   const errStr = `Cannot broadcast array with shape ${getShape(arr)} to ${shape}`;
   if (!Array.isArray(arr)) {
     throw new Error(`Scalars not allowed in reshape function: ${arr}`);
@@ -200,7 +200,7 @@ export const ones = (shape: number[]): numArray => {
 
   const perBlock = Math.round(flat.length / shape[0]);
   const restShape = shape.slice(1, shape.length);
-  let res: ndArray<T> = [];
+  const res: ndArray<T> = [];
   for (let i = 0; i < flat.length; i += perBlock) {
     const end = i + perBlock;
     res.push(reshape(flat.slice(i, end), restShape));

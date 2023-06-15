@@ -12,7 +12,7 @@ import { numArray } from "./types";
  * @param x the array to measure
  * @returns the mean of x
  */
- export const mean = (x: numArray): number => {
+export const mean = (x: numArray): number => {
   const size = getSize(x);
   if (size === 0) {
     throw new Error('Trying to find the mean of empty array');
@@ -31,15 +31,15 @@ import { numArray } from "./types";
  * @param arr the array to search through
  * @returns the most common element in arr
  */
- export const mode = (arr: numArray): number => {
+export const mode = (arr: numArray): number => {
   arr = flatten(arr);
   if (Array.isArray(arr)) {
     const flat: number[] = arr as number[];
     if (arr.length === 0) {
       throw new Error('Trying to find mode of empty array');
-    };
+    }
 
-    let counts: { [key: number]: number } = {};
+    const counts: { [key: number]: number } = {};
     for (const n of flat) {
       counts[n] = n in counts ? counts[n] + 1 : 1;
     }

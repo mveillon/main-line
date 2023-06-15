@@ -7,10 +7,11 @@ import Pawn from "../../chessLogic/pieces/Pawn"
 import { all } from "../../utils/numJS"
 import Rook from "../../chessLogic/pieces/Rook"
 
-const compareFENtoPGN = (fen: string, pgn: string) => {
+const compareFENtoPGN = (fen: string, pgn: string): boolean => {
   expect(toFEN(new Game(pgn))).toBe(fen)
   expect((new Game(pgn).board).sameBoard(new Game(undefined, fen).board)).toBeTruthy()
   expect(toFEN(new Game(undefined, fen))).toBe(fen)
+  return true
 }
 
 
@@ -100,7 +101,7 @@ test('more fen', () => {
   ]
 
   for (const { fen, pgn } of fens) {
-    compareFENtoPGN(fen, pgn)
+    expect(compareFENtoPGN(fen, pgn)).toBeTruthy()
   }
 })
 
@@ -167,8 +168,8 @@ test('fen details', () => {
   const blackNoCastleFen = 'rnbq1bnr/pp1kpppp/8/2ppP3/8/5P2/PPPP2PP/RNBQKBNR w KQ - 1 4'
   const blackNoCastle = new Game(undefined, blackNoCastleFen)
 
-  expect(cantCastle(blackNoCastle.board, COLOR.BLACK))
-  expect(canCastle(blackNoCastle.board, COLOR.WHITE))
+  expect(cantCastle(blackNoCastle.board, COLOR.BLACK)).toBeTruthy()
+  expect(canCastle(blackNoCastle.board, COLOR.WHITE)).toBeTruthy()
 })
 
 test('invalid fen', () => {

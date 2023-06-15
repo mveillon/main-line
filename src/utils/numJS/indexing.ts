@@ -12,7 +12,7 @@ const boolIndex = <T>(arr: ndArray<T>, inds: boolArray): ndArray<T> => {
   [arr, inds] = broadcast(arr, inds);
 
   if (Array.isArray(arr)) {
-    let res: ndArray<T> = [];
+    const res: ndArray<T> = [];
     for (let i = 0; i < arr.length; i++) {
       const sub = boolIndex(arr[i], (inds as boolean[])[i]);
       if (!Array.isArray(sub) || sub.length > 0) {

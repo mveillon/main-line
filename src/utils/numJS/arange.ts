@@ -13,7 +13,7 @@
  * @param step the difference between the `i`th element and the `i + 1` of the return array
  * @returns an array from start (inclusive) to stop (exclusive)
  */
- export const arange = (start: number, stop?: number, step?: number): number[] => {
+export const arange = (start: number, stop?: number, step?: number): number[] => {
   step = step || 1;
   if (typeof stop === 'undefined') {
     stop = start;
@@ -28,7 +28,7 @@
     comp = (a, b) => a > b;
   }
 
-  let res: number[] = [];
+  const res: number[] = [];
   for (let n = start; comp(n, stop); n += step) {
     res.push(n);
   }

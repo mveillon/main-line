@@ -6,9 +6,9 @@ import { fromFEN } from "./fenPGN";
 
 class Game {
   board: Board
-  turn: COLOR = COLOR.WHITE
-  halfMoves: number = 0
-  moveNumber: number = 1
+  turn = COLOR.WHITE
+  halfMoves = 0
+  moveNumber = 1
 
   get result(): string {
     if (!this.board.canMove(this.turn)) {

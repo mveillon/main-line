@@ -1,3 +1,4 @@
+import React from "react"
 import "./styling/global.css"
 import "./styling/PromotionSelector.css"
 
@@ -71,13 +72,16 @@ const PromotionSelector = (props: {
     <div className='flex-row selector'>
       {
         pieces.map(p => (
-          <img 
+          <button
+            onClick={p.onClick}
             key={p.img}
-            className="piece-img"
-            src={p.img} 
-            onClick={p.onClick} 
-            alt={p.img}
-          />
+          >
+            <img 
+              className="piece-img"
+              src={p.img} 
+              alt={p.img}
+            />
+          </button>
         ))
       }
     </div>

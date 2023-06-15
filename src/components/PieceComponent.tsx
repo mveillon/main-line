@@ -1,3 +1,4 @@
+import React from "react";
 import { Piece } from "../chessLogic/pieces/Piece";
 import COLOR from "../chessLogic/Color";
 import "./styling/PieceComponent.css"

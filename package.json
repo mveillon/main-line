@@ -26,16 +26,11 @@
   "scripts": {
     "start": "craco start",
     "build": "craco build",
-    "test": "craco test",
+    "test": "npx eslint; craco test",
     "eject": "craco eject",
+    "compile": "rm -rf ./tsOut && tsc && cp -r ./src/stockfish.wasm ./tsOut",
     "test-coverage": "npm test -- --coverage --watchAll=false --no-cache",
-    "gen-puzzles": "tsc && node tsOut/src/puzzles/generatePuzzles.js"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
+    "gen-puzzles": "npm run compile && node tsOut/puzzles/generatePuzzles.js"
   },
   "browserslist": {
     "production": [

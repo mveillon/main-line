@@ -1,3 +1,4 @@
+import React from "react";
 import Puzzles from "./Puzzles";
 import PuzzleSet from "../puzzles/PuzzleSet";
 import { useNavigate } from "react-router-dom";

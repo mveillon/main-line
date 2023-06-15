@@ -1,3 +1,4 @@
+import React from "react"
 import "./styling/global.css"
 import "./styling/Home.css"
 import OpeningSelector from "./OpeningSelector"

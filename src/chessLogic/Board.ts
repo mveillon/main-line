@@ -20,7 +20,7 @@ export type BoardT = (Piece | null)[][]
 export class Board {
   board: BoardT
   movesMade: MoveInfo[]
-  movePointer: number = -1
+  movePointer = -1
 
   get lastMove(): MoveInfo {
     return this.movesMade[this.movePointer]
@@ -41,10 +41,10 @@ export class Board {
   }
 
   toString(): string {
-    const line: string = '   --- --- --- --- --- --- --- --- '
-    let rows: string[] = [line]
+    const line = '   --- --- --- --- --- --- --- --- '
+    const rows: string[] = [line]
     for (let i = this.board.length - 1; i >= 0; i--) {
-      let current: string[] = [`${i + 1} |`]
+      const current: string[] = [`${i + 1} |`]
       for (let j = this.board[i].length - 1; j >= 0; j--) {
         const square = this.board[i][j]
         current.push(' ')
@@ -94,7 +94,7 @@ export class Board {
     file?: string, 
     rank?: string): Piece[] {
 
-    let res: Piece[] = []
+    const res: Piece[] = []
     for (const row of this.board) {
       for (const square of row) {
         if (

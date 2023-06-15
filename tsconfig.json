@@ -22,7 +22,6 @@
     "outDir": "tsOut/"
   },
   "include": [
-    "src", 
-    "src/tests"
-  ]
+    "src"
+, "src/stockfish.wasm"  ]
 }

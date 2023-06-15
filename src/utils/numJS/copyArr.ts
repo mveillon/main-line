@@ -22,7 +22,7 @@ import { ndArray } from "./types";
  * @param arr the array to copy
  * @returns a shallow copy of arr with the same elements
  */
- export const copyArr = <T>(arr: ndArray<T>): ndArray<T> => {
+export const copyArr = <T>(arr: ndArray<T>): ndArray<T> => {
   if (Array.isArray(arr)) {
     return arr.map(copyArr)
   }

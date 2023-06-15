@@ -1,0 +1,4 @@
+src/stockfish.wasm
+public
+node_modules
+tsOut

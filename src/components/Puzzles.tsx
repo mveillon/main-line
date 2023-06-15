@@ -1,3 +1,4 @@
+import React from "react";
 import { useEffect, useState } from "react";
 import BoardComponent from "./BoardComponent";
 import Game from "../chessLogic/Game";
@@ -177,8 +178,8 @@ function Puzzles(props: {
         <p>{result}</p>
         {
           available.size > 0 ?
-          <button onClick={pickNextPuzzle}>Next Puzzle</button> :
-          <p>No puzzles remaining!</p>
+            <button onClick={pickNextPuzzle}>Next Puzzle</button> :
+            <p>No puzzles remaining!</p>
         }
         <button onClick={toAnalysis}>Analysis Board</button>
       </div>

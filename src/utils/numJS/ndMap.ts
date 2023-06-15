@@ -12,7 +12,7 @@ import { boolArray, ndArray, numArray } from "./types";
  * @param func a function that takes an element of x and returns something else
  * @returns func mapped onto x
  */
- export const ndMap = <T, U>(x: ndArray<T>, func: (val: T) => U): ndArray<U> => {
+export const ndMap = <T, U>(x: ndArray<T>, func: (val: T) => U): ndArray<U> => {
   if (Array.isArray(x)) {
     return x.map(nested => ndMap(nested, func))
   }

@@ -47,7 +47,7 @@ export const matMul = (m1: numArray, m2: numArray): numArray => {
     );
   }
   
-  let res: number[][] = zeros([shape1[0], shape2[1]]) as number[][];
+  const res: number[][] = zeros([shape1[0], shape2[1]]) as number[][];
   // iteration order from https://cs61.seas.harvard.edu/wiki/images/0/0f/Lec14-Cache_measurement.pdf
   for (let k = 0; k < shape1[1]; k++) {
     for (let i = 0; i < shape1[0]; i++) {
@@ -78,9 +78,9 @@ export const matMul = (m1: numArray, m2: numArray): numArray => {
  * @returns the transposed matrix
  */
 export const transpose = (m: number[][]): number[][] => {
-  let res: number[][] = [];
+  const res: number[][] = [];
   for (let j = 0; j < m[0].length; j++) {
-    let row: number[] = [];
+    const row: number[] = [];
     for (let i = 0; i < m.length; i++) {
       row.push(m[i][j]);
     }
@@ -97,7 +97,7 @@ export const transpose = (m: number[][]): number[][] => {
  * @returns a matrix with all zeros except along the diagonal are ones
  */
 export const eye = (len: number): number[][] => {
-  let res: number[][] = zeros([len, len]) as number[][];
+  const res: number[][] = zeros([len, len]) as number[][];
   for (let i = 0; i < len; i++) {
     res[i][i] = 1;
   }
@@ -116,6 +116,7 @@ const rowReduce = (m: number[][]) => {
 
   for (let i = 0; i < m.length; i++) {
     let pivot = -1;
+    // eslint-disable-next-line no-empty
     while (++pivot < m[i].length && m[i][pivot] === 0) {}
     if (pivot === m[i].length) break;
     m[i] = scalarMul(m[i], 1 / m[i][pivot]) as number[];
@@ -183,7 +184,7 @@ export const invert = (m: number[][]): number[][] => {
   }
 
   const i = eye(m.length);
-  let aug = m.map((r, ind) => r.concat(i[ind]));
+  const aug = m.map((r, ind) => r.concat(i[ind]));
   rowReduce(aug);
   for (let i = 0; i < m.length; i++) {
     for (let j = 0; j < m[i].length; j++) {

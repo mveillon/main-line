@@ -19,11 +19,16 @@ import { ndMap } from "./ndMap";
  * @param atol the absolute tolerance. Should be non-zero when x and y have elements that are both zero
  * @returns an ndArray of which values of x and y are close
  */
- export const isClose = (x: numArray, y: numArray, rtol: number = 1e-5, atol: number = 1e-8): boolArray => {
+export const isClose = (
+  x: numArray, 
+  y: numArray, 
+  rtol = 1e-5, 
+  atol = 1e-8
+): boolArray => {
   [x, y] = broadcast(x, y);
 
   if (Array.isArray(x)) {
-    let res: boolArray = [];
+    const res: boolArray = [];
     for (let i = 0; i < x.length; i++) {
       res.push(isClose(x[i], (y as number[])[i], rtol, atol));
     }
@@ -48,7 +53,12 @@ import { ndMap } from "./ndMap";
  * @param atol the absolute tolerance. Should be non-zero when x and y have elements that are both zero
  * @returns whether every element of x is close to every element of y
  */
- export const allClose = (x: numArray, y: numArray, rtol: number = 1e-5, atol: number = 1e-8): boolean => {
+export const allClose = (
+  x: numArray, 
+  y: numArray, 
+  rtol = 1e-5, 
+  atol = 1e-8
+): boolean => {
   return all(isClose(x, y, rtol, atol));
 }
 
@@ -60,7 +70,7 @@ import { ndMap } from "./ndMap";
  * @returns an ndArray of booleans corresponding to the result
  * of comp on each element of a and b
  */
- const arrayComp = <T>(
+const arrayComp = <T>(
   a: ndArray<T>, 
   b: ndArray<T>, 
   comp: (x: T, y: T) => boolean
@@ -68,7 +78,7 @@ import { ndMap } from "./ndMap";
   [a, b] = broadcast(a, b);
 
   if (Array.isArray(a)) {
-    let res: boolArray = [];
+    const res: boolArray = [];
     for (let i = 0; i < a.length; i++) {
       res.push(arrayComp(a[i], (b as T[])[i], comp));
     }
@@ -109,7 +119,7 @@ export const arrEqual = <T>(a: ndArray<T>, b: ndArray<T>): boolArray => {
  * @returns an array of booleans, each corresponding to whether the 
  * element in the same position of a is less than that of b
  */
- export const arrLT = <T>(a: ndArray<T>, b: ndArray<T>): boolArray => {
+export const arrLT = <T>(a: ndArray<T>, b: ndArray<T>): boolArray => {
   return arrayComp(a, b, (x, y) => x < y);
 }
 
@@ -127,7 +137,7 @@ export const arrEqual = <T>(a: ndArray<T>, b: ndArray<T>): boolArray => {
  * @returns an array of booleans, each corresponding to whether the 
  * element in the same position of a is less than or equal to that of b
  */
- export const arrLTEq = <T>(a: ndArray<T>, b: ndArray<T>): boolArray => {
+export const arrLTEq = <T>(a: ndArray<T>, b: ndArray<T>): boolArray => {
   return arrayComp(a, b, (x, y) => x <= y);
 }
 
@@ -145,7 +155,7 @@ export const arrEqual = <T>(a: ndArray<T>, b: ndArray<T>): boolArray => {
  * @returns an array of booleans, each corresponding to whether the 
  * element in the same position of a is greater than that of b
  */
- export const arrGT = <T>(a: ndArray<T>, b: ndArray<T>): boolArray => {
+export const arrGT = <T>(a: ndArray<T>, b: ndArray<T>): boolArray => {
   return arrayComp(a, b, (x, y) => x > y);
 }
 
@@ -163,7 +173,7 @@ export const arrEqual = <T>(a: ndArray<T>, b: ndArray<T>): boolArray => {
  * @returns an array of booleans, each corresponding to whether the 
  * element in the same position of a is greater than that of b
  */
- export const arrGTEq = <T>(a: ndArray<T>, b: ndArray<T>): boolArray => {
+export const arrGTEq = <T>(a: ndArray<T>, b: ndArray<T>): boolArray => {
   return arrayComp(a, b, (x, y) => x >= y);
 }
 
@@ -182,7 +192,7 @@ export const arrEqual = <T>(a: ndArray<T>, b: ndArray<T>): boolArray => {
  * either the element in the same position of a is true or that 
  * of b is true
  */
- export const arrOr = (a: boolArray, b: boolArray): boolArray => {
+export const arrOr = (a: boolArray, b: boolArray): boolArray => {
   return arrayComp(a, b, (x, y) => x || y);
 }
 
@@ -201,7 +211,7 @@ export const arrEqual = <T>(a: ndArray<T>, b: ndArray<T>): boolArray => {
  * both the element in the same position of a is true and that
  * of b is true
  */
- export const arrAnd = (a: boolArray, b: boolArray): boolArray => {
+export const arrAnd = (a: boolArray, b: boolArray): boolArray => {
   return arrayComp(a, b, (x, y) => x && y);
 }
 

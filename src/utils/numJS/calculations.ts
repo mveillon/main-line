@@ -14,7 +14,7 @@ import { colAverage, addArrays, scalarMul } from "./arithmetic";
  * @param y the second vector
  * @returns the dot product
  */
- export const dot = (x: number[], y: number[]): number => {
+export const dot = (x: number[], y: number[]): number => {
   let res = 0;
   for (let i = 0; i < Math.min(x.length, y.length); i++) {
     res += x[i] * y[i];
@@ -45,7 +45,7 @@ export const variance = (x: numArray): number => {
  * @param x the number to reduce
  * @returns `1 / (1 + Math.exp(-x))`
  */
- export const sigmoid = (x: number): number => {
+export const sigmoid = (x: number): number => {
   return 1 / (1 + Math.exp(-x));
 }
 
@@ -61,7 +61,7 @@ export const colVariance = (x: number[][]): number[] => {
   const avgs = colAverage(x);
   let sums: number[] = zeros([avgs.length]) as number[];
   for (const row of x) {
-    let diffs: number[] = [];
+    const diffs: number[] = [];
     for (let i = 0; i < row.length; i++) {
       diffs.push(Math.pow(row[i] - avgs[i], 2));
     }

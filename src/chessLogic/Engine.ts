@@ -37,6 +37,11 @@ export class Engine {
     this._status = ENGINE_STATUS.IDLE
   }
 
+  /**
+   * Sends the messages that need to be sent to the UCI whenever it is
+   * initialized
+   * @param uci the UCI to send the messages to
+   */
   protected _initialMessages = (uci: UCI) => {
     uci.postMessage('uci')
     uci.postMessage(`setoption name multipv value ${this.numMoves}`)
@@ -48,35 +53,32 @@ export class Engine {
    */
   protected async _loadEngine(): Promise<UCI> {
     let getSF: () => Promise<UCI>
-    if (process.env.NODE_ENV === 'test') {
-      // testing
+    if (
+      !('NODE_ENV' in process.env) ||
+      process.env.NODE_ENV === 'test'  
+    ) {
       // @ts-ignore
-      const Stockfish = await import("../../public/stockfish.wasm")
-      getSF = Stockfish.default
-    } else if (typeof process.env.NODE_ENV === 'undefined') {
-      // gen-puzzles
-      // @ts-ignore
-      const Stockfish = await import("../../../public/stockfish.wasm/stockfish")
-      getSF = Stockfish.default
+      // eslint-disable-next-line no-global-assign
+      fetch = undefined
+      getSF = (await import("../stockfish.wasm")).default
     } else {
-      // browser
       // @ts-ignore
       getSF = window.Stockfish
     }
 
-    return getSF().then((sf: UCI) => {
+    return getSF().then((sf) => {
       this._initialMessages(sf)
       return sf
     })
   }
 
   /**
-   * Waits for the engine to say its ready for the next command
+   * Waits for the engine to say it's ready for the next command
    */
   protected async _waitForReady() {
     const deadInd = this._dead.push(false)
 
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, _reject) => {
       const cleanup = () => {
         this._uci?.removeMessageListener(listener)
         clearInterval(interval)
@@ -180,7 +182,7 @@ export class Engine {
   async stop() {
     if (this._status === ENGINE_STATUS.CALCULATING) {
       this._status = ENGINE_STATUS.STOPPING
-      return new Promise<void>((resolve, reject) => {
+      return new Promise<void>((resolve, _reject) => {
         const listener = (message: string) => {
           if (message.includes('bestmove')) {
             this._uci?.removeMessageListener(listener)

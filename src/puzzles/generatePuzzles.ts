@@ -28,9 +28,9 @@ const generatePuzzles = async (
   outFile: string, 
   depth: number,
   player: COLOR,
-  movesDeep: number = 10
+  movesDeep = 10
 ) => {
-  const puzzles: { [index: string]: {} } = {}
+  const puzzles: { [index: string]: Record<string, never> } = {}
 
   const sf = new Engine(depth, 5)
   try {
@@ -40,7 +40,7 @@ const generatePuzzles = async (
       const playRandomMove = async () => {
         const bestMoves = await sf.getBestMoves(toFEN(g))
   
-        let scores = bestMoves.map(m => m.score)
+        const scores = bestMoves.map(m => m.score)
         const smallest = Math.min(...scores)
         const adj = smallest < 0 ? smallest : 0
         scores[0] -= adj
@@ -103,7 +103,7 @@ const analyzeLines = async (path: string, depth: number) => {
               line: string[]
             }
           } = {}
-          let bestMove: string = ''
+          let bestMove = ''
 
           for (const piece of allPieces) {
             const startingCoords = piece.coords
@@ -169,8 +169,8 @@ const timeAsync = async (func: () => Promise<void>) => {
   const hours = (timeTaken / 3.6e6).toLocaleString(
     'en-us', 
     {
-        minimumFractionDigits: 3,
-        maximumFractionDigits: 3
+      minimumFractionDigits: 3,
+      maximumFractionDigits: 3
     }
   )
   console.log(`Completed after ${hours} hours\n`)

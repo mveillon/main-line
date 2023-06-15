@@ -3,8 +3,8 @@ import { Piece, PieceT } from "./Piece";
 import Rook from "./Rook";
 
 class King extends Piece {
-  readonly blackEmoji: string = '♔'
-  readonly whiteEmoji: string = '♚'
+  readonly blackEmoji = '♔'
+  readonly whiteEmoji = '♚'
   readonly type: PieceT = King
 
   legalMovesNoChecks(): Set<string> {

@@ -1,5 +1,5 @@
 import { Board } from "../../chessLogic/Board";
-import { setUpBoard } from "./parser.test";
+import { setUpBoard } from "./testUtilts"
 
 test('scholars mate 1', () => {
   const pgn = `

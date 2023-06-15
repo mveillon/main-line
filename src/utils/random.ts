@@ -6,7 +6,7 @@ import { copyArr, arrGTEq, all, numArray, reshape } from "./numJS";
  * @param max the upper bound. If not provided, the number will be between 0 and min
  * @returns a random integer in the provided range
  */
- export const randInt = (min: number, max?: number): number => {
+export const randInt = (min: number, max?: number): number => {
   if (typeof max === 'undefined') {
     max = min;
     min = 0;
@@ -95,7 +95,7 @@ export const choices = <T>(arr: T[], n: number): T[] => {
  */
 export const randArr = (shape: number[], min: number, max?: number): numArray => {
   const size = shape.reduce((a, b) => a * b, 1);
-  let flat: number[] = [];
+  const flat: number[] = [];
   for (let i = 0; i < size; i++) {
     flat.push(randInt(min, max));
   }
