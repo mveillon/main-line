@@ -6,7 +6,7 @@ import "./styling/global.css"
 import "./styling/AnalysisBoard.css"
 import { PieceT } from "../chessLogic/pieces/Piece"
 import { useLocation } from "react-router-dom"
-import { Engine, MoveScore } from "../chessLogic/Engine"
+import { MoveScore } from "../chessLogic/Engine"
 import { uciLineToPGN } from "../chessLogic/parser"
 import loadingGif from "../assets/loading.gif"
 import COLOR from "../chessLogic/Color"
@@ -19,7 +19,7 @@ import { WORKER_STATUS, useWorker } from "@koale/useworker"
  * @returns the best moves
  */
 const getMoves = async (fen: string): Promise<MoveScore[]> => {
-  const engine = new Engine(20, 3)
+  const engine = new (await import("../chessLogic/Engine")).Engine(20, 3)
   const moves = await engine.getBestMoves(fen)
   engine.quit()
   return moves
@@ -45,25 +45,26 @@ function AnalysisBoard() {
   ] = useWorker(getMoves)
 
   useEffect(() => {
-    findLines()
+    findLines(game)
 
     return () => {
       workerKill()
     }
   }, [])
 
-  const findLines = async () => {
-    if (workerStatus !== WORKER_STATUS.RUNNING) {
-      setLoading(true)
-      setLines(await getMovesWorker(toFEN(game)))
-      setLoading(false)
+  const findLines = async (currentGame: Game) => {
+    if (workerStatus === WORKER_STATUS.RUNNING) {
+      workerKill()
     }
+    setLoading(true)
+    setLines(await getMovesWorker(toFEN(currentGame)))
+    setLoading(false)
   }
 
   const playMove = (from: string, to: string, promoType?: PieceT) => {
     game.playMove(from, to, promoType)
     setGame(Object.assign(new Game(), game))
-    findLines()
+    findLines(game)
   }
 
   return (

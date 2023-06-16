@@ -141,19 +141,15 @@ const BoardComponent = (
                       <td
                         key={j} 
                         className={className}
+                        onClick={getOnClick(i, j)}
                       >
-                        <button 
-                          onClick={getOnClick(i, j)}
-                          className="button-square"
-                        >
-                          {
-                            square !== null &&
-                            <PieceComponent 
-                              piece={square} 
-                              selected={selected}
-                            />
-                          }
-                        </button>
+                        {
+                          square !== null &&
+                          <PieceComponent 
+                            piece={square} 
+                            selected={selected}
+                          />
+                        }
                       </td>
                     )
                   })}

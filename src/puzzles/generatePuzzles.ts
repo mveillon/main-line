@@ -11,6 +11,15 @@ import PuzzleSet from "./PuzzleSet"
 import Pawn from "../chessLogic/pieces/Pawn"
 import { PuzzleInfo, PGNs } from "./PGNs"
 
+// TODO : the player's color should always play the best move, and the opponent
+// should have a greater range of moves they can play. Each opening should have
+// a seperate set of puzzles for each sideline.
+
+// TODO : add traps. We can define a trap using Lichess' game database. A trap is
+// any move that is played reasonably often (say 5%) among intermediate players 
+// (maybe 1500-2000 on Lichess) that blunders a decent amount of advantage (maybe 3+
+// points)
+
 /**
  * Generates `numPuzzles` opening puzzles from the `startPGN` and writes the FENs
  * of each to `outFile`

@@ -60,7 +60,7 @@ export class Engine {
       // @ts-ignore
       // eslint-disable-next-line no-global-assign
       fetch = undefined
-      getSF = (await import("../stockfish.wasm")).default
+      getSF = require("../stockfish.wasm")
     } else {
       // @ts-ignore
       getSF = window.Stockfish
