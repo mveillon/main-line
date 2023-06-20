@@ -1,4 +1,4 @@
-import React, { useMemo } from "react"
+import React from "react"
 import { useEffect, useState } from "react"
 import BoardComponent from "./BoardComponent"
 import Game from "../chessLogic/Game"
@@ -26,20 +26,28 @@ function AnalysisBoard() {
   const [game, setGame] = useState(new Game(undefined, fen))
   const [lines, setLines] = useState<MoveScore[]>()
   const [loading, setLoading] = useState(false)
-  const engine = useMemo(() => (new Engine(20, 3)), [])
+  const [cancelled, setCancelled] = useState<boolean[]>([])
 
   useEffect(() => {
     findLines(game)
-
-    return () => {
-      engine.quit()
-    }
   }, [])
 
   const findLines = async (currentGame: Game) => {
     setLoading(true)
-    setLines(await engine.getBestMoves(toFEN(currentGame)))
-    setLoading(false)
+
+    const cancelInd = cancelled.push(false)
+    if (cancelled.length > 1) {
+      cancelled[cancelInd - 1] = true
+    }
+    setCancelled(cancelled)
+
+    const engine = new Engine(20, 3)
+    const moves = await engine.getBestMoves(toFEN(currentGame))
+    if (!cancelled[cancelInd]) {
+      setLines(moves)
+      engine.quit()
+      setLoading(false)
+    }
   }
 
   const playMove = (from: string, to: string, promoType?: PieceT) => {
