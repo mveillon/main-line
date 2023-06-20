@@ -12,9 +12,8 @@ function Home () {
   return (
     <div className='home'>
       <h1>Main Line</h1>
-      <OpeningSelector name='London' />
-      <OpeningSelector name='Caro-Kann' />
-      <br></br>
+      <Link to="/london">London</Link>
+      <Link to="/caro-kann">Caro-Kann</Link>
       <Link to="/analysis" state={{
         fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
         player: COLOR.WHITE

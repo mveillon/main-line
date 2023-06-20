@@ -11,10 +11,6 @@ import PuzzleSet from "./PuzzleSet"
 import Pawn from "../chessLogic/pieces/Pawn"
 import { PuzzleInfo, PGNs } from "./PGNs"
 
-// TODO : the player's color should always play the best move, and the opponent
-// should have a greater range of moves they can play. Each opening should have
-// a seperate set of puzzles for each sideline.
-
 // TODO : add traps. We can define a trap using Lichess' game database. A trap is
 // any move that is played reasonably often (say 5%) among intermediate players 
 // (maybe 1500-2000 on Lichess) that blunders a decent amount of advantage (maybe 3+
@@ -41,25 +37,29 @@ const generatePuzzles = async (
 ) => {
   const puzzles: { [index: string]: Record<string, never> } = {}
 
-  const sf = new Engine(depth, 5)
+  const engine = new Engine(depth, 5)
   try {
     for (let i = 0; i < numPuzzles; i++) {
       const g = new Game(startPGN)
-  
+
       const playRandomMove = async () => {
-        const bestMoves = await sf.getBestMoves(toFEN(g))
-  
-        const scores = bestMoves.map(m => m.score)
-        const smallest = Math.min(...scores)
-        const adj = smallest < 0 ? smallest : 0
-        scores[0] -= adj
-        for (let k = 1; k < scores.length; k++) {
-          scores[k] += scores[k - 1] - adj
+        const bestMoves = await engine.getBestMoves(toFEN(g))
+        let move: string
+        if (g.turn === player) {
+          move = bestMoves[0].move
+        } else {
+          const scores = bestMoves.map(m => m.score)
+          const smallest = Math.min(...scores)
+          const adj = smallest < 0 ? smallest : 0
+          scores[0] -= adj
+          for (let k = 1; k < scores.length; k++) {
+            scores[k] += scores[k - 1] - adj
+          }
+    
+          const toPlay = choice(arange(scores.length), scores)
+          move = bestMoves[toPlay].move
         }
-  
-        const toPlay = choice(arange(scores.length), scores)
-        const move = bestMoves[toPlay]
-        g.playMove(...uciToMove(move.move))
+        g.playMove(...uciToMove(move))
       }
       
       const depth = randInt(1, movesDeep)
@@ -74,7 +74,7 @@ const generatePuzzles = async (
       console.log(`Puzzle No. ${Object.keys(puzzles).length} found!`)
     }
   } finally {
-    sf.quit()
+    engine.quit()
     writeFileSync(
       outFile, 
       JSON.stringify(puzzles), 
@@ -109,7 +109,8 @@ const analyzeLines = async (path: string, depth: number) => {
           const mapping: {
             [index: string]: {
               score: number,
-              line: string[]
+              line: string[],
+              mate?: number
             }
           } = {}
           let bestMove = ''
@@ -129,7 +130,8 @@ const analyzeLines = async (path: string, depth: number) => {
                 const continuation = (await sf.getBestMoves(toFEN(g)))[0]
                 mapping[uci] = {
                   score: continuation.score,
-                  line: [continuation.move, ...continuation.line.slice(0, 5)]
+                  line: [continuation.move, ...continuation.line.slice(0, 5)],
+                  mate: continuation.mate
                 }
                 fromFEN(puzzle, g)
                 piece.coords = startingCoords
@@ -196,11 +198,11 @@ const genPuzzles = async (settings: PuzzleInfo) => {
     const cStr = c === COLOR.WHITE ? 'white' : 'black'
     console.log(`Generating puzzles for the ${settings.openingName} for ${cStr}...`)
 
-    const rootDir = `src/puzzles/${settings.openingName}`
+    const rootDir = `src/puzzles/${settings.openingName}/${settings.variantName}`
     const path = `${rootDir}/${cStr}.json`
 
     if (!existsSync(rootDir)) {
-      mkdirSync(rootDir)
+      mkdirSync(rootDir, { recursive: true })
     }
 
     await timeAsync(() => (
@@ -228,8 +230,8 @@ const genPuzzles = async (settings: PuzzleInfo) => {
  */
 const allPuzzles = async () => {
   const pgns = PGNs()
-  for (const pgn in pgns) {
-    await genPuzzles(pgns[pgn])
+  for (const pgn of pgns) {
+    await genPuzzles(pgn)
   }
 }
 

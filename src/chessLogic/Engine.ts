@@ -11,6 +11,7 @@ export interface MoveScore {
   move: string
   score: number
   line: string[]
+  mate?: number
 }
 
 export class Engine {
@@ -137,13 +138,24 @@ export class Engine {
           const moveInd = words.indexOf('pv') + 1
           if (!includedMoves.has(words[moveInd])) {
             includedMoves.add(words[moveInd])
+            const scoreInd = words.indexOf('cp') + 1
+            const score = words[scoreInd]
+            let parsedScore: number
+            let mate: number | undefined = undefined
+            if (score.includes('mate')) {
+              parsedScore = Number.MAX_SAFE_INTEGER
+              mate = parseInt(words[scoreInd + 1])
+            } else {
+              parsedScore = parseInt(score)
+            }
             messages.push({
               move: words[moveInd],
-              score: parseInt(words[words.indexOf('cp') + 1]),
-              line: words.slice(moveInd + 1)
+              score: parsedScore,
+              line: words.slice(moveInd + 1),
+              mate: mate
             })
 
-            if (isNaN(messages[messages.length - 1].score)) {
+            if (isNaN(parsedScore)) {
               reject(`NaN score in "${message}"`)
             }
           }
