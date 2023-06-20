@@ -63,7 +63,8 @@ export class Engine {
       getSF = require("../stockfish.wasm")
     } else {
       // @ts-ignore
-      getSF = window.Stockfish
+      // getSF = window.Stockfish
+      getSF = require("../stockfish.wasm")
     }
 
     return getSF().then((sf) => {

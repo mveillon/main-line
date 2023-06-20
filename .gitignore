@@ -153,5 +153,4 @@ yarn-debug.log*
 yarn-error.log*
 
 /tsOut
-/src/stockfish.wasm
-/public/stockfish.wasm
+stockfish.wasm

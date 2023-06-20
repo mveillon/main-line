@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useMemo } from "react"
 import { useEffect, useState } from "react"
 import BoardComponent from "./BoardComponent"
 import Game from "../chessLogic/Game"
@@ -11,19 +11,6 @@ import { uciLineToPGN } from "../chessLogic/parser"
 import loadingGif from "../assets/loading.gif"
 import COLOR from "../chessLogic/Color"
 import { toFEN } from "../chessLogic/fenPGN"
-import { WORKER_STATUS, useWorker } from "@koale/useworker"
-
-/**
- * Finds the best moves in the given position
- * @param fen the current board position, as a FEN
- * @returns the best moves
- */
-const getMoves = async (fen: string): Promise<MoveScore[]> => {
-  const engine = new (await import("../chessLogic/Engine")).Engine(20, 3)
-  const moves = await engine.getBestMoves(fen)
-  engine.quit()
-  return moves
-}
 
 /**
  * A Chess.com-like analysis board for seeing the engine evaluation of
@@ -39,26 +26,28 @@ function AnalysisBoard() {
   const [game, setGame] = useState(new Game(undefined, fen))
   const [lines, setLines] = useState<MoveScore[]>()
   const [loading, setLoading] = useState(false)
-  const [
-    getMovesWorker, 
-    { status: workerStatus, kill: workerKill }
-  ] = useWorker(getMoves)
+  const movesWorker = useMemo(() => (
+    new Worker(
+      new URL("../chessLogic/getBestMoves.worker.js", import.meta.url),
+      { type: 'module' }
+    )  
+  ), [])
 
   useEffect(() => {
     findLines(game)
 
     return () => {
-      workerKill()
+      movesWorker.terminate()
     }
   }, [])
 
   const findLines = async (currentGame: Game) => {
-    if (workerStatus === WORKER_STATUS.RUNNING) {
-      workerKill()
-    }
     setLoading(true)
-    setLines(await getMovesWorker(toFEN(currentGame)))
-    setLoading(false)
+    movesWorker.postMessage(toFEN(currentGame))
+    movesWorker.onmessage = (e: MessageEvent<MoveScore[]>) => {
+      setLines(e.data)
+      setLoading(false)
+    }
   }
 
   const playMove = (from: string, to: string, promoType?: PieceT) => {
