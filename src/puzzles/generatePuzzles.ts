@@ -1,14 +1,12 @@
 import { Engine } from "../chessLogic/Engine"
 import Game from "../chessLogic/Game"
 import { randInt, choice } from "../utils/random"
-import { fromFEN, toFEN } from "../chessLogic/fenPGN"
+import { toFEN } from "../chessLogic/fenPGN"
 import { arange } from "../utils/numJS"
 import { uciToMove } from "../chessLogic/parser"
 import { writeFileSync, readFile, existsSync, mkdirSync } from "fs"
-import { Piece } from "../chessLogic/pieces/Piece"
 import COLOR from "../chessLogic/Color"
 import PuzzleSet from "./PuzzleSet"
-import Pawn from "../chessLogic/pieces/Pawn"
 import { PuzzleInfo, PGNs } from "./PGNs"
 
 // TODO : add traps. We can define a trap using Lichess' game database. A trap is
@@ -89,7 +87,7 @@ const generatePuzzles = async (
  * @param depth the depth to run the engine at
  */
 const analyzeLines = async (path: string, depth: number) => {
-  const sf = new Engine(depth, 1)
+  const engine = new Engine(depth, 100) // just get all the moves
 
   return new Promise<void>((resolve, reject) => {
     readFile(path, 'utf-8', async (err, data) => {
@@ -104,8 +102,6 @@ const analyzeLines = async (path: string, depth: number) => {
       try {
         for (const puzzle in puzzles) {
           const g = new Game(undefined, puzzle)
-    
-          const allPieces = g.board.findPieces(Piece, g.turn)
           const mapping: {
             [index: string]: {
               score: number,
@@ -113,48 +109,23 @@ const analyzeLines = async (path: string, depth: number) => {
               mate?: number
             }
           } = {}
-          let bestMove = ''
-
-          for (const piece of allPieces) {
-            const startingCoords = piece.coords
-            for (const move of piece.legalMoves()) {
-              let suffixes = ['']
-              if (piece instanceof Pawn && (move[1] === '8' || move[1] === '1')) {
-                suffixes = ['b', 'n', 'q', 'r']
-              }
-
-              for (const s of suffixes) {
-                const uci = piece.coords + move + s
-                g.playMove(...uciToMove(uci))
-
-                const continuation = (await sf.getBestMoves(toFEN(g)))[0]
-                mapping[uci] = {
-                  score: continuation.score,
-                  line: [continuation.move, ...continuation.line.slice(0, 5)],
-                  mate: continuation.mate
-                }
-                fromFEN(puzzle, g)
-                piece.coords = startingCoords
-      
-                if (
-                  bestMove === '' || 
-                  continuation.score < mapping[bestMove].score
-                ) {
-                  bestMove = uci
-                }
-              }              
+          const moves = await engine.getBestMoves(toFEN(g))
+          for (const { move, score, line, mate } of moves) {
+            mapping[move] = {
+              score: score,
+              line: line,
+              mate: mate
             }
           }
-    
           res[puzzle] = {
             moves: mapping,
-            bestMove: bestMove
+            bestMove: moves[0].move
           }
           console.log(`Puzzle No. ${Object.keys(res).length} analyzed`)
         }
     
       } finally {
-        sf.quit()
+        engine.quit()
         writeFileSync(
           path,
           JSON.stringify(res)
@@ -196,7 +167,10 @@ const timeAsync = async (func: () => Promise<void>) => {
 const genPuzzles = async (settings: PuzzleInfo) => {
   for (const c of [COLOR.WHITE, COLOR.BLACK]) {
     const cStr = c === COLOR.WHITE ? 'white' : 'black'
-    console.log(`Generating puzzles for the ${settings.openingName} for ${cStr}...`)
+    console.log(
+      `Generating puzzles for the ${settings.variantName} ` +
+      `${settings.openingName} for ${cStr}...`
+    )
 
     const rootDir = `src/puzzles/${settings.openingName}/${settings.variantName}`
     const path = `${rootDir}/${cStr}.json`
@@ -228,11 +202,13 @@ const genPuzzles = async (settings: PuzzleInfo) => {
 /**
  * Generates and analyzes all puzzles in `PGNs.ts`
  */
-const allPuzzles = async () => {
-  const pgns = PGNs()
-  for (const pgn of pgns) {
-    await genPuzzles(pgn)
-  }
+const allPuzzles = () => {
+  timeAsync(async () => {
+    const pgns = PGNs()
+    for (const pgn of pgns) {
+      await genPuzzles(pgn)
+    }
+  })
 }
 
 allPuzzles()

@@ -138,15 +138,15 @@ export class Engine {
           const moveInd = words.indexOf('pv') + 1
           if (!includedMoves.has(words[moveInd])) {
             includedMoves.add(words[moveInd])
-            const scoreInd = words.indexOf('cp') + 1
-            const score = words[scoreInd]
+            const scoreInd = words.indexOf('score')
             let parsedScore: number
             let mate: number | undefined = undefined
-            if (score.includes('mate')) {
-              parsedScore = Number.MAX_SAFE_INTEGER
-              mate = parseInt(words[scoreInd + 1])
+            if (words[scoreInd + 1] === 'cp') {
+              parsedScore = parseInt(words[scoreInd + 2])
             } else {
-              parsedScore = parseInt(score)
+              // mate
+              parsedScore = Number.MAX_SAFE_INTEGER
+              mate = parseInt(words[scoreInd + 2])
             }
             messages.push({
               move: words[moveInd],

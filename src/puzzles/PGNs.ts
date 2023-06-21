@@ -22,44 +22,44 @@ export const PGNs = (): PuzzleInfo[] => {
   const depth = 20
   const numPuzzles = 20
   return [
+    // {
+    //   openingName: 'Caro-Kann',
+    //   variantName: 'Advance', 
+    //   depth: depth,
+    //   numPuzzles: numPuzzles,
+    //   pgn: '1. e4 c6 2. d4 d5 3. e5'
+    // },
+
     {
       openingName: 'Caro-Kann',
-      variantName: 'Advance', 
+      variantName: 'Exchange',
       depth: depth,
       numPuzzles: numPuzzles,
-      pgn: '1. e4 c6 2. d4 d5 3. e5'
+      pgn: '1. e4 c6 2. d4 d5 3. exd5 cxd5'
     },
 
-    // {
-    //   openingName: 'Caro-Kann',
-    //   variantName: 'Exchange',
-    //   depth: depth,
-    //   numPuzzles: numPuzzles,
-    //   pgn: '1. e4 c6 2. d4 d5 3. exd5 cxd5'
-    // },
+    {
+      openingName: 'Caro-Kann',
+      variantName: 'Ignore',
+      depth: depth,
+      numPuzzles: numPuzzles,
+      pgn: '1. e4 c6 2. d4 d5 3. Nc3'
+    },
 
-    // {
-    //   openingName: 'Caro-Kann',
-    //   variantName: 'Ignore',
-    //   depth: depth,
-    //   numPuzzles: numPuzzles,
-    //   pgn: '1. e4 c6 2. d4 d5 3. Nc3'
-    // },
+    {
+      openingName: 'London',
+      variantName: 'Standard',
+      depth: depth,
+      numPuzzles: numPuzzles,
+      pgn: '1. d4 d5 2. Bf4'
+    },
 
-    // {
-    //   openingName: 'London',
-    //   variantName: 'Standard',
-    //   depth: depth,
-    //   numPuzzles: numPuzzles,
-    //   pgn: '1. d4 d5 2. Bf4'
-    // },
-
-    // {
-    //   openingName: 'London',
-    //   variantName: 'c4',
-    //   depth: depth,
-    //   numPuzzles: numPuzzles,
-    //   pgn: '1.d4 d5 2. Bf4 Nc6 3. c4'
-    // }
+    {
+      openingName: 'London',
+      variantName: 'c4',
+      depth: depth,
+      numPuzzles: numPuzzles,
+      pgn: '1.d4 d5 2. Bf4 Nc6 3. c4'
+    }
   ]
 }

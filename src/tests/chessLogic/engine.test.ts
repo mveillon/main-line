@@ -125,3 +125,24 @@ test('status', async () => {
     expect(e.status).toBe(ENGINE_STATUS.STOPPING)
   })
 })
+
+test('mate', async () => {
+  const engine = new Engine(10, 1)
+  const m1 = 'rnbqkbnr/ppppp2p/5p2/6p1/4P3/2N5/PPPP1PPP/R1BQKBNR w KQkq g6 0 3'
+  let moves = await engine.getBestMoves(m1)
+  expect(moves.length).toBe(1)
+  expect(moves[0].mate).toBe(1)
+  expect(moves[0].move).toBe('d1h5')
+
+  const m2 = 'r1bq2r1/b4pk1/p1pp1p2/1p2pP2/1P2P1PB/3P4/1PPQ2P1/R3K2R w - - 0 0'
+  moves = await engine.getBestMoves(m2)
+  expect(moves.length).toBe(1)
+  expect(moves[0].mate).toBe(2)
+  expect(moves[0].move).toBe('d2h6')
+  expect(moves[0].line).toEqual([
+    'g7h6',
+    'h4f6'
+  ])
+
+  engine.quit()
+})
