@@ -154,3 +154,4 @@ yarn-error.log*
 
 /tsOut
 stockfish.wasm
+src/puzzles/games/**/*.txt

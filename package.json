@@ -13,6 +13,7 @@
     "@types/react-dom": "^18.2.1",
     "craco": "^0.0.3",
     "fs": "^0.0.1-security",
+    "node-fetch": "^2.6.11",
     "path": "^0.12.7",
     "perf_hooks": "^0.0.1",
     "react": "^18.2.0",

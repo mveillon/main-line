@@ -8,6 +8,7 @@ import { writeFileSync, readFile, existsSync, mkdirSync } from "fs"
 import COLOR from "../chessLogic/Color"
 import PuzzleSet from "./PuzzleSet"
 import { PuzzleInfo, PGNs } from "./PGNs"
+const fetch = require("node-fetch")
 
 // TODO : add traps. We can define a trap using Lichess' game database. A trap is
 // any move that is played reasonably often (say 5%) among intermediate players 
@@ -60,8 +61,8 @@ const generatePuzzles = async (
         g.playMove(...uciToMove(move))
       }
       
-      const depth = randInt(1, movesDeep)
-      for (let j = 0; j < depth; j++) {
+      const numMoves = randInt(1, movesDeep)
+      for (let j = 0; j < numMoves; j++) {
         await playRandomMove()
       }
   
@@ -138,6 +139,26 @@ const analyzeLines = async (path: string, depth: number) => {
 }
 
 /**
+ * Adds common traps in the opening
+ * @param path what file to add the traps to
+ * @param pgn the starting position
+ */
+const addTraps = async (path: string, pgn: string) => {
+  const base = 'https://explorer.lichess.ovh/lichess?'
+  const params = [
+    `fen=${toFEN(new Game(pgn))}`.trim().replace(/ /g, '%20'),
+    'ratings=1400,1600,1800,2000',
+    'moves=30',
+    'topGames=0',
+    'recentGames=0'
+  ]
+  const url = base + params.join('&')
+  const response = await fetch(url)
+  const data = await response.json()
+  console.log(data)
+}
+
+/**
  * Runs an async function and prints how long it takes to complete.
  * For reference, `depth` = 30 and `numPuzzles` = 50 takes about 30 hours while
  * `depth` = 20 and `numPuzzles` = 20 takes about 30 minutes
@@ -195,6 +216,13 @@ const genPuzzles = async (settings: PuzzleInfo) => {
         settings.depth
       )
     ))
+
+    await timeAsync(() => (
+      addTraps(
+        path,
+        settings.pgn
+      )
+    ))
   }
   
 }
@@ -211,4 +239,8 @@ const allPuzzles = () => {
   })
 }
 
-allPuzzles()
+// allPuzzles()
+addTraps(
+  'src/puzzles/Caro-Kann/Advance/black.json',
+  '1. e4 c6 2. d4 d5 3. e5'
+)
