@@ -4,6 +4,8 @@ This is a web application designed to allow people to learn chess openings by do
 
 These puzzles differ from a puzzle you'd typically find in a book or on Chess.com/Lichess in a few ways. Firstly, there are created automatically using Stockfish. As such, there are generally no tactics or crazy checkmates. The puzzles are just about trying to get a better position and not blunder in the opening. Another difference is that most puzzles have many good moves. In the opening, there are typically a few main lines and many sidelines, and this application tries not to discourage any of them.
 
+Created by Michael Veillon.
+
 # Installation
 
 This app uses Stockfish.wasm from Lichess. To install the dependencies, you first need to download and install [enscripten](https://emscripten.org/docs/getting_started/downloads.html). The enscripten folder will be called `emsdk` and will include a file called `emsdk_env.sh`. You can put the enscripten folder anywhere on your computer, but anytime you compile Stockfish, you have to run `source <path to /emsdk/emsdk_env.sh>`. It resets when you open a new Terminal window, so be sure to rerun it when you need to. Once you've run that, clone [the Stockfish repo](https://github.com/lichess-org/stockfish.wasm) and put it in the `public` directory. `cd` into the `stockfish.wasm` directory and run `npm run-script prepare` to compile Stockfish. `cd` back into the `chess-openings` root directory and you'll need to copy the `stockfish.wasm` directory into `src`, using `cp -r ./public/stockfish.wasm ./src` for example. Lastly, run `npm i` and pray everything works. From there, you can run any of the scripts below from the root directory.
